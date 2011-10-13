@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+<jsp:directive.page import="au.org.intersect.sydma.webapp.domain.ResearchDataset"/>
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<spring:message code="label_home_index" htmlEscape="false" var="title" />
+	<spring:message code="application_name" htmlEscape="false"
+		var="app_name" />
+    <spring:message var="homeTitle" arguments="${app_name}" code="welcome_titlepane" text="?Welcome?"/>        
+	<h1 title="${homeTitle}">
+		${homeTitle}
+	</h1>
+
+	<div id="homeIndexDisplay">
+		<h4 id="ResearchGroupsTitle"><spring:message code="home.title.group" text="?Groups?"/></h4>
+		<h4 id="ProjectsTitle"><spring:message code="home.title.project" text="?Projects?"/></h4>
+		<h4 id="DatasetsTitle"><spring:message code="home.title.dataset" text="?Datasets?"/></h4>
+
+
+        <spring:message var="groupSelectTitle" code="home.select.group" text="?Select Group?"/>
+		<select size="10" id="Research_Groups" name="Research Groups" tabindex="10" title="${groupSelectTitle}">
+			<jsp:text> </jsp:text>
+		</select>
+        <spring:message var="projectSelectTitle" code="home.select.project" text="?Select Project?"/> 
+        <select size="10" id="Projects" name="Projects" tabindex="10" title="${projectSelectTitle}">
+			<jsp:text> </jsp:text>
+		</select> 
+        <spring:message var="datasetSelectTitle" code="home.select.dataset" text="?Select Dataset?"/>
+        <select size="10" id="Datasets" name="Datasets" tabindex="10" title="${datasetSelectTitle}">
+			<jsp:text> </jsp:text>
+		</select>
+
+	</div>
+	<div id="advertisedMessage" style="display: none;">
+			<span>This Dataset has been advertised in the </span>
+			<span><a target="_blank" href="http://services.ands.org.au/home/orca/rda/">RDA.</a></span>		
+	</div>
+	<div id="notYetAdvertisedMessage" style="display: none;">
+		    <span>Raise your research profile, increase your Google ranking and promote your research. </span>
+		    <span><a target="_blank" href="http://www.google.com">Find out how.</a></span>  	
+	</div>
+	<div id="readyForAdvertisingMessage" style="display: none;">
+		    <span>This Dataset has been marked as Ready for Advertising – Advertising to RDA has yet to be carried out by the Principal Investigator.</span>
+	</div>
+
+	<c:url var="getGroupsUrl" value="getGroups" />
+	<c:url var="getProjectsUrl" value="getProjectsForGroup/{ID}" />
+	<c:url var="getDatasetsUrl" value="getDatasetsForProject/{ID}" />
+
+	<c:url var="createProjectUrl" value="../researchproject/new/{ID}" />
+	<c:url var="createDatasetUrl" value="../researchdataset/new/{ID}" />
+	
+	<c:url var="editDatasetUrl" value="../researchdataset/edit/{ID}" />
+	<c:url var="editProjectUrl" value="../researchproject/edit/{ID}" />
+	<c:url var="editGroupUrl" value="../researchgroup/edit/{ID}" />
+    
+    <c:url var="publishDatasetUrl" value="../researchdataset/publish/{ID}" />
+    <c:url var="rejectAdvertiseDatasetUrl" value="../researchdataset/rejectAdvertising/{ID}" />
+    <c:url var="confirmUnadvertiseUrl" value="../researchdataset/unadvertise/{ID}" />
+    
+    <c:url var="browseDatasetUrl" value="../managedataset/browse/dataset/{ID}" />
+    
+    <c:url var="permissionsGroupUrl" value="../permission/index/add&#63;type&#61;group&amp;id&#61;{ID}"/>
+    <c:url var="viewPermissionsUrl" value="../permission/view/{ID}" />
+    
+    <spring:message var="editGroupLinkText" code="home.link.editGroup" text="?Edit Group?"/>
+    <spring:message var="createProjectLinkText" code="home.link.createProject" text="?Create Project?"/>
+    <spring:message var="editProjectLinkText" code="home.link.editProject" text="?Edit Project?"/>
+    <spring:message var="createDatasetLinkText" code="home.link.createDataset" text="?Create Dataset?"/>
+    <spring:message var="editDatasetLinkText" code="home.link.editDataset" text="?Edit Dataset?"/>
+    <spring:message var="markReadyLinkText" code="home.link.markAsReady" text="?Mark Ready?"/>
+    <spring:message var="permissionsGroupLinkText" code="permissions.group.linktext" text="?Assign permissions to other researchers for this group?"/>
+    <spring:message var="viewPermissionLinkText" code="permissions.view.linktext" text="?View permissions for this group?" />
+    <spring:message var="rejectAdvertiseLinkText" code="home.link.rejectAdvertising" text="?Reject advertising?"/>
+    <spring:message var="unadvertiseLinkText" code="home.link.unadvertise" text="?Un-advertise Dataset?"/>
+    
+    <spring:message var="browseDatasetLinkText" code="home.link.browseDataset" text="?Browse Dataset?"/>
+
+    <c:url var="createDatasetSchemaUrl" value="../dbschema/create" />
+    <spring:message var="createDatasetSchemaLinkText" code="home.link.createSchema" text="?Create Schema"/>
+
+
+    <c:url var="viewDatasetSchemaUrl" value="../dbschema/view" />
+    <spring:message var="viewDatasetSchemaLinkText" code="home.link.viewSchema" text="?View Schema"/>
+
+
+
+	<script type="text/javascript">
+		(function() {
+		
+		    
+			/*
+			 * contentData
+			 * sourceSelect
+			 * sideBar
+			 * getChildUrl
+			 * linkTemplates
+			 * childControl
+			 * 
+			 */
+
+			var advertisedMessage = jQuery("#advertisedMessage");
+			var notYetAdvertisedMessage = jQuery("#notYetAdvertisedMessage");
+			var readyForAdvertiseMessage = jQuery("#readyForAdvertisingMessage");
+			var removeAdvert = function()
+			{
+			    advertisedMessage.hide();
+			    notYetAdvertisedMessage.hide();
+			    readyForAdvertiseMessage.hide();
+			};
+			var datasetOnSelect = function(datasetData)
+			{
+			    if (datasetData.advertiseStatus == "N")
+			    {
+    		        notYetAdvertisedMessage.show();			 
+    		        readyForAdvertiseMessage.hide();
+    		        advertisedMessage.hide();
+			    } 
+			    else if (datasetData.advertiseStatus == "R")
+                {
+			        notYetAdvertisedMessage.hide();			 
+			        readyForAdvertiseMessage.show();
+			        advertisedMessage.hide();
+			    } 
+			    else 
+			    {
+				    notYetAdvertisedMessage.hide();			 
+				    readyForAdvertiseMessage.hide();
+				    advertisedMessage.show();
+                }
+			};
+			
+			var datasetOpt = {
+				"paramVar" : "d",
+				"parentParamVar" : "p",
+				"sourceSelect" : "#Datasets",
+				"sideBar" : "#datasetSidebar",
+				"getContentsUrl" : "${getDatasetsUrl}",
+				"onReset": removeAdvert,
+				"onNew": removeAdvert,
+				"onSelect" : datasetOnSelect, 	
+				"linkTemplates" : {
+					"editDataset" : {
+						"url" : Sydma.home.getRestUrlGenerator("${editDatasetUrl}"),
+						"linkText" : "${editDatasetLinkText}",
+						"ajaxView" : true
+					},
+					"publishDataset" : {
+					    "url" : Sydma.home.getRestUrlGenerator("${publishDatasetUrl}"),
+						"linkText" : "${markReadyLinkText}",
+						"beforeInsert" : Sydma.home.publishDatasetCheck,
+						"ajaxView" : false
+					},
+					"rejectAdvertisingDataset" : {
+					    "url" : Sydma.home.getRestUrlGenerator("${rejectAdvertiseDatasetUrl}"),
+						"linkText" : "${rejectAdvertiseLinkText}",
+						"beforeInsert" : Sydma.home.rejectAdvertisingDatasetCheck,
+						"ajaxView" : false
+					},
+					"unadvertiseDataset" : {
+					    "url" : Sydma.home.getRestUrlGenerator("${confirmUnadvertiseUrl}"),
+						"linkText" : "${unadvertiseLinkText}",
+						"ajaxView" : true
+					},
+					"browseDataset" :
+					{
+						"url" : Sydma.home.getRestUrlGenerator("${browseDatasetUrl}"),
+						"linkText" : "${browseDatasetLinkText}",
+						"requirePermission" : false,
+						"beforeInsert" : Sydma.home.notPhysicalCheck,
+						"ajaxView" : false
+					},
+					"createSchema" :
+					{
+						"url" : Sydma.home.getParamUrlGenerator("${createDatasetSchemaUrl}", "datasetId"),
+						"linkText" : "${createDatasetSchemaLinkText}",
+						"beforeInsert" : Sydma.home.noSchemaCheck,
+						"ajaxView" : true
+					},
+					"viewSchema" :
+					{
+						"url" : Sydma.home.getParamUrlGenerator("${viewDatasetSchemaUrl}", "datasetId"),
+						"linkText" : "${viewDatasetSchemaLinkText}",
+						"beforeInsert" : Sydma.home.hasSchemaCheck,
+						"ajaxView" : true
+					}	
+				},
+				"childControl" : null
+			};
+			var datasetControl = Sydma.home.SelectControl(datasetOpt);
+			
+			var projectOpt = {
+					"paramVar" : "p",
+					"parentParamVar" : "g",
+					"sourceSelect" : "#Projects",
+					"sideBar" : "#projectSidebar",
+					"getContentsUrl" : "${getProjectsUrl}",
+					"linkTemplates" : {
+						"editProject" : {
+							"url" : Sydma.home.getRestUrlGenerator("${editProjectUrl}"),
+							"linkText" : "${editProjectLinkText}",
+							"ajaxView" : true
+						},
+						"createDataset" :
+						{
+							"url" : Sydma.home.getRestUrlGenerator("${createDatasetUrl}"),
+							"linkText" : "${createDatasetLinkText}",
+							"ajaxView" : true
+						}						
+					},
+					"childControl" : datasetControl
+
+				};
+				var projectControl = Sydma.home.SelectControl(projectOpt);
+	
+				var groupOpt = {
+						"getContentsOnLoad" : true,
+						"paramVar" : "g",
+						"parentParamVar" : null,
+						"sourceSelect" : "#Research_Groups",
+						"sideBar" : "#groupSidebar",
+						"getContentsUrl" : "${getGroupsUrl}",
+						"linkTemplates" : {
+							"editGroup" : {
+								"url" : Sydma.home.getRestUrlGenerator("${editGroupUrl}"),
+								"linkText" : "${editGroupLinkText}",
+								"ajaxView" : true
+							},
+							"createProject" :
+							{
+								"url" : Sydma.home.getRestUrlGenerator("${createProjectUrl}"),
+								"linkText" : "${createProjectLinkText}",
+								"ajaxView" : true
+							},
+							"assignGroupPermissions" :
+							{
+								"url" : Sydma.home.getRestUrlGenerator("${permissionsGroupUrl}"),
+								"linkText" : "${permissionsGroupLinkText}",
+								"ajaxView" : false								
+							},
+							"viewGroupPermissions" :
+							{
+								"url" : Sydma.home.getRestUrlGenerator("${viewPermissionsUrl}"),
+								"linkText" : "${viewPermissionLinkText}",
+								"ajaxView" : false
+							}
+						},
+						"childControl" : projectControl
+
+					};
+				var groupControl = Sydma.home.SelectControl(groupOpt);
+				groupControl.focus(); //on load select group select	
+		})();//instant call
+	</script>
+	
+</div>
+

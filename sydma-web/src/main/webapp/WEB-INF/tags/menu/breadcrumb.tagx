@@ -1,0 +1,22 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+	<jsp:output omit-xml-declaration="yes" />
+
+	<div class="breadcrumb moved">
+		<span class="prefix">You are here: </span>
+		<a href="http://sydney.edu.au/">Home</a>
+		<c:forEach items="${breadcrumbs}" var="breadcrumb">
+			<jsp:text> / </jsp:text>
+			<c:choose>
+				<c:when test="${breadcrumb.url != null}">
+				<c:url value="${breadcrumb.url}" var="breadcrumbUrl"></c:url>
+					<a href="${breadcrumbUrl}"><c:out value="${breadcrumb.description}" /></a>
+				</c:when>
+				<c:otherwise>
+					<c:out value="${breadcrumb.description}" />
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</div>
+</jsp:root>

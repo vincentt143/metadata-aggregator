@@ -1,0 +1,9 @@
+status:OK
+statusDesc:OK
+loginName:ictintersect2
+password:password
+givenName:Carlos
+surname:Aya
+email:carlos@intersect.org.au
+sKey:ictintersect2
+iKey:ictintersect2

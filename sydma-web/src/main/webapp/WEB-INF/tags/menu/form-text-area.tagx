@@ -1,0 +1,37 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+	<jsp:output omit-xml-declaration="yes" />
+
+
+	<jsp:directive.attribute name="path" type="java.lang.String"
+		required="true" description="path of form input" />
+	<jsp:directive.attribute name="code" type="java.lang.String"
+		required="true"
+		description="code of form input (may differ from path if it's more than one word)" />
+	<jsp:directive.attribute name="characters" type="java.lang.Integer"
+		required="true" description="maximum number of characters per input" />
+	<jsp:directive.attribute name="lines" type="java.lang.Integer"
+		required="false" description="maximum number of lines per input" />
+	<jsp:directive.attribute name="required" type="java.lang.Boolean"
+		required="true" description="whether the field is required or not" />
+
+	<spring:bind path="${path}">
+		<c:set var="errorSet">
+			<form:errors path="${path}" />
+		</c:set>
+		<c:if test="${not empty errorSet}">
+			<c:set var="cssStyle" value="error" />
+		</c:if>
+		<li class="${cssStyle}"><form:errors path="${path}"
+				cssClass="error-text" element="p" /> <form:label path="${path}">
+				<spring:message code="${code}" text="?${code}?" htmlEscape="false" />
+				<c:if test="${required}">
+					<em>*</em>
+				</c:if>
+			</form:label> <form:textarea path="${path}" maxlength="${characters}"
+				rows="${lines}" /></li>
+	</spring:bind>
+
+</jsp:root>

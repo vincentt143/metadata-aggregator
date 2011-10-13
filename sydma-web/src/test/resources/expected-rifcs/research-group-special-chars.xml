@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registryObjects xmlns="http://ands.org.au/standards/rif-cs/registryObjects"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/home/orca/schemata/registryObjects.xsd">
+<registryObject group="The University of Sydney">
+    <key>www.sydney.edu.au-metadata-aggregator-research-group-5</key>
+    <originatingSource>www.sydney.edu.au</originatingSource>
+    <party type="group">
+        <identifier type="local">15 211 513 464</identifier>
+
+        <name type="primary">
+            <namePart>My group name</namePart>
+        </name>
+        
+
+        <!-- Sydney Uni -->
+        <relatedObject>
+            <key>15211513464</key>
+            <relation type="isPartOf"/>
+        </relatedObject>
+
+        <!-- PI -->
+        <relatedObject>
+            <key>me@sydney.edu.au</key>
+            <relation type="isManagedBy"/>
+        </relatedObject>
+        
+        <!-- Advertised Projects -->
+
+                <relatedObject>
+                    <key>www.sydney.edu.au-metadata-aggregator-research-project-101</key>
+                    <relation type="isOwnerOf"/>
+                </relatedObject>
+                
+                <!-- Advertised Datasets -->
+                        <relatedObject>
+                            <key>www.sydney.edu.au-metadata-aggregator-research-dataset-201</key>
+                            <relation type="isOwnerOf"/>
+                        </relatedObject>
+                        
+                
+                <relatedObject>
+                    <key>www.sydney.edu.au-metadata-aggregator-research-project-103</key>
+                    <relation type="isOwnerOf"/>
+                </relatedObject>
+                
+                <!-- Advertised Datasets -->
+                        <relatedObject>
+                            <key>www.sydney.edu.au-metadata-aggregator-research-dataset-204</key>
+                            <relation type="isOwnerOf"/>
+                        </relatedObject>
+                        
+                
+
+        <subject type="anzsrc-for">555</subject>
+		<subject type="anzsrc-for">111</subject>
+        <description type="brief">&lt;A desc with &quot; some &gt; special &apos;characters&apos; &amp; some normal ones</description>
+
+    </party>
+</registryObject>
+</registryObjects>

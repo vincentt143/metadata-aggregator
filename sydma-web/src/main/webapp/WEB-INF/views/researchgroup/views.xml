@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="contentUnlightboxable" name="researchgroup/new">
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/new.jspx" cascade="true"/>
+        <put-attribute name="type" value="researchGroup" cascade="true"/>
+        <put-attribute name="formAction" value="createResearchGroup" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="researchgroup/edit">
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/edit.jspx" cascade="true"/>
+    </definition>
+</tiles-definitions>

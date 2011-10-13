@@ -1,0 +1,21 @@
+<div class="sydma_content" id="criticalFailure" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+    <form class="formbuilder">
+      <ol>
+        <li class="error">
+            <label>
+                <spring:message code="manageDataset.pathNotFound" arguments="${filePath }, ${executionError}" text="?Failed?"/>
+            </label>
+                       
+        </li>
+    </ol>   
+    <p>
+        <spring:message code="manageDataset.pathNotFound.description" text="?Refresh Page?"/>            
+    </p>         
+     <div class="buttons">
+        <input id="confirmRefresh" class="sydmaReload button" type="button" value="Okay" name="Okay"
+            title="Okay" />
+    </div>
+    </form>
+</div>

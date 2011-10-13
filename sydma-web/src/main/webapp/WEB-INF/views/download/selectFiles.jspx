@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <spring:message code="label_download_index" htmlEscape="false" var="title" />
+
+    <spring:message var="buttonNext" code="select.button.next" text="?Next?" />
+    <spring:message var="buttonBack" code="select.button.back" text="?Back?" />
+    <spring:message var="buttonFinish" code="select.button.finish" text="?Finish?" />
+
+    <c:set var="appletId" value="sydma-applet" />
+    <c:set var="appletUrl" value="/sydma-web/resources/applets/dms-applet.jar" />
+    <c:set var="code" value="au.org.intersect.dms.applet.BrowseApplet.class" />
+    <c:set var="propStr" value='width="16" height="12"' />
+    <c:set var="paramStr" value="" />
+    <c:set var="paramsForEmbed" value="" />
+    <div id="applet_container">
+        <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" id="${appletId }" width="16" height="12"
+            name="myPC"
+            codebase="http://java.sun.com/products/plugin/autodl/jinstall-1_6-windows-i586.cab#Version=1,6,0,0">
+            <param name="type" value="application/x-java-applet;version=1.6" />
+            <param name="code" value="${code }" />
+            <param name="name" value="myPC" />
+            <param name="archive" value="${appletUrl}" />
+            <param name="cache_archive" value="dms-applet.jar" />
+            <param name="scriptable" value="true" />
+            ${paramStr }
+            <comment> <embed type="application/x-java-applet;version=1.6" name="myPC" code="${code }"
+                pluginspage="http://www.oracle.com/technetwork/java/javase/downloads/index.html" archive="${appletUrl }"
+                cache_archive="dms-applet.jar" id="${appletId}" width="16" height="12" mayscript="mayscript"> <noembed>Your
+            Browser Does Not Have Java 1.6 Support, Which Is Needed To Run This Applet!</noembed> </embed> </comment>
+        </object>
+    </div>
+
+    <div id="download_tabs" class="transfer_tabs">
+        <ul>
+            <li><a href="#browse"> <spring:message code="select.files.to.download"
+                        text="?select.files.to.download?" /> </a>
+            </li>
+            <li><a href="#dest"> <spring:message code="select.files.to.destination"
+                        text="?select.files.to.destination?" /> </a>
+            </li>
+            <li><a href="#confirm"> <spring:message code="select.files.confirm.download" text="?select.files.confirm?" />
+            </a>
+            </li>
+        </ul>
+
+        <div id="browse" class="tabContent">
+            <div id="browse_tree" class="tree"><jsp:text>
+                </jsp:text></div>
+            <spring:message var="browseNextTitle" code="select.button.title.browseNext" text="?Next?" />
+            <button id="browse_next" class="tab_navigation tabNext" title="${browseNextTitle }" tabindex="19">${buttonNext
+                }</button>
+        </div>
+        <!-- /tab-1 (browse) -->
+        <div id="dest" class="tabContent">
+            <div id="destination_tree" class="tree"><jsp:text>
+                </jsp:text>
+            </div>
+            <spring:message var="destinationNextTitle" code="select.button.title.download.destinationNext" text="?Next?" />
+            <spring:message var="desinationBackTitle" code="select.button.title.download.destinationBack" text="?Back?" />
+            <button id="destination_back" class="tab_navigation tabBack" title="${desinationBackTitle }" tabindex="29">${buttonBack
+                }</button>
+            <button id="destination_next" class="tab_navigation tabNext" title="${destinationNextTitle }" tabindex="29">${buttonNext
+                }</button>
+        </div>
+        <div id="confirm" class="tabContent">
+            <p>
+                <spring:message code="select.files.confirm.download.from" text="?Confirm From?" />
+            </p>
+            <div id="confirm_source">
+                <jsp:text>
+                </jsp:text>
+            </div>
+            <p>
+                <spring:message code="select.files.confirm.to" text="?Confirm To?" />
+            </p>
+            <div id="confirm_destination">
+                <jsp:text>
+                </jsp:text>
+            </div>
+            <spring:message var="confirmFinishTitle" code="select.button.title.confirmFinish" text="?Finish?" />
+            <spring:message var="confirmBackTitle" code="select.button.title.confirmBack" text="?Back?" />
+            <button id="confirm_back" class="tab_navigation tabBack" title="${confirmBackTitle }" tabindex="39">${buttonBack
+                }</button>
+            <button id="confirm_finish" class="tab_navigation" title="${confirmFinishTitle }" tabindex="39">${buttonFinish
+                }</button>
+        </div>
+    </div>
+    <!-- /tabs -->
+
+    <c:url var="listDestinationUrl" value="../filetree/listDownload" />
+    <c:url var="connectUrl" value="../filetree/connect" />
+
+    <spring:message var="confirmAlertMsg" code="select.files.download.alertConfirm" text="?You Must Select File and Destination?" />
+    <spring:message var="destinationAlertMsg" code="select.files.download.alertDestination"
+        text="?You Must Select File to Download?" />
+    <c:url var="downloadJobUrl" value="../transferJob/copyJob/" />
+
+
+    <script type="text/javascript">
+                    jQuery(function()
+                    {
+                        
+
+                        var listDestinationUrl = "${listDestinationUrl}";
+                        var confirmAlertMsg = "${confirmAlertMsg}";
+                        var destinationAlertMsg = "${destinationAlertMsg}";
+                        var connectUrl = "${connectUrl}";
+
+                        var downloadUrl = "${downloadJobUrl}";
+                        var opt =
+                        {
+                            "transferUrl" : downloadUrl,
+                            "tabSelector" : "#download_tabs",
+                            "tabContentSelectors" : [ "#browse", "#dest", "#confirm" ],
+                            "invalidMsgs" : ["",destinationAlertMsg,confirmAlertMsg], //tab 0 has no invalid msgs
+                            "treeOpts" : 
+                                {                                	
+                            	    "srcOpt" :
+                                	    {
+                            	        	"treeSelector" : "#browse_tree",
+                                	        "treeType" : "server",
+                                	        "tabIndex" : 10,
+                                	        "connectUrl" : connectUrl,
+                                	        "url" : listDestinationUrl
+                                	    },
+                            	    "destOpt" :
+                                	    {
+                                	    	"treeSelector" : "#destination_tree",
+                                	    	"treeType" : "local",
+                                	    	"tabIndex" : 20,
+                                	    	"appletId" : "sydma-applet"
+                                	    }
+                                }                            
+                        };
+                        Sydma.transfer.createTab(opt);
+
+                        
+
+
+                    });
+                </script>
+</div>
+

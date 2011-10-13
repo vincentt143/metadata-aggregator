@@ -1,0 +1,9 @@
+
+<div id="content" class="withtabs" style="margin-left: 0;"
+	xmlns:tiles="http://tiles.apache.org/tags-tiles">
+	<div id="w4" class="sydma">
+		<tiles:insertAttribute name="lightboxable" />
+		<tiles:insertAttribute name="unlightboxable" />
+	</div>
+
+</div>

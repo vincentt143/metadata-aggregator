@@ -1,0 +1,364 @@
+@CHARSET "UTF-8";
+
+@import url('ajax_form.css');
+
+.js-show
+{
+	display:none;
+}
+
+.js .js-show
+{
+	display:inline;	
+}
+
+.js .js-hide
+{
+	display:none;	
+}	
+
+#content.withtabs
+	{
+		margin-left:0;
+	}
+#homeIndexDisplay h4 {
+	width: 220px;
+	display: inline-block;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+#homeIndexDisplay select {
+	margin: 5px;
+	width: 220px;
+}
+
+#homeIndexDisplay select :hover {
+	cursor: pointer;
+	background-color: #E4E4E4;
+}
+
+#sidebarContainer {
+	width: 200px;
+	float: right;
+}
+
+.sidebar {
+	float: right;
+	margin: 1em;
+	overflow: hidden;
+	text-align: left;
+	width: 18em;
+	border: 0.1em solid #dbd3c2;
+}
+
+.sidebar .feature dt,.sidebar .feature.noborder .feature dt {
+	background: none repeat scroll 0 0 #12416C;
+	color: #FFFFFF;
+	margin: 0 0.667em 0 0;
+	padding: 0.467em 0.667em;
+	text-transform: uppercase;
+	font: bold 1.5em Arial, Helvetica, sans-serif;
+}
+
+.sidebar dd {
+	font-size: 1.2em;
+	padding: 0.5em;
+}
+
+#content li {
+	font-size: 1em;
+}
+
+.sydma .clickable 
+	{
+	cursor: pointer;	
+}
+
+.sydma .jstree-classic {
+	background: white;
+}
+
+.sydma .jstree {
+	overflow-x: auto;
+}
+
+.sydma .tab_navigation {
+	cursor: pointer;
+	margin-right: 10px;
+	margin-top: 10px;
+}
+
+#addUserToTablei, #goToLevelSelection { margin: 0 10px 10px 640px; }
+#ObjectType p { margin: 0 0 0 1.4em; }
+.inputs { margin: 0 0 0 60px; }
+
+label#fullAccess, label#editingAccess, label#viewingAccess { margin: 20px 0 0 0; }
+
+input.right { float: right; }
+
+input.tab_navigaiton { margin-left: 630px; }
+
+#permissionsTabs span { margin: 0 0 0 60px; }
+
+.sydma .field_value {
+	margin-left: 10px;
+	margin-top: 0.2em;
+	vertical-align: bottom;
+}
+
+.sydma .transfer_tabs li,.sydma .transfer_tabs li a, #permissionsTabs li, #permissionsTabs li a {
+	background-image: none;
+}
+
+table.login,td {
+	border-width: 0 !important;
+}
+
+table.login td.label {
+	width: 100px;
+}
+
+#title errors {
+	color: red;
+	font-size: 1.1em !important;
+}
+
+/* CSS extracted from jQuery modifications */
+.ui-widget-header {
+	border: 1px solid #aed0ea;
+	background: transparent
+		url(images/ui-bg_highlight-soft_100_deedf7_1x100.png) 50% 50% repeat-x;
+	color: #222222;
+	font-weight: bold;
+}
+
+/*Interaction states*/
+.ui-state-default,.ui-widget-content .ui-state-default,.ui-widget-header .ui-state-default,.ui-widget button
+	{
+	border: 0px solid #aed0ea;
+	background: transparent url(images/ui-bg_glass_80_d7ebf9_1x400.png) 50%
+		50% repeat-x;
+	font-weight: normal;
+	color: #2779aa;
+	text-decoration: none;
+}
+
+.ui-state-default a,.ui-state-default a:link,.ui-state-default a:visited
+	{
+	color: transparent text-decoration:  none;
+}
+
+.ui-state-hover,.ui-widget-content .ui-state-hover,.ui-widget-header .ui-state-hover,.ui-state-focus,.ui-widget-content .ui-state-focus,.ui-widget-header .ui-state-focus
+	{
+	border: 0px solid #74b2e2;
+	background: transparent url(images/ui-bg_glass_100_e4f1fb_1x400.png) 50%
+		50% repeat-x;
+	font-weight: bold;
+	color: #0070a3;
+	text-decoration: none;
+}
+
+.ui-state-active,.ui-widget-content .ui-state-active,.ui-widget-header .ui-state-active
+	{
+	border: 0px solid #2694e8;
+	background: transparent url(images/ui-bg_glass_50_3baae3_1x400.png) 50%
+		50% repeat-x;
+	font-weight: normal;
+	color: #000;
+	text-decoration: none;
+}
+
+.ui-state-active a,.ui-state-active a:link,.ui-state-active a:visited {
+	color: #000;
+	text-decoration: none;
+}
+
+.ui-tabs .ui-tabs-nav li a {
+	float: left;
+	padding: 0em 0em;
+	text-decoration: none;
+}
+
+.sydma ul li.ui-state-default.ui-state-hover {
+	font-weight: normal;
+}
+
+.sydma ul.ui-tabs-nav {
+	background-image: url('../images/common/bc_bg.gif');
+	background-repeat: repeat-x;
+	height: 30px;
+	line-height: 30px;
+	color: #888;
+	border: solid 1px #cacaca;
+	overflow: hidden;
+	margin: 1em 1.4em 0 1.4em;
+	padding: 0;
+	font-weight: normal;
+}
+
+.sydma ul li.ui-state-default {
+	list-style-type: none;
+	padding-left: 10px;
+	display: inline-block;
+	float: left;
+}
+
+.sydma ul li.ui-state-default a {
+	display: inline-block;
+	background-image: url('../images/common/bc_separator.gif');
+	background-repeat: no-repeat;
+	background-position: right;
+	padding-right: 15px;
+	line-height: 23px;
+	text-decoration: none;
+	color: #999;
+	outline: none;
+}
+
+.sydma ul li.ui-state-default a:hover {
+	font-weight: normal;
+	color: #000;
+}
+
+.sydma ul li.ui-state-active a {
+	font-weight: bold;
+	color: #000;
+}
+
+.sydma ul li.ui-state-active.ui-state-hover a:hover {
+	font-weight: bold;
+}
+
+.sydma ul li.ui-state-default.done a {
+	color: #CCC;
+}
+
+.sydma ul li.ui-state-default.ui-state-active.done a {
+	color: #000;
+}
+
+ul.ui-widget li 
+{
+	list-style:none;
+}
+
+
+/** TWO COL STYLE {Content <> Menu}*/
+
+.sydma .column_left
+{
+	float:left;	
+}
+
+.sydma .column_right
+{
+	float:right;
+}
+
+/** popup style*/
+
+.popup #w3
+{
+	border-width:0;
+}
+
+.popup .sydma table
+{
+	margin:0;
+}	
+
+/** duplicate styles in ajax window since it exists outside #content*/
+
+.sydma 
+{
+	padding:1em 2em;
+}
+.sydma p 
+{
+    font-size: 1.1em;
+    line-height: 145%;
+}
+
+.sydma h1,.ajax_content h2,.ajax_content h3,.ajax_content h4,.ajax_content h5,.ajax_content h6
+	{
+	color: #ce1126;
+	clear: both;
+	margin: .8em 0 0 0;
+	font-weight: normal;
+	text-transform:capitalize;
+}
+
+.sydma h3 {
+	font-size: 1.4em;
+	margin: 2em 0 0 0;
+	font-weight: bold;
+}
+
+.sydma form
+{
+	margin-top:1em;
+}
+
+.sydma form.formbuilder input.button.submit-button {
+	background: #12416c;
+}
+
+
+.sydma form.formbuilder li,
+.sydma_exception li {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0.5em 0.5em 1em;
+}
+
+
+
+.sydma form.formbuilder label,
+.sydma_exception label	 {
+    
+    margin-right: 1em;
+    
+}
+
+.sydma form.formbuilder li.error,
+.sydma_exception li.error	 {
+	border-color: #ce1126;
+	border-width: 2px 0 1px 0;
+	color: #ce1126;
+	border-style: solid;
+	width: auto;
+}
+
+.sydma label.error,
+.sydma_exception label.error	 {
+	color: #a00;
+	background: transparent url(../images/common/icon_error.gif) no-repeat
+		scroll 0 2px;
+}
+
+
+.sydma form.formbuilder p.error-text,
+.sydma_exception p.error-text	 
+{
+	margin-bottom: .8em;
+	color: #ce1126;
+	background: transparent url(../images/common/icon_error.gif) no-repeat
+		left .167em;
+	border-bottom: .083em solid #ce1126;
+	padding-bottom: .5em;
+	padding-left: 1.7em;
+}
+
+.sydma form.formbuilder .buttons 
+{
+	text-align: right;
+	margin-top: 1em;	
+}
+
+.button
+{
+	cursor:pointer;
+}
+
+

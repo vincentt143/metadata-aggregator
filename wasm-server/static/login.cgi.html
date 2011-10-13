@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="DC.Creator" content="Webmaster, University of Sydney">
+<meta name="DC.Subject" content="University of Sydney WWW Authentication and Session Manager Login Page">
+<meta name="DC.Title" content="University of Sydney WWW Authentication and Session Manager Login Page">
+<meta name="DC.Description" content="University of Sydney WWW Authentication and Session Manager Login Page">
+<title>Authentication required - The University of Sydney</title>
+<link rel="stylesheet" href="login.cgi_files/screen.css" type="text/css">
+<!--[if IE]><link rel="stylesheet" href="styles/screen-ie.css" type="text/css" /><![endif]-->
+<link rel="stylesheet" href="login.cgi_files/screen-local.css" type="text/css">
+<!--[if IE]><link rel="stylesheet" href="styles/screen-local-ie.css" type="text/css" /><![endif]-->
+
+</head>
+<body class="splash" id="home" onload="document.loginForm.credential_0.focus()">
+
+
+<div id="w1">
+  <div id="w2">
+    <div id="w3">
+      <div id="head">
+        <div id="masthead">
+                        <a href="#content" class="skip-nav">Skip to main content</a>
+                <h1><a id="logo" href="http://www.usyd.edu.au/">The University of Sydney</a> <span id="separator">-</span> <span id="tag-line">Authentication Required</span></h1>
+                </div>
+
+          </div>
+      <div id="mid" class="clearfix">
+        <div id="content" class="nomenu nofeature">
+          <div id="w4">
+            <p class="notice">
+<font color="red" face="arial,verdana,helvetica,sans-serif" size="3">
+Please authenticate: ${error}
+</font>
+</p><p>
+                        </p><p>Enter your <a href="http://www.usyd.edu.au/ict/switch/unikey/"><strong>UniKey</strong></a>
+                                details below, and you will be directed to the service you have requested.</p>
+
+                                <table class="login" border="0" cellpadding="0" cellspacing="2">
+                                        <form name="loginForm" method="post" action="/login.cgi">
+                                                <input name="appID" value="${appID}" type="hidden">
+                                                <input name="appRealm" value="${appRealm}" type="hidden">
+                                                <input name="destURL" value="${destURL}" type="hidden">
+                                                <tbody><tr>
+                                                        <td class="label">Login name:</td>
+                                                        <td class="value"><input name="credential_0" size="20" maxlength="25" autocomplete="off" type="text"></td>
+                                                </tr>
+                                                <tr>
+                                                        <td>Password:</td>
+                                                        <td><input name="credential_1" size="20" maxlength="20" autocomplete="off" type="password"></td>
+                                                </tr>
+
+                                                <tr>
+                                                        <td></td>
+                                                        <td valign="bottom">
+                                                                <input name="Submit" value="Log in" class="logIn" type="submit">
+                                                        </td>
+                                                </tr>
+                                        </form>
+                                </tbody></table>
+
+                                <p><a href="http://www.usyd.edu.au/ict/switch/unikey/">Login problem?</a><br>
+                                •&nbsp;Your browser must be set to accept cookies. <a href="http://www.usyd.edu.au/ict/switch/troubleshooting/cookies.shtml">Information on cookies</a>.<br>
+
+                                <span class="notice"><strong>* Important Notice</strong></span><br>
+                                <strong>To protect your privacy, please ensure that you log out of the University web service and close
+                                all your web browser windows at the end of your current session.</strong> For a list of services you are
+                                logged into, go to <a href="https://wasm-test.ucc.usyd.edu.au/wasm_services.shtml">list of services
+                                covered by this authentication system</a>.
+                                </p>
+          </div>
+        </div>
+      </div>
+                  <div id="foot" class="clearfix no-sitemap">
+                          <div id="legal">
+                          <p>© 2002-2010 The University of Sydney. <strong>Last&nbsp;updated:</strong>&nbsp;2-Feb-2010</p>
+                          <p><strong>ABN:</strong>&nbsp;15&nbsp;211&nbsp;513&nbsp;464. <strong>CRICOS number:</strong>&nbsp;00026A. <strong>Phone:</strong>&nbsp;+61&nbsp;2&nbsp;9351&nbsp;2222. </p>
+                          <p><strong>Maintained&nbsp;by:</strong>&nbsp;Infrastructure Services, ICT.</p>
+                          <p id="foot-links"><a href="http://www.usyd.edu.au/contact.shtml">Contact the University</a> | <a href="http://www.usyd.edu.au/disclaimer.shtml">Disclaimer</a> | <a href="http://www.usyd.edu.au/privacy.shtml">Privacy</a> | <a href="http://www.usyd.edu.au/accessibility.shtml">Accessibility</a>
+                         </p></div>
+                  </div>
+          </div>
+        </div>
+</div>
+<!-- SERVER_NAME:wasm-test.ucc.usyd.edu.au;HOSTNAME:idm-auth-uat-01.ucc.usyd.edu.au -->
+</body></html>

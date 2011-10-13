@@ -1,0 +1,21 @@
+<div class="sydma_content" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+
+    <h3>Create Directory</h3>
+
+    <c:url value="/managedataset/createDirectory" var="submitUrl" />
+
+    <form:form id="create_dir_form" modelAttribute="directoryName" class="formbuilder ajaxForm" method="post"
+        action="${submitUrl}">
+
+        <input type="hidden" name="filePath" value="${filePath }" />
+        <menu:form-entry characters="120" code="manageDataset.directoryName" path="directoryName" required="true"/>
+        <div class="buttons">
+            <input id="confirm_submit" class="submit-button button" type="submit" value="Create" name="Create"
+                title="Create" />
+        </div>
+
+    </form:form>
+
+</div>

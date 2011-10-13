@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" id="menu" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <menu:menu id="_menu" z="nZaf43BjUg1iM0v70HJVEsXDopc=">
+        <menu:category id="c_controller" z="nj8Dm3hojIyIEyPkwE1UMDIs+K8=">
+            <menu:item id="i_controller__researchgroupindex_id" messageCode="global_generic" url="/researchgroup/index" z="tZ1CK56GDZb6oXf19KmIM7DQcW0="/>
+            <menu:item id="i_controller__researchprojectindex_id" messageCode="global_generic" url="/researchproject/index" z="PsRpb+Wrfw0WA/09gkfw0BvLt8M="/>
+            <menu:item id="i_controller__uploadindex_id" messageCode="global_generic" url="/upload/index" z="K8xg8fVrROUzsLbtbZ4E+U1KoFU="/>
+            <menu:item id="i_controller__loginindex_id" messageCode="global_generic" url="/login/index" z="+bAgKvV6j5ehIOcfril0sqwLmhU="/>
+            <menu:item id="i_controller__permissionindex_id" messageCode="global_generic" url="/permission/index" z="3/wXg5YkTGuTFe1ipfFLzVL/hyY="/>
+        </menu:category>
+        <menu:category id="c_view" z="HjmI4Chx/kBYfS/6HjBLbCA+XpU=">
+            <menu:item id="i_view__adminindex_id" messageCode="global_generic" url="/admin/index" z="user-managed"/>
+            <menu:item id="i_view__permissionpermissionlevel_id" messageCode="global_generic" url="/permission/permissionlevel" z="egTVXYpoO1+AcF2Gx5zcu48t2s8="/>
+            <menu:item id="i_view__advertisingunadvertiseconfirm_id" messageCode="global_generic" url="/advertising/unadvertiseconfirm" z="UhfP6aanfiQMzWtfv+PNBouKJyY="/>
+        </menu:category>
+    </menu:menu>
+</div>

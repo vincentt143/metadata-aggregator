@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />	  
+	<spring:message code="label_login_index" htmlEscape="false" var="title" />
+	<util:panel id="title" title="${title}">
+	
+		<c:if test="${param.reject}">
+			<div class="errors">
+				<p>
+				<font size="3" face="arial,verdana,helvetica,sans-serif" color="red">
+					Sorry, in order to use the system you need to accept the user agreement.
+				</font>
+				</p>
+			</div>
+		</c:if>
+		
+		<h3>
+			<spring:message code="sign.in.head" text="?sign.in.head?" />
+		</h3>
+		<p>
+			<spring:message code="sign.in.unikey" text="?sign.in.unikey?" />
+			<a href="${wasmUrl}">
+				<spring:message code="sign.in.unikey.link.text" text="?sign.in.unikey.link.text?" />
+			</a>
+		</p>
+		<c:url value="/login" var="loginUrl"></c:url>
+		<p>
+			<spring:message code="sign.in.external" text="?Select Group?" />
+			<a href="${loginUrl}">
+				<spring:message code="sign.in.external.link.text" text="?sign.in.external.link.text?" />
+			</a>
+		</p>
+	</util:panel>
+</div>

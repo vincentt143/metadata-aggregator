@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="contentLightboxable" name="researchdataset/index">
+        <put-attribute name="body" value="/WEB-INF/views/researchdataset/index.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="researchdataset/new">
+        <put-attribute name="body" value="/WEB-INF/views/researchdataset/new.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="researchdataset/edit">
+        <put-attribute name="body" value="/WEB-INF/views/researchdataset/edit.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentUnlightboxable" name="researchdataset/publish">
+        <put-attribute name="body" value="/WEB-INF/views/researchdataset/publish.jspx" cascade="true"/>
+        <put-list-attribute name="page_js_files">
+           <add-attribute value="/actionutil/ActionControl.js" />
+       </put-list-attribute>
+    </definition>
+</tiles-definitions>

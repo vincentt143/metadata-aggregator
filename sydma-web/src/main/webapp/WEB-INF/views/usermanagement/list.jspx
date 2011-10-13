@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0"
+	xmlns:display="urn:jsptld:http://displaytag.sf.net">
+
+
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	
+	<h3>
+		<spring:message code="userManagement.list" text="?userManagement.list?" />
+	</h3> <br />
+	<display:table class="tabledata_blue" uid="existingUser" name="existingUserList" defaultsort="1" 
+			pagesize="25" requestURI="" >
+		
+		<display:column property="givenname" sortable="false" title="Given Name" />
+		<display:column property="surname" sortable="false" title="Surname" />
+		<display:column property="email" sortable="false" title="Email" />
+		<display:column title="Actions"> 
+			<c:url value='/usermanagement/edit/${existingUser.id}' var="externalUserUrl" /> 
+			<a href="${externalUserUrl}">Edit</a>
+		</display:column>
+		
+		<display:setProperty name="basic.empty.showtable" value="true" />  
+        <display:setProperty name="paging.banner.group_size" value="25" />  
+        <display:setProperty name="paging.banner.onepage" value=" " />  
+        <display:setProperty name="paging.banner.placement" value="bottom" />
+	</display:table>
+</div>

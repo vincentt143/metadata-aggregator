@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<form xmlns:jsp="http://java.sun.com/JSP/Page" id="search" action="http://search.usyd.edu.au/search/search.cgi">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<input type="hidden" name="collection" value="Usyd" /> <input
+		type="text" name="query" class="field" title="Enter search terms"
+		value="Enter search terms" /> <input type="submit" value="Go"
+		class="button" /> <input type="hidden" name="scope"
+		value="sydney.edu.au/unit" />
+</form>

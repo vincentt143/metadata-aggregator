@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!DOCTYPE import-control PUBLIC
+    "-//Puppy Crawl//DTD Import Control 1.0//EN"
+    "http://www.puppycrawl.com/dtds/import_control_1_0.dtd">
+
+<import-control pkg="au.org.intersect">
+	<subpackage name="sydma">
+		<allow pkg="org.slf4j" />
+		<allow pkg="java.util" />
+		<allow pkg="java.io" />
+		<allow pkg="java.net" />
+		<allow pkg="java.lang" />
+		<allow pkg="java.text" />
+		<allow pkg="org.apache.commons.lang" />
+		<allow pkg="org.joda.time" />
+		<allow pkg="au.org.intersect.dms.util" />
+		<allow pkg="org.antlr.stringtemplate" />
+
+		<subpackage name="webapp">
+			<allow pkg="javax.servlet" />
+			<allow pkg="java.text" />
+			<allow pkg="org.springframework.beans" />
+			<allow pkg="org.springframework.stereotype" />
+			<allow pkg="org.springframework.context" />
+			<allow pkg="org.springframework.security" />
+			<allow pkg="org.springframework.roo" />
+			<allow class="de.saxsys.roo.equals.addon.RooEquals" />
+			<allow pkg="org.springframework.web" />
+			<allow pkg="org.springframework.ui" />
+			<allow pkg="org.springframework.dao" />
+			<allow pkg="org.springframework.ws" />
+			<allow pkg="org.springframework.util" />
+			<allow pkg="java.security" />
+			<subpackage name="wasm">
+				<allow pkg="javax.servlet.http" />
+				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+			</subpackage>
+            <subpackage name="converter">
+                <allow pkg="org.springframework.core.convert.converter" />
+                <allow pkg="au.org.intersect.sydma.webapp.domain" />
+                <allow pkg="javax.persistence" />
+            </subpackage>
+			<subpackage name="permission">
+				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+				<allow pkg="javax.persistence" />
+			</subpackage>
+			<subpackage name="domain">
+				<allow pkg="javax.validation.constraints" />
+				<allow pkg="javax.persistence" />
+				<allow pkg="org.hibernate.validator.constraints" />
+				<allow pkg="au.org.intersect.sydma.webapp.util" />
+				<allow pkg="au.org.intersect.sydma.webapp.validator" />
+				<allow pkg="au.org.intersect.sydma.webapp.service" />
+				<allow pkg="au.org.intersect.sydma.webapp.permission" />
+                <allow pkg="org.apache.commons"/>
+			</subpackage>
+			<subpackage name="controller">
+				<allow pkg="au.org.intersect.dms" />
+				<allow pkg="au.org.intersect.sydma.webapp.controller" />
+				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+				<allow pkg="au.org.intersect.sydma.webapp.util" />
+				<allow pkg="au.org.intersect.sydma.webapp.wasm" />
+				<allow pkg="au.org.intersect.sydma.webapp.service" />
+				<allow pkg="au.org.intersect.sydma.webapp.json" />
+				<allow pkg="au.org.intersect.sydma.webapp.security" />
+				<allow pkg="au.org.intersect.sydma.webapp.exception" />
+				<allow pkg="au.org.intersect.sydma.webapp.dto" />
+				<allow pkg="au.org.intersect.sydma.webapp.controller.propertyeditor" />
+				<allow pkg="javax.validation" />
+				<allow pkg="javax.persistence" />
+				<allow pkg="org.springframework.validation" />
+				<allow pkg="org.springframework.transaction" />
+				<allow pkg="flexjson" />
+				<allow pkg="java.beans" />
+				<allow pkg="au.org.intersect.sydma.webapp.permission" />
+			</subpackage>
+			<subpackage name="dto">
+				<allow pkg="org.hibernate.validator.constraints" />
+				<allow pkg="javax.validation" />
+				<allow pkg="org.springframework.validation" />
+			</subpackage>
+			<subpackage name="util">
+				<allow pkg="org.apache.commons.io" />
+				<allow pkg="org.springframework.mail" />
+				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+                <allow pkg="java.sql" />
+                <allow pkg="javax.sql" />
+                <allow pkg="org.springframework.jdbc" />
+			</subpackage>
+			<subpackage name="service">
+				<allow pkg="au.org.intersect.sydma.webapp.util" />
+				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+				<allow pkg="au.org.intersect.sydma.webapp.exception" />
+				<allow pkg="au.org.intersect.sydma.webapp.dto" />
+				<allow pkg="au.org.intersect.sydma.webapp.permission" />
+				<allow pkg="org.springframework.mail" />
+				<allow pkg="org.springframework.transaction.annotation" />
+				<allow pkg="javax.persistence" />
+                <allow pkg="java.sql" />
+                <allow pkg="javax.sql" />
+                <allow pkg="org.springframework.jdbc.datasource" />
+			</subpackage>
+			<subpackage name="permission">
+				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+			</subpackage>
+			<subpackage name="json">
+				<allow pkg="flexjson" />
+			</subpackage>
+			<subpackage name="security">
+				<allow pkg="au.org.intersect.dms.core.errors" />
+			</subpackage>
+			<subpackage name="validator">
+				<allow pkg="javax.validation" />
+			</subpackage>
+		</subpackage>
+	</subpackage>
+
+</import-control>
+

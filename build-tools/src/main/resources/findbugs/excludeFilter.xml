@@ -1,0 +1,6 @@
+<FindBugsFilter>
+    <!-- Exclude tests -->
+    <Match>
+        <Class name="~au\.org\.intersect\.sydma\..*Test" />
+    </Match>
+</FindBugsFilter>

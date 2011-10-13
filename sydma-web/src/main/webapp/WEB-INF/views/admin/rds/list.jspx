@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+    xmlns:tiles="http://tiles.apache.org/tags-tiles"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	
+    <tiles:useAttribute name="listType" />
+    
+	<h3><spring:message code="${listType }.title" text="?Rds Request List?"/></h3> <br />
+	
+	<table class="tabledata_blue" id="requestList">
+		<tbody>
+			<tr valign="top">
+				<th width="50%">Name</th>
+				<th width="50%">Principal Investigator</th>
+			</tr>
+			<c:forEach items="${rdsRequests}" var="rdsRequest">
+				<tr class="white">
+					<td>
+						<c:url value='/admin/rds/show/${rdsRequest.id}' var="rdsRequestUrl" />
+						<a href="${rdsRequestUrl}"><c:out value="${rdsRequest.name}"></c:out></a>
+					</td>
+					<td><c:out value="${rdsRequest.principalInvestigator}"></c:out></td>
+				</tr>
+			</c:forEach>
+
+		</tbody>
+	</table>
+</div>

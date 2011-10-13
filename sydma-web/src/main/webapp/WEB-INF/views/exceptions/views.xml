@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="contentLightboxable" name="exceptions/connectionClosedException">
+        <put-attribute name="body" value="/WEB-INF/views/exceptions/connectionClosedException.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="exceptions/connectionClosedExceptionAjax">
+        <put-attribute name="body" value="/WEB-INF/views/exceptions/connectionClosedException.jspx" cascade="true"/>      
+    </definition>
+    
+    
+    <definition extends="contentLightboxable" name="researchDatasetDBException">
+        <put-attribute name="body" value="/WEB-INF/views/exceptions/researchDatasetDBException.jspx" cascade="true"/>
+    </definition>
+    
+    
+</tiles-definitions>

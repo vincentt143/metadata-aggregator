@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="withSidebar" name="managedataset/browse">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/browse.jspx" cascade="true"/>
+        <put-attribute name="leftMenu" value="/WEB-INF/views/managedataset/actionMenu.jspx" cascade="true"/>
+        <put-attribute name="activeTab" value="" cascade="true"/>        
+        <put-list-attribute name="page_js_files">
+	       <add-attribute value="/filetree/FileTree.js" />
+           <add-attribute value="/actionutil/ActionMenu.js" />
+           <add-attribute value="/managedataset/ManageTree.js" />
+           <add-attribute value="/managedataset/managedataset.js" />
+           <add-attribute value="/actionutil/ActionControl.js" />
+	   </put-list-attribute>
+       <put-list-attribute name="page_css_files">
+                
+       </put-list-attribute>
+    </definition>
+    
+    <definition extends="ajax" name="managedataset/createDirectory">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/createDirectory.jspx"/>      
+    </definition>
+    
+    
+    <definition extends="ajax" name="managedataset/deleteDirectory">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/delete.jspx"/>
+        <put-attribute name="fileType" value="directory" cascade="true"/>       
+    </definition>
+            
+    <definition extends="ajax" name="managedataset/deleteFile">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/delete.jspx"/>
+        <put-attribute name="fileType" value="file" cascade="true"/>      
+    </definition>
+    
+    
+    
+    <definition extends="ajax" name="managedataset/move">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/move.jspx"/>
+    </definition>
+            
+    
+    
+    <definition extends="ajax" name="managedataset/pathNotFound">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/pathNotFound.jspx"/>      
+    </definition>
+    
+    <definition extends="ajax" name="managedataset/success">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/success.jspx"/>      
+    </definition>
+</tiles-definitions>
