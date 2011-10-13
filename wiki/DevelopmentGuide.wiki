@@ -1,0 +1,74 @@
+#summary Getting started guide for developers
+
+= Compile command line =
+
+For those with a hurry, the steps to get the source compiling command line are quite simple:
+  # Get and install [http://maven.apache.org/ Apache Maven]
+  # [http://code.google.com/p/metadata-aggregator/source/checkout Checkout] the source code
+  # Open a command line shell and into the checked out directory do:
+{{{
+    $ cd metadata-aggregator
+    $ mvn clean package
+}}} 
+  This compiles all sources command line and should work out of the box.
+
+= Getting into the IDE =
+
+The Metadata Aggregator was developed using the eclipse-based Spring source's _Integrated Development Environment_. Here the steps to get the Metadata Aggregator into STS.
+
+  # First, follow the steps above to get the source compiling command line.
+  # Get and install the Spring source Tool Suite (STS) [http://www.springsource.com/developer/sts here]
+  # In STS use *Import* > *Existing maven projects*, and select the top folder
+  # STS cannot understand few generated folders that have been configured into the classpath; so one has to do it manually by selecting all projects, right-click and selecting *Maven* > *Update project configuration* and then same with *Maven* > *Update dependencies*
+  # Done. You should have the Metadata Aggregator compiled into STS.
+  # We recommend disabling all validations in STS.
+
+= Few points on basic STS troubleshooting =
+
+STS is a powerful IDE including support for Java, JSPX, javascript, AspectJ, Spring Roo, among others. But the DMS uses Roo and other features and it stretches it quite a bit; sometimes it just can't handle it. So, few tips are helpful:
+
+  # Ignore the javascript error reported on jquery.
+  # Sometimes, when using *auto build*, it just gets recompiling forever (in Linux). Disable *auto build* and build manually... at least for a while.
+  # Doing *Maven* > *Update project configuration*, *Maven* > *Update dependencies* then *Clean all projects* usually helps.
+  # Tomcat support in Eclipse is a pain. So, *clean server folder* in context menu usually helps so things get re-deployed to known state as they should.
+  # It is recommended to extend the Tomcat start up time out to at least 1.5 mins. (This is for your development machine, in a middle-end dedicated server the DMS starts in under 30 secs.)
+  # We believe most issues are created when one runs the command line maven build and then refresh STS. Unfortunately, doing a command line {{{mvn clean install}}} to get all the tests checked is a must for any experienced developer. Our work around, cleaning the project space as mentioned above usually helps.
+
+= Running the DMS from STS =
+
+Running the DMS inside STS with a single worker architecture requires more steps:
+
+== Install required third party software ==
+
+  # Grab and install [http://www.mysql.com/ MySQL]
+  # Likewise for [http://activemq.apache.org/ ActiveMQ]
+  # and [http://tomcat.apache.org/download-60.cgi Tomcat 6]
+  # In MySQL, create a database `ammrf` and populate it with the provided [http://code.google.com/p/ammrf-dms/source/browse/trunk/dms/dms-bookinggw/src/main/sql/mysql/001_create.sql sql] in dms-booking/src/main/sql/mysql
+  # Also, create a database `specimendb` if you want to try the atom probe ingestion (please contact us for sample data)
+  # In STS, configure the !Tomcat instance
+  # Download [http://lucene.apache.org/solr/ Apache Solr] and put the apache-solr-`<version>`.war in the STS's Tomcat temporary folder as outlined in reference [#R1 R1].
+
+  `*` *Note*: Tomcat, ActiveMQ and Solr are already in dms-install/src/main/resources/lib, but feel free to try a latest release if you want.
+
+== Configure your profile ==
+
+The system uses a bunch of java property files located in a configuration folder. A sample of those are in dms-install/src/main/resources/profiles/default.dir. Copy the contents of this folder into your home directory, under .ammrf/dms for example. Then follow this [DmsPropertyFiles guideline] on how to configure those properties for your system.
+
+== Launch in STS ==
+
+Once the properties files are in place; one can run the application from within STS. Create a subdirectory where the property files are called _data_
+
+  # Start ActiveMQ
+  # Launch the worker using org.apache.camel.spring.Main and providing
+    # Arguments: -ac META-INF/applicationContext-worker*.xml
+    # VM arguments: -Ddms.config.home=`<`path-to-config-files`>` -Dsolr.solr.home=`<`path-to-data`>`
+  # Launch Tomcat, by adding the dms.config.home above as VM argument of the launcher.
+
+= References =
+==R1== 
+(_Retrieved from [http://abtj.blogspot.com/2009/07/how-to-adddeploy-war-file-into-eclipse.html here] 13/Jul/2011_)
+In some scenarios, you wish to deploy a default web application into Eclipse Tomcat which is not part of your project, you may just add the war file into the below directory:
+
+%your_workspace%\.metadata\.plugins\org.eclipse.wst.server.core\tmpX\webapps
+
+where tmpX could be tmp0, tmp1 etc
