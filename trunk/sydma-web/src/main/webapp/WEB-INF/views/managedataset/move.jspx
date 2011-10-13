@@ -1,0 +1,41 @@
+<div class="sydma_content" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+
+    <h3><spring:message code="manageDataset.move.heading"/></h3>
+
+    <c:url value="/managedataset/move" var="submitUrl" />
+    <p></p>
+    <form id="move_form" class="formbuilder ajaxForm" method="post"
+        action="${submitUrl}">
+         <c:if test="${not empty executionError}">            
+                <ol>
+                    <li class="error">
+                        <label>
+                            <spring:message code="manageDataset.move.fail" arguments="${movingNamedPath }, ${destinationNamedPath }, ${executionError}" text="?Failed?"/>
+                        </label>
+                    </li>
+                </ol>            
+        </c:if> 
+        <p>
+            <spring:message code="manageDataset.move.description" text="?Move?" />            
+        </p>
+        <p>
+            <spring:message code="manageDataset.move.description.moving" text="?Move Moving" />
+            <b><c:out value="${movingNamedPath }" escapeXml="true"/></b>
+        </p>
+        <p>
+            <spring:message code="manageDataset.move.description.to"  text="?Move To?" />            
+            <b><c:out value="${destinationNamedPath }" escapeXml="true"/></b>
+        </p>
+        
+        <input type="hidden" name="movingPath" value="${movingPath }" />
+        <input type="hidden" name="destinationPath" value="${destinationPath }" />        
+        <div class="buttons">
+            <input id="confirm_submit" class="submit-button button" type="submit" value="Move" name="Move"
+                title="Move" />
+        </div>
+
+    </form>
+
+</div>

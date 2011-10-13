@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+  
+  <definition name="popup" template="/WEB-INF/layouts/popup.jspx">
+    <put-attribute name="page_js_file" value="" cascade="true"/>    
+  </definition>
+  
+  
+  <definition name="ajax" template="/WEB-INF/layouts/ajax.jspx"/>    
+  
+  
+  
+  <!-- Ajaxable Lightbox Views -->
+  
+  <definition name="base" template="/WEB-INF/layouts/base.jspx">
+    <put-attribute name="legal" value="/WEB-INF/views/legal.jspx" />
+    <put-attribute name="searchForm" value="/WEB-INF/views/searchForm.jspx" />
+    <put-attribute name="siteMap" value="/WEB-INF/views/siteMap.jspx" />
+    <put-attribute name="mastHead" value="/WEB-INF/views/mastHead.jspx" />
+    <put-attribute name="globalNavigation" value="/WEB-INF/views/globalNavigation.jspx" />
+    <put-attribute name="page_js_file" value="" cascade="true"/>
+    <put-attribute name="activeTab" value="browse.rds.tab" cascade="true"/>
+    <put-attribute name="content" value="/WEB-INF/layouts/contentNormal.jspx"/>        
+  </definition>
+  
+  <definition name="withSidebar" extends="base">
+	<put-attribute name="content" value="/WEB-INF/layouts/contentWithSidebars.jspx"/>
+	<put-attribute name="lightboxable" value="/WEB-INF/layouts/blank.jspx" cascade="true"/>
+	<put-attribute name="unlightboxable" value="/WEB-INF/layouts/insertBody.jspx" cascade="true"/>  		  	  	
+  </definition>
+  
+  <definition name="contentLightboxable" extends="base">
+  	<put-attribute name="lightboxable" value="/WEB-INF/layouts/insertBody.jspx" cascade="true"/>
+	<put-attribute name="unlightboxable" value="/WEB-INF/layouts/blank.jspx" cascade="true"/>  		  
+  </definition>
+    
+  <definition name="contentUnlightboxable" extends="base">
+  	<put-attribute name="lightboxable" value="/WEB-INF/layouts/blank.jspx" cascade="true"/>
+	<put-attribute name="unlightboxable" value="/WEB-INF/layouts/insertBody.jspx" cascade="true"/>  				  
+  </definition>
+  
+
+</tiles-definitions>

@@ -1,0 +1,5 @@
+<div id="sidebarContainer" xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu">
+	<menu:dataset-sidebar />
+	<menu:project-sidebar />
+	<menu:research-group-sidebar />
+</div>

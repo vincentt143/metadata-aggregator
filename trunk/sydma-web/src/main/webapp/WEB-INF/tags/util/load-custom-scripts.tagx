@@ -1,0 +1,29 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:tiles="http://tiles.apache.org/tags-tiles" xmlns:jsp="http://java.sun.com/JSP/Page"
+    xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    <jsp:output omit-xml-declaration="yes" />
+
+    <tiles:useAttribute name="page_js_file" />
+    <c:if test="${page_js_file != '' }">
+        <spring:url value="/resources/scripts/${page_js_file}" var="page_js" />
+        <script type="text/javascript" src="${page_js}">
+                                    <jsp:text></jsp:text>
+                                </script>
+    </c:if>
+    <tiles:useAttribute name="page_js_files" classname="java.util.List" ignore="true" />
+    <c:if test="${page_js_files != ''}">
+        <c:forEach var="js_file" items="${page_js_files}">
+            <spring:url value="/resources/scripts/${js_file}" var="additional_js" />
+            <script type="text/javascript" src="${additional_js}">
+                                                    <jsp:text> </jsp:text>
+                                                </script>
+        </c:forEach>
+    </c:if>
+    <tiles:useAttribute name="page_css_files" classname="java.util.List" ignore="true" />
+    <c:if test="${page_css_files != ''}">
+        <c:forEach var="css_file" items="${page_css_files}">
+            <spring:url value="/resources/${css_file}" var="additional_css" />
+            <link rel="stylesheet" type="text/css" media="screen" href="${additional_css}" />
+        </c:forEach>
+    </c:if>
+</jsp:root>

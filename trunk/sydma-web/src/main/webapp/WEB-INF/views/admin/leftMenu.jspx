@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div id="menu" class="withtabs" xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+
+	<dl>
+		<dt><spring:message code="left.menu.title" text="?left.menu.title?"/></dt>
+		<dd>
+			<ul>
+				<li><c:url value='/admin/rds/list?created' var="rdsListCreated" />
+				<a href="${rdsListCreated}">Unapproved RDS requests</a>
+				</li>
+				<li><c:url value='/admin/rds/list?approved' var="rdsListApproved" />
+				<a href="${rdsListApproved}">Approved RDS requests</a>
+				</li>			
+			</ul>
+		</dd>	
+	</dl>
+</div>

@@ -1,0 +1,37 @@
+<div class="sydma_content" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+
+    <tiles:useAttribute name="fileType" />
+
+    <h3>
+        <spring:message code="manageDataset.delete.heading" arguments="${fileType}" text="?Delete?" />
+    </h3>
+
+    <c:url value="/managedataset/delete" var="submitUrl" />
+
+    <form:form id="delete_form" modelAttribute="directoryName" class="formbuilder ajaxForm" method="post"
+        action="${submitUrl}">
+        <c:if test="${not empty executionError}">            
+                <ol>
+                    <li class="error">
+                        <label>
+                            <spring:message code="manageDataset.delete.fail" arguments="${fileType }, ${executionError}" text="?Failed?"/>
+                        </label>
+                    </li>
+                </ol>            
+        </c:if>
+        <p>
+            <spring:message code="manageDataset.delete.description" arguments="${fileType }" text="?Delete?" />
+            <b><c:out value="${namedPath}" escapeXml="true"/></b>
+        </p>
+        <input type="hidden" name="filePath" value="${filePath }" />
+        <input type="hidden" name="fileType" value="${fileType }" />
+        <div class="buttons">
+            <input id="confirm_submit" class="submit-button button" type="submit" value="Delete" name="Delete"
+                title="Delete" />
+        </div>
+
+    </form:form>
+
+</div>

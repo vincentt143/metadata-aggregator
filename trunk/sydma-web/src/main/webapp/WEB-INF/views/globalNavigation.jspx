@@ -1,0 +1,18 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+	<jsp:output omit-xml-declaration="yes" />
+
+<ul id="nav-global">
+	<!-- use the "active" class to define the currently active item (highlighted text and nav indicator) -->
+	<li class="active"><c:url value="/" var="homeIndex"/><a href="${homeIndex}">My Research Data</a>
+	</li>
+	<li><a href="http://sydney.edu.au/">University Home</a>
+	</li>
+	<li><a href="#">Contacts</a>
+	</li>
+	<li><a href="#">Sitemap</a>
+	</li>
+</ul>
+</jsp:root>
+

@@ -1,0 +1,8 @@
+<div id="masthead">
+	<a href="#content" class="skip-nav">Skip to main content</a>
+	<h1>
+		<a id="logo" href="http://sydney.edu.au/">The University of Sydney</a>
+		<span id="separator">-</span> <span id="tag-line">My Research
+			Data Manager</span>
+	</h1>
+</div>

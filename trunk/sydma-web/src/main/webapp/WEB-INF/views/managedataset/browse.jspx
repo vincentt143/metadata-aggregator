@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div class="sydma_content" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+        <spring:message code="manageDataset.browse.title" text="?Browse Dataset?" arguments="${group.name},${project.name},${dataset.name}" htmlEscape="true" />
+    </h1>
+    
+    <div class="column_left">
+        <div id="browse_tree">
+        <jsp:text> </jsp:text>
+        </div>
+    
+    </div>
+    
+
+    <c:url var="listDestinationUrl" value="../../../filetree/listDownload" />    
+    <c:url var="connectUrl" value="../../../filetree/connect" />
+    
+    <c:url var="createDirectoryUrl" value="../../directory/create" />
+    <c:url var="deleteDirectoryUrl" value="../../directory/delete" />      
+    <c:url var="deleteFileUrl" value="../../file/delete" />
+    
+    <c:url var="moveNodeUrl" value="../../file/move" />                                
+    
+<script type="text/javascript">
+jQuery(function(){
+    
+    var rootPath = "${nodeRootPath}";
+    var rootName = "${nodeRootName}";
+    var listDestinationUrl = "${listDestinationUrl}";
+    var connectUrl = "${connectUrl}";
+    var destinationTreeTabIndex = 10;
+    
+    var moveNodeUrl = "${moveNodeUrl}";
+    
+    var controlManager = Sydma.manageDataset.createControlManager();
+    
+    var createDirUrlCreator = Sydma.manageDataset.getUrlCreator("${createDirectoryUrl}");
+    var deleteDirUrlCreator = Sydma.manageDataset.getUrlCreator("${deleteDirectoryUrl}");
+    var deleteFileUrlCreator = Sydma.manageDataset.getUrlCreator("${deleteFileUrl}");
+    
+    var onDeleteActionComplete = controlManager.onDeleteActionLinkComplete;
+    var onCreateActionComplete = controlManager.onCreateActionLinkComplete;
+    
+    var linkOpt = 
+    {
+        "actionMenuContainerSelector" : "#actionMenu",
+        "links" : 
+            {
+            	"createDir" :
+        	    {
+        	    	"title" : "Create Directory",
+        	    	"url" : createDirUrlCreator,
+        	    	"forTypes" : ["DIRECTORY","DATASET"],
+        	    	"linkClass" : "createDir",
+        	    	"onComplete" : onCreateActionComplete
+        	    },
+        	    "deleteDir" :
+                {
+                	"title" : "Delete Directory",
+                	"url" : deleteDirUrlCreator,
+                	"forTypes" : ["DIRECTORY"],
+                	"linkClass" : "deleteDir",
+                	"onComplete" : onDeleteActionComplete
+                },   
+                "deleteFile" :
+                {
+                	"title" : "Delete File",
+                	"url" : deleteFileUrlCreator,
+                	"forTypes" : ["FILE"],
+                	"linkClass" : "deleteFile",
+                	"onComplete" : onDeleteActionComplete
+                }            	
+            }
+    };
+    
+    var browseTreeOpt =
+    {
+        "treeSelector" : "#browse_tree",
+        "treeId" : "browse_tree",
+        "url" : listDestinationUrl,
+        "tabIndex" : destinationTreeTabIndex,
+        "connectUrl" : connectUrl,
+        "rootName" : rootName,
+        "rootPath" : rootPath,
+        "allowFileSelect" : true,
+        "limitSelection" : 1
+    };
+    
+    var moveNodeOpt = 
+    {
+		"moveNodeUrl" : moveNodeUrl  
+    };
+    
+    
+    controlManager.createBrowseTree(browseTreeOpt, linkOpt, moveNodeOpt);
+    
+    Sydma.activateReloadButton();
+    
+});
+</script> 
+</div>
+

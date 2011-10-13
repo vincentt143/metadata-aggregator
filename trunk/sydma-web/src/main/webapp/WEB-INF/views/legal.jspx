@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" id="legal" version="2.0">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+
+	<p>
+		<jsp:text>© </jsp:text>2002-11 The University of Sydney. <strong>Last
+			updated:</strong> 09 November 2009
+	</p>
+
+	<p>
+		<strong>ABN:</strong> 15 211 513 464. <strong>CRICOS number:</strong>
+		00026A. <strong>Phone:</strong> +61 2 9351 2222.
+	</p>
+	<p>
+		<strong>Authorised by:</strong>Director, Unit title.
+	</p>
+
+	<p id="foot-links">
+		<a href="http://sydney.edu.au/contact.shtml">Contact the
+			University</a> | <a href="http://sydney.edu.au/disclaimer.shtml">Disclaimer</a>
+		| <a href="http://sydney.edu.au/privacy.shtml">Privacy</a> | <a
+			href="http://sydney.edu.au/accessibility.shtml">Accessibility</a>
+	</p>
+</div>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="withSidebar" name="admin/index">
+        <put-attribute name="body" value="/WEB-INF/views/admin/index.jspx" cascade="true"/>
+        <put-attribute name="activeTab" value="admin.tab" cascade="true"/>
+        <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx" cascade="true"/>
+    </definition>
+    <definition extends="withSidebar" name="admin/rds/listUnapproved">
+        <put-attribute name="body" value="/WEB-INF/views/admin/rds/list.jspx" cascade="true"/>
+        <put-attribute name="listType" value="admin.rds.list.unapproved" cascade="true"/>
+        <put-attribute name="activeTab" value="admin.tab" cascade="true"/>
+        <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx" cascade="true"/>
+    </definition>
+    <definition extends="withSidebar" name="admin/rds/listApproved">
+        <put-attribute name="body" value="/WEB-INF/views/admin/rds/list.jspx" cascade="true"/>
+        <put-attribute name="listType" value="admin.rds.list.approved" cascade="true"/>
+        <put-attribute name="activeTab" value="admin.tab" cascade="true"/>
+        <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx" cascade="true"/>
+    </definition>
+    <definition extends="withSidebar" name="admin/rds/show">
+        <put-attribute name="body" value="/WEB-INF/views/admin/rds/show.jspx" cascade="true"/>
+        <put-attribute name="activeTab" value="admin.tab" cascade="true"/>
+        <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx" cascade="true"/>
+    </definition>
+</tiles-definitions>

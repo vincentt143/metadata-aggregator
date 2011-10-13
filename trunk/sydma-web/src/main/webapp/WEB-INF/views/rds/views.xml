@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="contentUnlightboxable" name="rds/new">
+        <put-attribute name="body" value="/WEB-INF/views/rds/new.jspx" cascade="true"/>
+        <put-attribute name="activeTab" value="request.rds.tab" cascade="true"/>
+    </definition>
+    <definition extends="contentUnlightboxable" name="rds/show">
+        <put-attribute name="body" value="/WEB-INF/views/rds/show.jspx" cascade="true"/>
+        <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx"/>
+    </definition>
+</tiles-definitions>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<spring:message code="label_advertising_unadvertiseconfirm"
+		htmlEscape="false" var="title" />
+		<spring:message code="application_name" htmlEscape="false"
+			var="app_name" />
+		<h3>
+			<spring:message arguments="${app_name}" code="researchDataset.title.unadvertise" />
+		</h3>
+
+	<c:url var="formAction" value="/researchdataset/unadvertise"/>
+		<form action="${formAction}" method="post" class="formbuilder">
+
+			<p>Are you sure you want to un-advertise dataset <b> <c:out value= "${researchDataset.name}"/> </b>? Doing so will remove it from the RDA.</p>
+			<input type="hidden" name="datasetId" value="${researchDataset.id}"/>
+			<div class="buttons">
+				<input class="cancel-button button" type="submit" name="submit" value="Cancel"></input>
+				<input class="submit-button button" type="submit" name="submit" value="Confirm"></input>
+			</div>
+
+		</form>
+</div>

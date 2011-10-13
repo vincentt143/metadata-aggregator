@@ -1,0 +1,11 @@
+body.splash #head {border-bottom: 1.7em solid #F5AF00 !important; height: 10em; min-height: 0;}
+div#w1, div#w2, div#w3 {width: 700px !important;}
+div#w2 {min-width: 0;}
+#content #w4 {padding-bottom: 0.5em;}
+#foot {padding: 0.5em 0;}
+#foot #legal {width: 100%;}
+table.login, table.login td  {border-width: 0px !important;}
+table.login td.label {width: 100px;}
+.notice {color: red; font-size: 1.1em !important;}
+
+

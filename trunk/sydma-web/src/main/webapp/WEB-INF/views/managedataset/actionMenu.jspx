@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0"
+    
+    id="sidebarContainer">
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    
+        <div id="actionMenu" class="column_right sidebar">
+            <dl class="feature">
+                <dt>
+                    <spring:message code="manageDataset.action" text="?Actions?" />
+                </dt>               
+            </dl>
+        </div>
+</div>
+

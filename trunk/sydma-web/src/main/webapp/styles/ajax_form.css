@@ -1,0 +1,244 @@
+@CHARSET "UTF-8";
+
+/***/
+
+.sydma_content h1, .sydma_content h2, .sydma_content h3, .sydma_content h4, .sydma_content h5, .sydma_content h6
+	{
+		color: #CE1126;
+	}
+.sydma_content h1
+	{
+		text-transform:uppercase;
+		font-size:1.7em;
+	}	
+	
+.sydma_content form.boxed {
+	padding: .909em;
+	width: 45em;
+	margin: .909em 0;
+	background-color: #f3f3f3;
+	border: 1px solid #ddd;
+}
+
+.sydma_content form p {
+	margin: .25em 0;
+	vertical-align: middle;
+}
+
+.sydma_content form p.first {
+	margin-top: 0;
+}
+
+.sydma_content form p.last {
+	margin-bottom: 0;
+}
+
+.sydma_content form p label {
+	margin-right: 0;
+	vertical-align: middle;
+	position: relative;
+}
+
+
+
+.sydma_content form.formbuilder legend {
+	font-style: normal;
+	text-transform: none;
+	font-weight: bold;
+	padding-left: 1em;
+	padding-bottom: 1em;
+	padding-right: 1em;
+	padding-top: .6em;
+	font-size: 1.5em;
+	clear: left;
+	margin: 0 0 0 -0.65em;
+	background: #fdfcde;
+}
+
+.sydma_content form.formbuilder label {
+	margin-top: .4em;
+	width: 11em;
+	margin-top: .2em;
+	display: inline-block;
+	vertical-align: top;
+	text-align: right;
+	font-weight: bold;
+}
+
+.sydma_content form.formbuilder fieldset {
+	background-color: #fdfcde;
+	position: relative;
+	padding: 0 1em 1em 1em;
+	margin: 1em 0;
+}
+
+.sydma_content form.formbuilder fieldset ol {
+	margin: 1em 0 0 0;
+	padding: 0;
+}
+
+.sydma_content form.formbuilder fieldset li {
+	list-style: none;
+	padding: .5em .5em 1em .5em;
+	margin: 0;
+}
+
+.sydma_content form.formbuilder fieldset li.error {
+	border-color: #ce1126;
+	border-width: 2px 0 1px 0;
+	color: #ce1126;
+	border-style: solid;
+	width: auto;
+}
+
+.sydma_content form.formbuilder fieldset fieldset {
+	border: none;
+	margin: .3em 0 0;
+	padding-left: 0;
+	background: none;
+	margin: 0;
+}
+
+.sydma_content form.formbuilder fieldset fieldset legend {
+	background: none;
+	padding: 0 0 .5em;
+	margin: 0;
+	border: 0;
+	font-size: 1em;
+	font-weight: bold;
+}
+
+.sydma_content form.formbuilder fieldset fieldset label {
+	display: block;
+	width: auto;
+	font-weight: normal;
+	text-align: left;
+	max-width: 34em;
+	margin-left: 8em;
+	margin-top: 0;
+}
+
+.sydma_content form.formbuilder fieldset legend span {
+	display: block;
+	max-width: 25em;
+	white-space: normal;
+}
+
+.sydma_content form.formbuilder fieldset fieldset legend span {
+	max-width: 42em;
+}
+
+.sydma_content form.formbuilder select {
+	max-width: 25em;
+}
+
+.sydma_content form.formbuilder fieldset li.error {
+	margin-bottom: .5em;
+	background-color: #FFF5EE;
+}
+
+.sydma_content form.formbuilder em,.sydma_content .required-warning em {
+	font-weight: bold;
+	font-style: normal;
+	color: #f00;
+}
+
+.sydma_content form.formbuilder .user-agreement label {
+	width: auto;
+	font-weight: normal;
+	margin: -1.6em 0 0 3em;
+	line-height: 1.5;
+	text-align: left;
+}
+
+.sydma_content form.formbuilder textarea {
+	width: 25em;
+	font-size: 1em;
+}
+
+.sydma_content form.formbuilder .buttons {
+	text-align: right;
+	margin-top: 1em;
+}
+
+.sydma_content form.formbuilder .buttons input {
+	margin-left: 2em;
+}
+
+.sydma_content form.formbuilder h2 {
+	color: #384856;
+	margin: .8em 0;
+	font-size: 1.6em;
+}
+
+.sydma_content form.formbuilder p {
+	margin: 1em 0;
+}
+
+.sydma_content form.formbuilder p.error-text {
+	margin-bottom: .8em;
+	color: #ce1126;
+	background: transparent url(../images/common/icon_error.gif) no-repeat
+		left .167em;
+	border-bottom: .083em solid #ce1126;
+	padding-bottom: .5em;
+	padding-left: 1.7em;
+}
+
+.sydma_content form.formbuilder p.leader-text {
+	padding-top: 1em;
+	margin-top: 0;
+}
+
+.sydma_content form.formbuilder li p {
+	font-size: 1em;
+	margin: 0;
+}
+
+.sydma_content form.formbuilder li input.button {
+	padding: .25em .75em;
+	margin-bottom: .2em;
+}
+
+.sydma_content form.formbuilder .hidden {
+	height: 1px;
+	left: -9999em;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	width: 1px;
+}
+
+.sydma_content form.formbuilder input[type=text] {
+	width: 18em;
+}
+
+.sydma_content form.formbuilder .buttons input.button {
+	margin: 0 0 0 1em;
+}
+
+.sydma_content form.formbuilder input.button {
+	height: auto;
+	border: 0;
+	color: #fff;
+	padding: .5em .75em;
+	cursor: pointer;
+	margin: 0;
+}
+
+.sydma_content form.formbuilder input.button.clear-button {
+	background: #ce1126;
+}
+
+.sydma_content form.formbuilder input.button.submit-button {
+	background: #12416c;
+}
+
+.sydma_content form.formbuilder input.button:hover {
+	background: #355d82;
+	text-decoration: underline;
+}
+
+.sydma_content form.formbuilder input.button.clear-button:hover {
+	background-color: #d53447;
+}

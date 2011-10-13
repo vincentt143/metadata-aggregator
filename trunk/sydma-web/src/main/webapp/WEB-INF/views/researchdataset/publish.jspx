@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags"
+    xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+    xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <spring:message code="label_researchdataset_publish" htmlEscape="false"
+        var="title" text="?Research Dataset Publish?" />
+    <spring:message code="application_name" htmlEscape="false"
+        var="app_name" />
+    <h1>
+        <spring:message code="researchDataset.title.publish" text="?Confirm Advertise Dataset?" arguments="${researchDataset.name}" htmlEscape="true" />
+    </h1>
+    
+    
+        <form:form class="formbuilder" modelAttribute="researchProject" method="post" action="publish" autocomplete="off">
+        <form:hidden path="id" />
+        <form:hidden path="version" />
+
+        <fieldset>
+            <legend>
+                <spring:message code="researchGroup.legend.publish" text="?Parent Group Info?" />
+            </legend>
+            
+            <ol>
+                <li>
+                <label>
+                <spring:message code="researchGroup.name" text="?name?"/>:
+                </label>
+                <span class="field_value">
+                    <c:out value="${researchGroup.name }" escapeXml="true"/>
+                </span>
+                </li>
+                
+                <li>
+                <label>
+                <spring:message code="researchGroup.field.of.research.code" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchGroup.subjectCode}">
+                        <c:out value="${researchGroup.subjectCode.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+
+                <li>
+                <label>
+                <spring:message code="researchGroup.field.of.research.code.optional" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchGroup.subjectCode2}">
+                        <c:out value="${researchGroup.subjectCode2.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+  
+                <li>
+                <label>
+                <spring:message code="researchGroup.field.of.research.code.optional" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchGroup.subjectCode3}">
+                        <c:out value="${researchGroup.subjectCode3.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+            
+                <li>
+                <label>
+                <spring:message code="researchGroup.principal.investigator" text="?Principal Investigator?"/>:
+                </label>
+                <span class="field_value">
+                    <c:out value="${researchGroup.principalInvestigator }" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchGroup.principal.investigator.full.name" text="?Principal Investigator Full Name?"/>:
+                </label>
+                <span class="field_value">
+                    <c:out value="${researchGroup.principalInvestigator.givenname }" escapeXml="true"/>
+                    <c:out value=" " escapeXml="true"/>
+                    <c:out value="${researchGroup.principalInvestigator.surname }" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchGroup.data.management.contact" text="?Data Management Contact?"/>:
+                </label>
+                <span class="field_value">
+                    <c:out value="${researchGroup.dataManagementContact }" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchGroup.URL" text="?URL?"/>:
+                </label>
+                <span class="field_value">
+                <c:out value="${researchGroup.url }" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchGroup.description" text="?description?"/>:
+                </label>
+                <span class="field_value">
+                <c:out value="${researchGroup.description }" escapeXml="true"/>
+                </span>
+                </li>
+            </ol>
+            <c:url var="editGroupUrl" value="../../researchgroup/edit/${researchGroup.id}" />
+            <a href="${editGroupUrl}" class="edit_link"> <spring:message code="researchGroup.legend.edit" text="?Edit Group Info?" /> </a>
+        </fieldset>
+    </form:form>
+    
+    
+    <form:form class="formbuilder" modelAttribute="researchProject" method="post" action="publish" autocomplete="off">
+        <form:hidden path="id" />
+        <form:hidden path="version" />
+
+        <fieldset>
+            <legend>
+                <spring:message code="researchProject.legend.publish" text="?Parent Project Info?" />
+            </legend>
+            
+            <ol>
+                <li>
+                <label>
+                <spring:message code="researchProject.name" text="?name?"/>:
+                </label>
+                <span class="field_value">
+                    <c:out value="${researchProject.name }" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchProject.field.of.research.code" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchProject.subjectCode}">
+                        <c:out value="${researchProject.subjectCode.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+                
+				<li>
+                <label>
+                <spring:message code="researchProject.field.of.research.code.optional" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchProject.subjectCode2}">
+                        <c:out value="${researchProject.subjectCode2.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+				<li>
+                <label>
+                <spring:message code="researchProject.field.of.research.code.optional" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchProject.subjectCode3}">
+                        <c:out value="${researchProject.subjectCode3.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+                
+                <li>
+                <label>
+                <spring:message code="researchProject.URL" text="?URL?"/>:
+                </label>
+                <span class="field_value">
+                <c:out value="${researchProject.url }" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchProject.description" text="?description?"/>:
+                </label>
+                <span class="field_value">
+                <c:out value="${researchProject.description }" escapeXml="true"/>
+                </span>
+                </li>
+            </ol>
+            <c:url var="editProjectUrl" value="../../researchproject/edit/${researchProject.id}" />
+            <a href="${editProjectUrl}" class="edit_link"> <spring:message code="researchProject.legend.edit" text="?Edit Project Info?" /> </a>
+        </fieldset>
+    </form:form>
+    
+    
+    <form:form class="formbuilder" modelAttribute="researchDataset" method="post" action="publish" autocomplete="off">
+        <form:hidden path="id" />
+        <form:hidden path="version" />
+
+        <fieldset>
+            <legend>
+                <spring:message code="researchDataset.legend.publish" text="?Dataset Info?" />
+            </legend>
+            
+            <ol>
+                <menu:form-select path="publicAccessRight" code="researchDataset.publicAccessRight" required="true" items="${publicAccessRightOptions}" label="shortName" value="id" includeBlank="false"/>
+                <li>
+                <label>
+                <spring:message code="researchDataset.name" text="?name?"/>:
+                </label>
+                <span class="field_value">
+                    <c:out value="${researchDataset.name }" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchDataset.field.of.research.code" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchDataset.subjectCode}">
+                        <c:out value="${researchDataset.subjectCode.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+                
+                <li>
+                <label>
+                <spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchDataset.subjectCode2}">
+                        <c:out value="${researchDataset.subjectCode2.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+               	<li>
+                <label>
+                <spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
+                </label>
+                <span class="field_value">
+                    <c:if test="${not empty researchDataset.subjectCode3}">
+                        <c:out value="${researchDataset.subjectCode3.displayName }" escapeXml="true"/>
+                    </c:if>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchDataset.physicalLocation" text="?location?"/>:
+                </label>
+                <span class="field_value">
+                <c:if test="${not empty researchDataset.physicalLocation}">
+                <c:out value="${researchDataset.physicalLocation.label}" escapeXml="true"/>
+                </c:if>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchDataset.additionalLocationInformation" text="?location?"/>:
+                </label>
+                <span class="field_value">
+                <c:out value="${researchDataset.additionalLocationInformation}" escapeXml="true"/>
+                </span>
+                </li>
+                <li>
+                <label>
+                <spring:message code="researchDataset.description" text="?description?"/>:
+                </label>
+                <span class="field_value">
+                <c:out value="${researchDataset.description }" escapeXml="true"/>
+                </span>
+                </li>
+            </ol>
+            <c:url var="editDatasetUrl" value="../edit/${researchDataset.id}" />
+            <a href="${editDatasetUrl}" class="edit_link"> <spring:message code="researchDataset.legend.edit" text="?Edit Dataset Info?"/> </a>
+        </fieldset>
+        <div class="buttons">
+            <input id="cancel" class="cancel-button button" type="submit" name="submit" value="Cancel"></input>
+            <input id="advertise" class="submit-button button" type="submit" name="submit" value="Advertise"></input>
+        </div>
+    </form:form>
+    <script type="text/javascript">
+    	jQuery(document).ready(
+    	function()
+    	{
+    	 	if (Sydma.useAjaxView)
+	 	    {
+    	 	    var onComplete = function()
+    	 	    {
+    	 	        //ideally we may want to get a new fragment for the edited component, but whatever works
+	 	      	  location.reload();
+    	 	    };
+    	 	    var opt = 
+    	 	        {
+    	 	            "onActionComplete" : onComplete
+    	 	        };
+    	 	    var actionControl = Sydma.ActionControl.createActionControl(opt);
+	 	    	var $editLinks = jQuery(".edit_link");
+	 	    	
+	 	    	var peformAction = function(event)
+	 	    	{
+	 	    	   event.preventDefault();
+	 	    	   var url = jQuery(this).attr("href");
+	 	    	   actionControl.doUrl(url);
+	 	    	   return false;
+	 	    	};
+	 	    	
+	 	    	$editLinks.click(peformAction);
+	 	    }
+    	});
+    
+    </script>
+</div>

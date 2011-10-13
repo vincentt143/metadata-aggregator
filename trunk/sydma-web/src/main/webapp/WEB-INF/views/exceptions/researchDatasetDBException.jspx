@@ -1,0 +1,23 @@
+<div id="criticalFailure" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+    <div class="sydma_exception">
+      <ol>
+        <li class="error">
+            <label>
+                <spring:message code="exceptions.researchDatasetDBException" arguments="${exception.message}" text="?Research Dataset DB Failure"/>
+            </label>                       
+        </li>
+    </ol>   
+    <p>
+        <spring:message code="exceptions.reload.description" text="?Refresh Page?"/>            
+    </p>         
+     <div class="buttons">
+        <input id="confirmRefresh" class="sydmaReload button" type="button" value="Okay" name="Okay"
+            title="Okay" />
+    </div>
+    </div>
+    <script type="text/javascript">
+        Sydma.activateReloadButton();
+    </script>
+</div>

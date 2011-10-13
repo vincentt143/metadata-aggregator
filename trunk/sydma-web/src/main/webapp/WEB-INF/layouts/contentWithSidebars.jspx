@@ -1,0 +1,16 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:tiles="http://tiles.apache.org/tags-tiles"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" 
+	version="2.0">
+	<tiles:insertAttribute name="leftMenu" />
+	<!-- start content -->
+	<div id="content" class="withtabs">
+		<div id="w4" class="sydma">
+			<tiles:insertAttribute name="lightboxable" />
+			<tiles:insertAttribute name="unlightboxable" />
+		</div>
+	</div>
+</jsp:root>
