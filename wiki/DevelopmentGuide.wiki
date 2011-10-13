@@ -25,7 +25,7 @@ The Metadata Aggregator was developed using the eclipse-based Spring source's _I
 
 = Few points on basic STS troubleshooting =
 
-STS is a powerful IDE including support for Java, JSPX, javascript, AspectJ, Spring Roo, among others. But the DMS uses Roo and other features and it stretches it quite a bit; sometimes it just can't handle it. So, few tips are helpful:
+STS is a powerful IDE including support for Java, JSPX, javascript, AspectJ, Spring Roo, among others. Here you have a few usage tips:
 
   # Ignore the javascript error reported on jquery.
   # Sometimes, when using *auto build*, it just gets recompiling forever (in Linux). Disable *auto build* and build manually... at least for a while.
@@ -34,41 +34,49 @@ STS is a powerful IDE including support for Java, JSPX, javascript, AspectJ, Spr
   # It is recommended to extend the Tomcat start up time out to at least 1.5 mins. (This is for your development machine, in a middle-end dedicated server the DMS starts in under 30 secs.)
   # We believe most issues are created when one runs the command line maven build and then refresh STS. Unfortunately, doing a command line {{{mvn clean install}}} to get all the tests checked is a must for any experienced developer. Our work around, cleaning the project space as mentioned above usually helps.
 
-= Running the DMS from STS =
+= Running the Metadata Aggregator from STS =
 
-Running the DMS inside STS with a single worker architecture requires more steps:
+Running the Metadata Aggregator inside STS with a single worker architecture requires the following steps:
 
-== Install required third party software ==
+  # Grab and install [http://www.mysql.com/ MySQL]. 
+  # Install [http://tomcat.apache.org/download-60.cgi Tomcat 6]
+  # In MySQL, create a database called and a user with all privileges over it.
+  # Configure two dms home directories, one for development, and one for integration testing. You can do that by copying the sydma-install > config > hudson directory into your user folder. A few properties in the three property files make reference to the dms home directory, so you should change them from "/var/lib/tomcat5/hudson/jobs/DC2F/workspace/sydma-install/config/" to your dms.config directory.
+  # The worker.properties has a dms.wn.localRootPath directory. Point that to an existing directory
+  # The dms.properties have properties for the database jdbc url. Change the url to sydma_int or sydma depending on the environment (development or integration)
+  # In sydma-web > src > main > filters change filter-dev and filter-int to point to your respectives dms homes. You should now be able to run cucumber as a maven target
+To run on development mode, you can run in from maven as mvn tomcat:run of from Spring STS. To run from STS you need to deploy both the web and the httptunnel modules. Make sure your run configuration has proper memory seetings (I use -Xmx1024m -XX:MaxPermSize=256m , but less than that should also work) and you set the dms home properties (-Ddms.config.home=/Users/diego/dms.home -Ddms.worker.profile=worker-external.xml)  
 
-  # Grab and install [http://www.mysql.com/ MySQL]
-  # Likewise for [http://activemq.apache.org/ ActiveMQ]
-  # and [http://tomcat.apache.org/download-60.cgi Tomcat 6]
-  # In MySQL, create a database `ammrf` and populate it with the provided [http://code.google.com/p/ammrf-dms/source/browse/trunk/dms/dms-bookinggw/src/main/sql/mysql/001_create.sql sql] in dms-booking/src/main/sql/mysql
-  # Also, create a database `specimendb` if you want to try the atom probe ingestion (please contact us for sample data)
-  # In STS, configure the !Tomcat instance
-  # Download [http://lucene.apache.org/solr/ Apache Solr] and put the apache-solr-`<version>`.war in the STS's Tomcat temporary folder as outlined in reference [#R1 R1].
+= Integration testing =
+We use cucumber for integration test. All the features are created in the features directory in the root of the sydma-web module.
 
-  `*` *Note*: Tomcat, ActiveMQ and Solr are already in dms-install/src/main/resources/lib, but feel free to try a latest release if you want.
+Cucumber Testing starts up Tomcat with the web application, and runs the test cases in Selenium. It does require a fair bit of memory, so you may need to increase maven defaults with export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
 
-== Configure your profile ==
+The first time you run cucumber, you need to install a few gems in your system. To do that, you run
 
-The system uses a bunch of java property files located in a configuration folder. A sample of those are in dms-install/src/main/resources/profiles/default.dir. Copy the contents of this folder into your home directory, under .ammrf/dms for example. Then follow this [DmsPropertyFiles guideline] on how to configure those properties for your system.
+$ mvn -DcukeArgs="--tags @passing" integration-test -Dcucumber.installGems=true -P=int
 
-== Launch in STS ==
+Subsequent runs can be run as
 
-Once the properties files are in place; one can run the application from within STS. Create a subdirectory where the property files are called _data_
+$ mvn -DcukeArgs="--tags @passing" integration-test -P=int
 
-  # Start ActiveMQ
-  # Launch the worker using org.apache.camel.spring.Main and providing
-    # Arguments: -ac META-INF/applicationContext-worker*.xml
-    # VM arguments: -Ddms.config.home=`<`path-to-config-files`>` -Dsolr.solr.home=`<`path-to-data`>`
-  # Launch Tomcat, by adding the dms.config.home above as VM argument of the launcher.
+You can annotate the test cases with different tags, both the scenarios or full features like:
+@passing
+Scenario: Administrator gets redirected to admin home page
+    Given I log in as "administrator"
+    Then I should be on the administrator home page
 
-= References =
-==R1== 
-(_Retrieved from [http://abtj.blogspot.com/2009/07/how-to-adddeploy-war-file-into-eclipse.html here] 13/Jul/2011_)
-In some scenarios, you wish to deploy a default web application into Eclipse Tomcat which is not part of your project, you may just add the war file into the below directory:
+or
+@passing
+Feature: Test advertising of datasets
+...
 
-%your_workspace%\.metadata\.plugins\org.eclipse.wst.server.core\tmpX\webapps
+We have a full set of integration tests that cover the whole application. The downside of this is that running the whole test suite can take a long time. If you want to run only the tests that affect the functionality you are currently working on, you can mark them as work in progress (wip)
 
-where tmpX could be tmp0, tmp1 etc
+To run the features the @wip scenarios only, you run mvn -DcukeArgs="--tags @wip" integration-test -P=int
+
+If we have several @wip in the feature set (as we have several developers working at the same time in different regions of the system), command line you can restrict which feature file to scan for scenarios using -Dcucumber.features, like
+
+$ mvn -Dcucumber.features=/home/carlos/Devel/sydma/sydma-web/features/dataset_file_move.feature -DcukeArgs="--tags @wip" integration-test -P=int
+
+Be careful to provide the full path to the file (the relative path didn't work running from within sydma). You can provide the argument in Eclipse as well.
