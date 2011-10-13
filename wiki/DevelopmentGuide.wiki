@@ -75,10 +75,11 @@ Feature: Test advertising of datasets
 }}}
 We have a full set of integration tests that cover the whole application. The downside of this is that running the whole test suite can take a long time. If you want to run only the tests that affect the functionality you are currently working on, you can mark them as work in progress (wip)
 
-To run the features the @wip scenarios only, you run mvn -DcukeArgs="--tags @wip" integration-test -P=int
+To run the features the @wip scenarios only, you run 
+{{{mvn -DcukeArgs="--tags @wip" integration-test -P=int}}}
 
 If we have several @wip in the feature set (as we have several developers working at the same time in different regions of the system), command line you can restrict which feature file to scan for scenarios using -Dcucumber.features, like
-
+{{{
 $ mvn -Dcucumber.features=/home/carlos/Devel/sydma/sydma-web/features/dataset_file_move.feature -DcukeArgs="--tags @wip" integration-test -P=int
-
+}}}
 Be careful to provide the full path to the file (the relative path didn't work running from within sydma). You can provide the argument in Eclipse as well.
