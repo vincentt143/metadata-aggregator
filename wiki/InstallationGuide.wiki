@@ -26,7 +26,7 @@ To install the software, go to sydma-install/bin, and run
 {{{
 $ qa-installer.sh –h <environment>
 }}}
-The <environment> parameter needs to match:
+The {{{<environment>}}} parameter needs to match:
   # A host name where it is possible to ssh/scp. We recommend setting your public key in the authorized_keys of the target environment, to avoid having to enter the password multiple times. 
   # A directory under sydma-intall/config
-  # A filter called  filter-<environment>.properties under sydma-web/src/main/filters
+  # A filter called  {{{filter-<environment>.properties}}} under sydma-web/src/main/filters
