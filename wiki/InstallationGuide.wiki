@@ -1,0 +1,32 @@
+#summary Installation Guide
+
+= Introduction =
+
+This document describes the process needed to install the system in target environments.
+
+
+= Target environment requirements =
+The system has been tested on CentOS (redhat based) and Ubuntu (debian based) operating systems. The minimal requirements are:
+  # OpenJDK
+  # Bash shell (version 3+)
+  # Utilities: unzip, which, awk, readlink, head, tail, etc
+  # MySQL server
+  # Tomcat 6.0
+  # A directory under the home directory called {{{staging}}}
+
+= Installation Profiles =
+
+The software contains an installation script that depends on installation profiles. For each server where the system is to be deployed, the following configuration files are needed:
+  # sydma-install/config configuration: where the dms, tunnel, and worker properties are customised, and where the system keys are in place. There are examples of some profiles in the source code, that can serve as a baseline.
+  # Filter configuration. System specific properties that need to be accessible at runtime are stored in sydma-web/src/main/filters. Each deployment environment should have a filter file, where the environment specific variables are defined.
+
+= Installation Script = 
+
+To install the software, go to sydma-install/bin, and run
+{{{
+$ qa-installer.sh –h <environment>
+}}}
+The <environment> parameter needs to match:
+  # A host name where it is possible to ssh/scp. We recommend setting your public key in the authorized_keys of the target environment, to avoid having to enter the password multiple times. 
+  # A directory under sydma-intall/config
+  # A filter called  filter-<environment>.properties under sydma-web/src/main/filters
