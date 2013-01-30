@@ -8,26 +8,47 @@
 
 	<jsp:directive.page contentType="text/html;charset=UTF-8" />
 	<jsp:output omit-xml-declaration="yes" />
-	
-	<h3>
-		<spring:message code="permissions.view.title" text="?permissions.view.title?" />
-	</h3> 
+
+	<h1>
+		<spring:message code="permissions.view.title"
+			text="?permissions.view.title?" arguments="${group.name}" />
+	</h1>
 	<br />
-	<display:table class="tabledata_blue" uid="permission" name="permissionList" defaultsort="1" 
-			pagesize="25" requestURI="" >
-		<c:set var="user" value="${permission.user}" />
-		<display:column title="Name">
-			<c:out value="${user.givenname} ${user.surname}" />
-		</display:column>
-		<display:column title="Identifier">
-			<c:out value="${user.userType}" />
-		</display:column>
-		<display:column property="path" sortable="false" title="Path" />
-		<display:column property="accessLevel" sortable="false" title="Permissions" />
-		
-		<display:setProperty name="basic.empty.showtable" value="true" />  
-        <display:setProperty name="paging.banner.group_size" value="25" />  
-        <display:setProperty name="paging.banner.onepage" value=" " />  
-        <display:setProperty name="paging.banner.placement" value="bottom" />
-	</display:table>
+	<fieldset class="ajax_links">
+		<legend> Viewing Permissions </legend>
+		<display:table uid="permission"
+			name="permissionEntries" defaultsort="1" pagesize="20" requestURI="/permission/view/${group.id}">
+			<display:column title="Name" property="fullName" />
+			<display:column title="User Type" property="typeOfUser" />
+			<display:column sortable="false" title="Resources">
+				<c:set var="path" value="${permission.displayPath}" />
+				<div title="${path}">
+					<c:out value="${fn:substring(path, 0, 70)}" />
+					<c:if test="${fn:length(path) > 70}"> ...</c:if>
+				</div>
+			</display:column>
+			<display:column sortable="false" title="Permissions" property="accessLevel" />
+			<display:column sortable="false" title="Actions" class="ajax_links">
+				<!-- logic  -->
+					<c:if test="${permission.canDelete}" >
+					<c:url value='/permission/delete' var="deletePermissionUrl">
+						<c:param name="group" value="${group.id}" />
+						<c:param name="id" value="${permission.id}" />
+					</c:url>
+					<a href="${deletePermissionUrl}"> 
+						<spring:message code="permissions.delete" text="?permissions.delete?" />
+					</a>
+					</c:if>
+			</display:column>
+
+			<display:setProperty name="basic.empty.showtable" value="true" />
+			<display:setProperty name="paging.banner.group_size" value="25" />
+			<display:setProperty name="paging.banner.onepage" value=" " />
+			<display:setProperty name="paging.banner.placement" value="bottom" />
+		</display:table>
+	</fieldset>
+	<script>
+        // inserting class to display:table pagelinks span. Adding to the whole table causes a problem with the download
+        $("span.pagelinks").addClass("ajax_links");
+    </script>
 </div>

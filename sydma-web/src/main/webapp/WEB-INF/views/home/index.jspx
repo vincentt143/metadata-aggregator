@@ -9,7 +9,7 @@
 	<spring:message code="label_home_index" htmlEscape="false" var="title" />
 	<spring:message code="application_name" htmlEscape="false"
 		var="app_name" />
-    <spring:message var="homeTitle" arguments="${app_name}" code="welcome_titlepane" text="?Welcome?"/>        
+	<spring:theme var="homeTitle" arguments="${app_name}" code="sections.welcome.titlepane" text="?Welcome?" />    
 	<h1 title="${homeTitle}">
 		${homeTitle}
 	</h1>
@@ -35,15 +35,20 @@
 
 	</div>
 	<div id="advertisedMessage" style="display: none;">
-			<span>This Dataset has been advertised in the </span>
-			<span><a target="_blank" href="http://services.ands.org.au/home/orca/rda/">RDA.</a></span>		
+            <spring:message var="advertisedText" code="home.subnote.advertise.link.title" text="?Advertised?"/>
+			<span><spring:message code="home.subnote.advertise.description" text="?Advertised?"/><jsp:text> </jsp:text></span>
+			<span><a target="_blank" href="http://services.ands.org.au/home/orca/rda/"
+                title="${advertisedText }"><spring:message code="home.subnote.advertise.link" text="?RDA?"/>.</a></span>		
 	</div>
 	<div id="notYetAdvertisedMessage" style="display: none;">
-		    <span>Raise your research profile, increase your Google ranking and promote your research. </span>
-		    <span><a target="_blank" href="http://www.google.com">Find out how.</a></span>  	
+        <spring:message var="notAdvertiseUrl" code="home.subnote.notAdvertise.url" text="i18n/home.subnote.notAdvertise.url"/>
+        <spring:message var="notAdvertiseText" code="home.subnote.notAdvertise.description" text="?Raise Profile?"/>
+		    <span><c:out value="${notAdvertiseText }"/>. </span>
+		    <span><a target="_blank" href="${notAdvertiseUrl}" 
+                title="${notAdvertiseText }"><spring:message code="home.subnote.notAdvertise.link" text="?Find out how?"/>.</a></span>  	
 	</div>
 	<div id="readyForAdvertisingMessage" style="display: none;">
-		    <span>This Dataset has been marked as Ready for Advertising – Advertising to RDA has yet to be carried out by the Principal Investigator.</span>
+		    <span><spring:message code="home.subnote.readyForadvertise.description" text="?Ready For Advertise?"/>.</span>
 	</div>
 
 	<c:url var="getGroupsUrl" value="getGroups" />
@@ -57,33 +62,50 @@
 	<c:url var="editProjectUrl" value="../researchproject/edit/{ID}" />
 	<c:url var="editGroupUrl" value="../researchgroup/edit/{ID}" />
     
+    <c:url var="viewGroupUrl" value="../researchgroup/view/{ID}" />
+    <c:url var="viewProjectUrl" value="../researchproject/view/{ID}" />
+    <c:url var="viewDatasetUrl" value="../researchdataset/view/{ID}" />
+    
     <c:url var="publishDatasetUrl" value="../researchdataset/publish/{ID}" />
     <c:url var="rejectAdvertiseDatasetUrl" value="../researchdataset/rejectAdvertising/{ID}" />
     <c:url var="confirmUnadvertiseUrl" value="../researchdataset/unadvertise/{ID}" />
     
     <c:url var="browseDatasetUrl" value="../managedataset/browse/dataset/{ID}" />
     
-    <c:url var="permissionsGroupUrl" value="../permission/index/add&#63;type&#61;group&amp;id&#61;{ID}"/>
-    <c:url var="viewPermissionsUrl" value="../permission/view/{ID}" />
+    <c:url var="manageVocabularyUrl" value="../researchgroup/managevocabulary/{ID}?browse=false" />
     
+    <c:url var="permissionsGroupUrl" value="../permission/new&#63;type&#61;group&amp;id&#61;{ID}"/>
+    <c:url var="permissionsProjectUrl" value="../permission/new&#63;type&#61;project&amp;id&#61;{ID}"/>
+    <c:url var="permissionsDatasetUrl" value="../permission/new&#63;type&#61;dataset&amp;id&#61;{ID}"/>
+    <c:url var="viewPermissionsUrl" value="../permission/view/{ID}" />
+    <c:url var="permissionActivityLogUrl" value="/permission/activityLog" />
+    <c:url var="manageDatabaseBackupUrl" value="../dbinstance/manageBackup" />
+    
+    <spring:message var="viewGroupLinkText" code="home.link.viewGroup" text="?View Group?" />
+    <spring:message var="viewProjectLinkText" code="home.link.viewProject" text="?View Project?" />
+    <spring:message var="viewDatasetLinkText" code="home.link.viewDataset" text="?View Dataset?" />
     <spring:message var="editGroupLinkText" code="home.link.editGroup" text="?Edit Group?"/>
     <spring:message var="createProjectLinkText" code="home.link.createProject" text="?Create Project?"/>
     <spring:message var="editProjectLinkText" code="home.link.editProject" text="?Edit Project?"/>
     <spring:message var="createDatasetLinkText" code="home.link.createDataset" text="?Create Dataset?"/>
     <spring:message var="editDatasetLinkText" code="home.link.editDataset" text="?Edit Dataset?"/>
     <spring:message var="markReadyLinkText" code="home.link.markAsReady" text="?Mark Ready?"/>
-    <spring:message var="permissionsGroupLinkText" code="permissions.group.linktext" text="?Assign permissions to other researchers for this group?"/>
-    <spring:message var="viewPermissionLinkText" code="permissions.view.linktext" text="?View permissions for this group?" />
+    <spring:message var="permissionsGroupLinkText" code="permissions.group.linktext" text="?Assign group permissions?"/>
+    <spring:message var="permissionsProjectLinkText" code="permissions.project.linktext" text="?Assign project permissions?"/>
+    <spring:message var="permissionsDatasetLinkText" code="permissions.dataset.linktext" text="?Assign dataset permissions?"/>
+    <spring:message var="viewPermissionLinkText" code="permissions.view.linktext" text="?View permissions?" />
+    <spring:message var="permissionActivtyLogLinkText" code="permissions.activity.log.linktext" text="?Activity Log?" />
     <spring:message var="rejectAdvertiseLinkText" code="home.link.rejectAdvertising" text="?Reject advertising?"/>
     <spring:message var="unadvertiseLinkText" code="home.link.unadvertise" text="?Un-advertise Dataset?"/>
-    
     <spring:message var="browseDatasetLinkText" code="home.link.browseDataset" text="?Browse Dataset?"/>
-
-    <c:url var="createDatasetSchemaUrl" value="../dbschema/create" />
+	<spring:message var="manageDatabaseBackupLinkText" code="home.link.manageDatabaseBackup" text="?Manage Database Backups?" />
+	<spring:message var="manageVocabularyLinkText" code="home.link.manage.vocabulary" text="?Manage Vocabulary?" />
+	
+    <c:url var="createDatasetSchemaUrl" value="/dbinstance/create" />
     <spring:message var="createDatasetSchemaLinkText" code="home.link.createSchema" text="?Create Schema"/>
 
 
-    <c:url var="viewDatasetSchemaUrl" value="../dbschema/view" />
+    <c:url var="viewDatasetSchemaUrl" value="/dbinstance/view" />
     <spring:message var="viewDatasetSchemaLinkText" code="home.link.viewSchema" text="?View Schema"/>
 
 
@@ -143,6 +165,11 @@
 				"onNew": removeAdvert,
 				"onSelect" : datasetOnSelect, 	
 				"linkTemplates" : {
+				    "viewDataset" : {
+				    	"url" : Sydma.home.getRestUrlGenerator("${viewDatasetUrl}"),
+				    	"linkText" : "${viewDatasetLinkText}",
+				    	"ajaxView" : true
+				    },
 					"editDataset" : {
 						"url" : Sydma.home.getRestUrlGenerator("${editDatasetUrl}"),
 						"linkText" : "${editDatasetLinkText}",
@@ -173,6 +200,12 @@
 						"beforeInsert" : Sydma.home.notPhysicalCheck,
 						"ajaxView" : false
 					},
+					"assignDatasetPermissions" :
+					{
+						"url" : Sydma.home.getRestUrlGenerator("${permissionsDatasetUrl}"),
+						"linkText" : "${permissionsDatasetLinkText}",
+						"ajaxView" : true								
+					},
 					"createSchema" :
 					{
 						"url" : Sydma.home.getParamUrlGenerator("${createDatasetSchemaUrl}", "datasetId"),
@@ -185,8 +218,15 @@
 						"url" : Sydma.home.getParamUrlGenerator("${viewDatasetSchemaUrl}", "datasetId"),
 						"linkText" : "${viewDatasetSchemaLinkText}",
 						"beforeInsert" : Sydma.home.hasSchemaCheck,
-						"ajaxView" : true
-					}	
+						"ajaxView" : false
+					},
+					"manageDatabase" :
+					{
+						"url" : Sydma.home.getParamUrlGenerator("${manageDatabaseBackupUrl}", "datasetId"),
+						"linkText" : "${manageDatabaseBackupLinkText}",
+						"beforeInsert" : Sydma.home.hasSchemaCheck,
+						"ajaxView" : false
+					}
 				},
 				"childControl" : null
 			};
@@ -199,17 +239,28 @@
 					"sideBar" : "#projectSidebar",
 					"getContentsUrl" : "${getProjectsUrl}",
 					"linkTemplates" : {
+					    "viewProject" : {
+					        "url" : Sydma.home.getRestUrlGenerator("${viewProjectUrl}"),
+					        "linkText" : "${viewProjectLinkText}",
+					        "ajaxView" : true
+					    },
 						"editProject" : {
 							"url" : Sydma.home.getRestUrlGenerator("${editProjectUrl}"),
 							"linkText" : "${editProjectLinkText}",
 							"ajaxView" : true
+						},
+						"assignProjectPermissions" :
+						{
+							"url" : Sydma.home.getRestUrlGenerator("${permissionsProjectUrl}"),
+							"linkText" : "${permissionsProjectLinkText}",
+							"ajaxView" : true								
 						},
 						"createDataset" :
 						{
 							"url" : Sydma.home.getRestUrlGenerator("${createDatasetUrl}"),
 							"linkText" : "${createDatasetLinkText}",
 							"ajaxView" : true
-						}						
+						}
 					},
 					"childControl" : datasetControl
 
@@ -224,6 +275,11 @@
 						"sideBar" : "#groupSidebar",
 						"getContentsUrl" : "${getGroupsUrl}",
 						"linkTemplates" : {
+						    "viewGroup" : {
+						        "url" : Sydma.home.getRestUrlGenerator("${viewGroupUrl}"),
+						        "linkText" : "${viewGroupLinkText}",
+						        "ajaxView" : true
+						    },
 							"editGroup" : {
 								"url" : Sydma.home.getRestUrlGenerator("${editGroupUrl}"),
 								"linkText" : "${editGroupLinkText}",
@@ -235,17 +291,29 @@
 								"linkText" : "${createProjectLinkText}",
 								"ajaxView" : true
 							},
+							"manageVocabulary" :
+						    {
+						    	"url" : Sydma.home.getRestUrlGenerator("${manageVocabularyUrl}"),
+						    	"linkText" : "${manageVocabularyLinkText}",
+						    	"ajaxView" : false
+						    },
 							"assignGroupPermissions" :
 							{
 								"url" : Sydma.home.getRestUrlGenerator("${permissionsGroupUrl}"),
 								"linkText" : "${permissionsGroupLinkText}",
-								"ajaxView" : false								
+								"ajaxView" : true								
 							},
 							"viewGroupPermissions" :
 							{
 								"url" : Sydma.home.getRestUrlGenerator("${viewPermissionsUrl}"),
 								"linkText" : "${viewPermissionLinkText}",
-								"ajaxView" : false
+								"ajaxView" : true
+							},
+							"permissionActivityLog" :
+							{
+							    "url" : Sydma.home.getParamUrlGenerator("${permissionActivityLogUrl}", "id"),
+							    "linkText" : "${permissionActivtyLogLinkText}",
+							    "ajaxView" : true
 							}
 						},
 						"childControl" : projectControl

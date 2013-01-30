@@ -34,6 +34,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,22 +43,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import au.org.intersect.dms.core.domain.FileInfo;
+import au.org.intersect.sydma.webapp.domain.FileAnnotation;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.json.JsonFileInfo;
 import au.org.intersect.sydma.webapp.json.JsonResponse;
+import au.org.intersect.sydma.webapp.permission.PermissionType;
 import au.org.intersect.sydma.webapp.permission.dataset.DatasetPermissionQuery;
 import au.org.intersect.sydma.webapp.permission.group.GroupPermissionQuery;
 import au.org.intersect.sydma.webapp.permission.path.Path;
 import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 import au.org.intersect.sydma.webapp.permission.project.ProjectPermissionQuery;
+import au.org.intersect.sydma.webapp.service.ApplicationType;
+import au.org.intersect.sydma.webapp.service.ApplicationTypeService;
 import au.org.intersect.sydma.webapp.service.FilePathService;
 import au.org.intersect.sydma.webapp.service.PermissionService;
 
 /**
  * Controller that handles file browsing ajax calls from FileTree js class
+ * 
+ * Some terminologies dmsPath do not end with /, ie, abc/def instead of abc/def/ virtualPath refer to
+ * /{grpid}/{prjid}/{datasetid}/{a}/{b}/{c} absolutePath refer to /uploadPath/grpDir/dataDir/{a}/{b}/{c} named path
+ * refer to datasetName/a/b/c
  */
 @RequestMapping("/filetree/**")
 @Controller
@@ -65,87 +74,135 @@ public class FileTreeController extends AbstractControllerWithDmsConnection
 {
     private static final Logger LOG = LoggerFactory.getLogger(FileTreeController.class);
 
+    private final List<PermissionType> directoryActions = new ArrayList<PermissionType>();
+
     @Autowired
     private FilePathService filePathService;
-    
+
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
+
+    public FileTreeController(ApplicationTypeService applicationTypeService)
+    {
+        super();
+        directoryActions.add(PermissionType.CREATE_DIRECTORY);
+        directoryActions.add(PermissionType.DELETE_DIRECTORY);
+        directoryActions.add(PermissionType.DELETE_FILE);
+        directoryActions.add(PermissionType.MOVE_DIRECTORY_FILE);
+        directoryActions.add(PermissionType.ASSIGN_DIRECTORY_PERMISSION);
+        if (applicationTypeService.applicationIs(ApplicationType.AGR_ENV))
+        {
+            directoryActions.add(PermissionType.CREATE_ANNOTATION);
+            directoryActions.add(PermissionType.EDIT_ANNOTATION);
+            directoryActions.add(PermissionType.DELETE_ANNOTATION);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/connect")
     @ResponseBody
-    public String createConnection()
+    public String createConnection(Principal principal)
     {
-        Integer connectionLocal = connectLocal();
+        Integer connectionLocal = connectLocal(principal.getName());
         JsonResponse response = new JsonResponse(connectionLocal, null);
         return response.toJson();
     }
 
+    /**
+     * Returns json tree info for the source
+     * 
+     * @param dmsPath
+     * @param connectionId
+     * @param model
+     * @param principal
+     * @return
+     */
     @RequestMapping(value = "/listDownload")
     @ResponseBody
-    public String listDestination(@RequestParam(value = "path") String pathString,
+    public String listDownload(@RequestParam(value = "path") String dmsPath,
             @RequestParam("connectionId") Integer connectionId, Model model, Principal principal)
     {
 
-        Path path = PathBuilder.buildFromString(pathString);
+        Path path = PathBuilder.buildFromString(dmsPath);
         List<JsonFileInfo> fileList = null;
-
-        if (path.isDatasetPath() || path.isFilePath())
-        {
-            fileList = listUploadDirectory(path, connectionId, principal);
-        }
-        else if (path.isProjectPath())
-        {
-            fileList = listDownloadDatasets(path, principal);
-        }
-        else if (path.isGroupPath())
-        {
-            fileList = listDownloadProjects(path, principal);
-        }
-        else
-        {
-            fileList = listDownloadGroups(principal);
-        }
-
-        JsonResponse response = new JsonResponse(fileList, null);
-        return response.toJson();
-    }
-
-    @RequestMapping(value = "/listUpload")
-    @ResponseBody
-    public String listUploadDestination(@RequestParam(value = "path") String pathString,
-            @RequestParam("connectionId") Integer connectionId, Model model, Principal principal)
-    {
-
-        Path path = PathBuilder.buildFromString(pathString);
-        List<JsonFileInfo> fileList = null;
-
-        if (path.isDatasetPath() || path.isFilePath())
-        {
-            fileList = listUploadDirectory(path, connectionId, principal);
-        }
-        else if (path.isProjectPath())
-        {
-            fileList = listUploadDatasets(path, principal);
-        }
-        else if (path.isGroupPath())
-        {
-            fileList = listUploadProjects(path, principal);
-        }
-        else
-        {
-            fileList = listUploadGroups(principal);
-        }
-
-        JsonResponse response = new JsonResponse(fileList, null);
-        return response.toJson();
-    }
-    
-    private List<JsonFileInfo> listUploadGroups(Principal principal)
-    {
         User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
 
-        GroupPermissionQuery groupQuery = permissionService.getUploadGroupPermission(user);
+        if (path.isDatasetPath() || path.isFilePath())
+        {
+            fileList = listDownloadDirectory(path, connectionId, user);
+        }
+        else if (path.isProjectPath())
+        {
+            fileList = listDownloadDatasets(path, user);
+        }
+        else if (path.isGroupPath())
+        {
+            fileList = listDownloadProjects(path, user);
+        }
+        else
+        {
+            fileList = listDownloadGroups(user);
+        }
+        JsonResponse response = new JsonResponse(fileList, null);
+        return response.toJson();
+    }
 
+    /**
+     * returns json tree for destination
+     * 
+     * @param dmsPath
+     * @param connectionId
+     * @param model
+     * @param principal
+     * @return
+     */
+    @RequestMapping(value = "/listUpload")
+    @ResponseBody
+    public String listDestination(@RequestParam(value = "path") String dmsPath,
+            @RequestParam("connectionId") Integer connectionId, Model model, Principal principal)
+    {
+
+        Path path = PathBuilder.buildFromString(dmsPath);
+        List<JsonFileInfo> fileList = null;
+        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+
+        if (path.isDatasetPath() || path.isFilePath())
+        {
+            fileList = listUploadDirectory(path, connectionId, user);
+        }
+        else if (path.isProjectPath())
+        {
+            fileList = listUploadDatasets(path, user);
+        }
+        else if (path.isGroupPath())
+        {
+            fileList = listUploadProjects(path, user);
+        }
+        else
+        {
+            fileList = listUploadGroups(user);
+        }
+
+        JsonResponse response = new JsonResponse(fileList, null);
+        return response.toJson();
+    }
+
+    private List<JsonFileInfo> listUploadGroups(User user)
+    {
+        GroupPermissionQuery groupQuery = permissionService.getUploadGroupPermission(user);
+        return buildGroupJson(groupQuery);
+    }
+
+    private List<JsonFileInfo> listDownloadGroups(User user)
+    {
+        GroupPermissionQuery groupQuery = permissionService.getDownloadGroupPermission(user);
+        return buildGroupJson(groupQuery);
+    }
+
+    private List<JsonFileInfo> buildGroupJson(GroupPermissionQuery groupQuery)
+    {
         List<JsonFileInfo> entityList = new ArrayList<JsonFileInfo>();
         for (ResearchGroup researchGroup : ResearchGroup.findResearchGroupWithPermission(groupQuery))
         {
@@ -157,110 +214,163 @@ public class FileTreeController extends AbstractControllerWithDmsConnection
         return entityList;
     }
 
-    private List<JsonFileInfo> listUploadProjects(Path path, Principal principal)
+    private List<JsonFileInfo> listUploadProjects(Path path, User user)
     {
-        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
-
         ProjectPermissionQuery projectQuery = permissionService.getUploadProjectPermission(user, path);
+        return buildProjectsJson(projectQuery);
+    }
 
+    private List<JsonFileInfo> listDownloadProjects(Path path, User user)
+    {
+        ProjectPermissionQuery projectQuery = permissionService.getDownloadProjectPermission(user, path);
+        return buildProjectsJson(projectQuery);
+    }
+
+    private List<JsonFileInfo> buildProjectsJson(ProjectPermissionQuery projectQuery)
+    {
         List<JsonFileInfo> entityList = new ArrayList<JsonFileInfo>();
         for (ResearchProject researchProject : ResearchProject.findProjectWithPermission(projectQuery))
         {
             Path virtualPath = PathBuilder.projectPath(researchProject);
             JsonFileInfo entityFile = new JsonFileInfo(researchProject.getName(), virtualPath.getPath(),
-                    JsonFileInfo.ENTITY_TYPE, "", null);            
+                    JsonFileInfo.ENTITY_TYPE, "", null);
             entityList.add(entityFile);
         }
         return entityList;
     }
 
-    
-    private List<JsonFileInfo> listUploadDatasets(Path path, Principal principal)
+    private List<JsonFileInfo> listUploadDatasets(Path path, User user)
     {
-        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
-
         DatasetPermissionQuery datasetQuery = permissionService.getUploadDatasetPermissions(user, path);
+        return buildDatasetsJson(datasetQuery, user);
+    }
 
+    private List<JsonFileInfo> listDownloadDatasets(Path path, User user)
+    {
+        DatasetPermissionQuery datasetQuery = permissionService.getDownloadDatasetPermissions(user, path);
+        return buildDatasetsJson(datasetQuery, user);
+    }
+
+    private List<JsonFileInfo> buildDatasetsJson(DatasetPermissionQuery datasetQuery, User user)
+    {
         List<JsonFileInfo> entityList = new ArrayList<JsonFileInfo>();
         for (ResearchDataset researchDataset : ResearchDataset.findDatasetsWithPermission(datasetQuery))
         {
             Path virtualPath = PathBuilder.datasetPath(researchDataset);
-            JsonFileInfo entityFile = new JsonFileInfo(researchDataset.getName(), virtualPath.getPath(), 
-                    JsonFileInfo.DATASET_TYPE, "", null);
+            boolean canUpload = permissionService.hasEditingAccessPermissionForDataset(user, researchDataset);
+            JsonFileInfo entityFile = new JsonFileInfo(researchDataset.getName(), virtualPath.getPath(),
+                    JsonFileInfo.DATASET_TYPE, "", null, canUpload);
             entityList.add(entityFile);
         }
         return entityList;
     }
 
-    private List<JsonFileInfo> listUploadDirectory(Path filePath, Integer connectionId, Principal principal)
+    private List<JsonFileInfo> listUploadDirectory(Path filePath, Integer connectionId, User user)
     {
-        String uploadRelativePath = filePathService.resolveRelativePath(filePath);
-        LOG.info("Listing destination with connection {} relativeUploadPath {}", connectionId, uploadRelativePath);
-        List<FileInfo> fileInfoList = getDmsService().getList(connectionId, uploadRelativePath);
+        String virtualPath = filePath.getPath();
+
+        String dmsAbsolutePath = filePathService.resolveToRelativePath(filePath);
+        List<FileInfo> fileInfoList = getDmsService().getList(connectionId, dmsAbsolutePath);
 
         List<JsonFileInfo> jsonFileInfoList = new ArrayList<JsonFileInfo>();
         for (FileInfo fileInfo : fileInfoList)
         {
-            String uploadPath = fileInfo.getAbsolutePath();
-            String virtualPath = filePathService.relativeToVirtualPath(filePath, uploadPath);
+            String childAbsolutePath = fileInfo.getAbsolutePath();
+            String childVirtualPath = filePathService.relativeToVirtualPath(filePath, childAbsolutePath);
 
-            JsonFileInfo jsonFileInfo = new JsonFileInfo(fileInfo.getName(), virtualPath, fileInfo.getFileType()
-                    .toString(), fileInfo.getModificationDate(), fileInfo.getSize());
-            jsonFileInfoList.add(jsonFileInfo);
+            if (permissionService.canDirectoryAction(PermissionType.VIEW_DIRECTORY,
+                    PathBuilder.buildFromString(childVirtualPath), user))
+            {
+                boolean canUpload = permissionService.hasEditingAccessPermissionForDirectory(user, childVirtualPath);
+                List<String> allowedActions = getAllowedActions(virtualPath, user);
+                JsonFileInfo jsonFileInfo = new JsonFileInfo(fileInfo.getName(), childVirtualPath, fileInfo
+                        .getFileType().toString(), fileInfo.getModificationDate(), fileInfo.getSize(), allowedActions,
+                        canUpload);
+
+                jsonFileInfoList.add(jsonFileInfo);
+            }
         }
         return jsonFileInfoList;
     }
 
-    private List<JsonFileInfo> listDownloadDatasets(Path path, Principal principal)
+    private List<JsonFileInfo> listDownloadDirectory(Path filePath, Integer connectionId, User user)
     {
-        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
 
-        DatasetPermissionQuery datasetQuery = permissionService.getDownloadDatasetPermissions(user, path);
+        String virtualPath = filePath.getPath();
+        List<FileAnnotation> fileAnnotations = listAnnotationsUnderDirectory(virtualPath);
 
-        List<JsonFileInfo> entityList = new ArrayList<JsonFileInfo>();
-        for (ResearchDataset researchDataset : ResearchDataset.findDatasetsWithPermission(datasetQuery))
+        String dmsAbsolutePath = filePathService.resolveToRelativePath(filePath);
+        List<FileInfo> fileInfoList = getDmsService().getList(connectionId, dmsAbsolutePath);
+
+        List<JsonFileInfo> jsonFileInfoList = new ArrayList<JsonFileInfo>();
+        for (FileInfo fileInfo : fileInfoList)
         {
-            Path virtualPath = PathBuilder.datasetPath(researchDataset);
-            JsonFileInfo entityFile = new JsonFileInfo(researchDataset.getName(), virtualPath.getPath(), 
-                    JsonFileInfo.DATASET_TYPE, "", null);
-            entityList.add(entityFile);
+            String childAbsolutePath = fileInfo.getAbsolutePath();
+            String childVirtualPath = filePathService.relativeToVirtualPath(filePath, childAbsolutePath);
+            if (permissionService.canDirectoryAction(PermissionType.VIEW_DIRECTORY,
+                    PathBuilder.buildFromString(childVirtualPath), user))
+            {
+                List<String> allowedActions = getAllowedActions(childVirtualPath, user);
+                JsonFileInfo jsonFileInfo = new JsonFileInfo(fileInfo.getName(), childVirtualPath, fileInfo
+                        .getFileType().toString(), fileInfo.getModificationDate(), fileInfo.getSize(), allowedActions,
+                        false);
+
+                FileAnnotation fileAnnotation = getFileAnnotation(childVirtualPath, fileAnnotations);
+                if (fileAnnotation != null)
+                {
+                    setAnnotation(jsonFileInfo, fileAnnotation);
+                }
+
+                jsonFileInfoList.add(jsonFileInfo);
+            }
         }
-        return entityList;
+        return jsonFileInfoList;
+
     }
 
-    private List<JsonFileInfo> listDownloadProjects(Path path, Principal principal)
+    private void setAnnotation(JsonFileInfo jsonFileInfo, FileAnnotation fileAnnotation)
     {
-        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+        String annotation = fileAnnotation.getAnnotation();
 
-        ProjectPermissionQuery projectQuery = permissionService.getDownloadProjectPermission(user, path);
-
-        List<JsonFileInfo> entityList = new ArrayList<JsonFileInfo>();
-        for (ResearchProject researchProject : ResearchProject.findProjectWithPermission(projectQuery))
+        if (fileAnnotation.isOutOfDate())
         {
-            Path virtualPath = PathBuilder.projectPath(researchProject);
-            JsonFileInfo entityFile = new JsonFileInfo(researchProject.getName(), virtualPath.getPath(), 
-                    JsonFileInfo.ENTITY_TYPE, "", null);            
-            entityList.add(entityFile);
+            annotation = annotation
+                    + "\n"
+                    + messageSource.getMessage("fileAnnotation.outOfDate", new Object[] {},
+                            "Annotation may be out of date", null);
         }
-        return entityList;
+
+        jsonFileInfo.setAnnotation(annotation);
     }
 
-    private List<JsonFileInfo> listDownloadGroups(Principal principal)
+    private FileAnnotation getFileAnnotation(String virtualPath, List<FileAnnotation> fileAnnotations)
     {
-        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
-
-        GroupPermissionQuery groupQuery = permissionService.getDownloadGroupPermission(user);
-
-        List<JsonFileInfo> entityList = new ArrayList<JsonFileInfo>();
-        for (ResearchGroup researchGroup : ResearchGroup.findResearchGroupWithPermission(groupQuery))
+        // TODO: Change this into accessing a map probably
+        for (FileAnnotation annotation : fileAnnotations)
         {
-            String virtualPath = filePathService.createVirtualPath(researchGroup.getId());
-            JsonFileInfo entityFile = new JsonFileInfo(researchGroup.getName(), virtualPath, JsonFileInfo.ENTITY_TYPE,
-                    "", null);
-            entityList.add(entityFile);
+            if (virtualPath.equals(annotation.getPath()))
+            {
+                return annotation;
+            }
         }
-        return entityList;
+        return null;
     }
 
+    private List<FileAnnotation> listAnnotationsUnderDirectory(String directoryPath)
+    {
+        return FileAnnotation.findFileAnnotationsByParentPath(directoryPath).getResultList();
+    }
+
+    private List<String> getAllowedActions(String path, User user)
+    {
+        List<PermissionType> allowedActions = permissionService.restrictDirectoryActions(directoryActions, path, user);
+
+        List<String> allowedActionList = new ArrayList<String>(allowedActions.size());
+        for (PermissionType permission : allowedActions)
+        {
+            allowedActionList.add(permission.getPermissionTypeName());
+        }
+        return allowedActionList;
+    }
 
 }

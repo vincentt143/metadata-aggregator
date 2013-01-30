@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
 <tiles-definitions>
-    <definition extends="withSidebar" name="managedataset/browse">
+    <definition extends="browse" name="managedataset/browse">
         <put-attribute name="body" value="/WEB-INF/views/managedataset/browse.jspx" cascade="true"/>
         <put-attribute name="leftMenu" value="/WEB-INF/views/managedataset/actionMenu.jspx" cascade="true"/>
         <put-attribute name="activeTab" value="" cascade="true"/>        
@@ -17,34 +17,40 @@
        </put-list-attribute>
     </definition>
     
-    <definition extends="ajax" name="managedataset/createDirectory">
-        <put-attribute name="body" value="/WEB-INF/views/managedataset/createDirectory.jspx"/>      
+    <definition extends="contentLightboxable" name="managedataset/createDirectory">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/createDirectory.jspx" cascade="true"/>      
     </definition>
     
     
-    <definition extends="ajax" name="managedataset/deleteDirectory">
-        <put-attribute name="body" value="/WEB-INF/views/managedataset/delete.jspx"/>
+    <definition extends="contentLightboxable" name="managedataset/deleteDirectory">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/delete.jspx" cascade="true"/>
         <put-attribute name="fileType" value="directory" cascade="true"/>       
     </definition>
             
-    <definition extends="ajax" name="managedataset/deleteFile">
-        <put-attribute name="body" value="/WEB-INF/views/managedataset/delete.jspx"/>
+    <definition extends="contentLightboxable" name="managedataset/deleteFile">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/delete.jspx" cascade="true"/>
         <put-attribute name="fileType" value="file" cascade="true"/>      
     </definition>
     
     
     
-    <definition extends="ajax" name="managedataset/move">
-        <put-attribute name="body" value="/WEB-INF/views/managedataset/move.jspx"/>
+    <definition extends="contentLightboxable" name="managedataset/move">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/move.jspx" cascade="true"/>
     </definition>
             
     
     
-    <definition extends="ajax" name="managedataset/pathNotFound">
-        <put-attribute name="body" value="/WEB-INF/views/managedataset/pathNotFound.jspx"/>      
+    <definition extends="contentLightboxable" name="managedataset/pathNotFound">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/pathNotFound.jspx" cascade="true"/>      
     </definition>
     
-    <definition extends="ajax" name="managedataset/success">
-        <put-attribute name="body" value="/WEB-INF/views/managedataset/success.jspx"/>      
+    
+    
+    <definition extends="contentLightboxable" name="managedataset/moveDenied">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/moveDenied.jspx" cascade="true"/>      
+    </definition>
+    
+    <definition extends="contentLightboxable" name="managedataset/success">
+        <put-attribute name="body" value="/WEB-INF/views/managedataset/success.jspx" cascade="true"/>      
     </definition>
 </tiles-definitions>

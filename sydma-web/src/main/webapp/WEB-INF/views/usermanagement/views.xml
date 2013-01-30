@@ -1,31 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
 <tiles-definitions>
-    <definition extends="withSidebar" name="usermanagement/index">
-        <put-attribute name="body" value="/WEB-INF/views/usermanagement/index.jspx" cascade="true"/>
-        <put-attribute name="activeTab" value="user.management.tab" cascade="true"/>
-        <put-attribute name="leftMenu" value="/WEB-INF/views/usermanagement/leftMenu.jspx" cascade="true"/>
-    </definition>
-    <definition extends="withSidebar" name="usermanagement/list">
+    <definition extends="contentUnlightboxable" name="usermanagement/list">
 	    <put-attribute name="body" value="/WEB-INF/views/usermanagement/list.jspx" cascade="true"/>
-	    <put-attribute name="activeTab" value="user.management.tab" cascade="true"/>
-	    <put-attribute name="leftMenu" value="/WEB-INF/views/usermanagement/leftMenu.jspx" cascade="true"/>
-    </definition>
-    <definition extends="withSidebar" name="usermanagement/assignroles">
-	    <put-attribute name="body" value="/WEB-INF/views/usermanagement/assignRoles.jspx" cascade="true"/>
-	    <put-attribute name="activeTab" value="user.management.tab" cascade="true"/>
-	    <put-attribute name="leftMenu" value="/WEB-INF/views/usermanagement/leftMenu.jspx" cascade="true"/>
-    </definition>
-    <definition extends="contentUnlightboxable" name="usermanagement/new">
-	    <put-attribute name="body" value="/WEB-INF/views/usermanagement/new.jspx" cascade="true"/>
 	    <put-attribute name="activeTab" value="user.management.tab" cascade="true"/>
     </definition>
     <definition extends="contentUnlightboxable" name="usermanagement/edit">
 	    <put-attribute name="body" value="/WEB-INF/views/usermanagement/edit.jspx" cascade="true"/>
-	    <put-attribute name="activeTab" value="user.management.tab" cascade="true"/>
-    </definition>
-    <definition extends="contentUnlightboxable" name="usermanagement/editroles">
-	    <put-attribute name="body" value="/WEB-INF/views/usermanagement/editRoles.jspx" cascade="true"/>
 	    <put-attribute name="activeTab" value="user.management.tab" cascade="true"/>
     </definition>
 </tiles-definitions>

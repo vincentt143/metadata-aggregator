@@ -4,6 +4,7 @@
 package au.org.intersect.sydma.webapp.domain;
 
 import au.org.intersect.sydma.webapp.domain.RdsRequestStatus;
+import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
 import au.org.intersect.sydma.webapp.domain.User;
 import java.lang.Integer;
@@ -75,12 +76,36 @@ privileged aspect RdsRequest_Roo_JavaBean {
         this.dataManagementContact = dataManagementContact;
     }
     
+    public ResearchGroup RdsRequest.getResearchGroup() {
+        return this.researchGroup;
+    }
+    
+    public void RdsRequest.setResearchGroup(ResearchGroup researchGroup) {
+        this.researchGroup = researchGroup;
+    }
+    
     public RdsRequestStatus RdsRequest.getRequestStatus() {
         return this.requestStatus;
     }
     
     public void RdsRequest.setRequestStatus(RdsRequestStatus requestStatus) {
         this.requestStatus = requestStatus;
+    }
+    
+    public String RdsRequest.getTimeAndDateOfRequest() {
+        return this.timeAndDateOfRequest;
+    }
+    
+    public void RdsRequest.setTimeAndDateOfRequest(String timeAndDateOfRequest) {
+        this.timeAndDateOfRequest = timeAndDateOfRequest;
+    }
+    
+    public String RdsRequest.getRequester() {
+        return this.requester;
+    }
+    
+    public void RdsRequest.setRequester(String requester) {
+        this.requester = requester;
     }
     
 }

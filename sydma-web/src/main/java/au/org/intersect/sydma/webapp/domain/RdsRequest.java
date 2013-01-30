@@ -46,12 +46,13 @@ import org.springframework.roo.addon.tostring.RooToString;
  */
 @RooJavaBean
 @RooToString
-@RooEntity(finders = {"findRdsRequestsByRequestStatus", "findRdsRequestsByNameEquals"}, persistenceUnit = "sydmaPU")
+@RooEntity(finders = {"findRdsRequestsByRequestStatus", "findRdsRequestsByNameEquals", 
+        "findRdsRequestsByNameEqualsAndRequestStatus","findRdsRequestByResearchGroupEquals"}, persistenceUnit = "sydmaPU")
 // TODO CHECKSTYLE-OFF: MagicNumber
 public class RdsRequest
 {
-
     @NotNull
+    @Size(min = 1, max = 100, message = "Must be between 1 and 100 characters in length")
     @Pattern(regexp = "\\p{Alnum}[\\w\\d\\s]*", message = "Must be alphanumeric")
     private String name;
 
@@ -75,13 +76,20 @@ public class RdsRequest
     private Integer amountOfStorage;
     
     @NotNull
-    @Size(max = 1000)
+    @Size(max = 1000, message = "Must not exceed 1000 characters in length")
     @NotEmpty(message = "Description is a required field")
     private String description;
 
     @OneToOne
     private User dataManagementContact;
 
+    @OneToOne
+    private ResearchGroup researchGroup;
+    
     @Enumerated(EnumType.STRING)
     private RdsRequestStatus requestStatus;
+    
+    private String timeAndDateOfRequest;
+    
+    private String requester;
 }

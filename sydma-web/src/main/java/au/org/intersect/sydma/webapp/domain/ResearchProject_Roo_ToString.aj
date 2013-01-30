@@ -13,16 +13,17 @@ privileged aspect ResearchProject_Roo_ToString {
         sb.append("Description: ").append(getDescription()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("KeyForRifCs: ").append(getKeyForRifCs()).append(", ");
+        sb.append("Keywords: ").append(getKeywords() == null ? "null" : getKeywords().size()).append(", ");
         sb.append("Name: ").append(getName()).append(", ");
         sb.append("OriginatingSource: ").append(getOriginatingSource()).append(", ");
+        sb.append("Publications: ").append(getPublications() == null ? "null" : getPublications().size()).append(", ");
         sb.append("ResearchDatasets: ").append(getResearchDatasets() == null ? "null" : getResearchDatasets().size()).append(", ");
         sb.append("ResearchGroup: ").append(getResearchGroup()).append(", ");
         sb.append("SubjectCode: ").append(getSubjectCode()).append(", ");
         sb.append("SubjectCode2: ").append(getSubjectCode2()).append(", ");
         sb.append("SubjectCode3: ").append(getSubjectCode3()).append(", ");
         sb.append("Url: ").append(getUrl()).append(", ");
-        sb.append("Version: ").append(getVersion()).append(", ");
-        sb.append("Duplicate: ").append(isDuplicate());
+        sb.append("Version: ").append(getVersion());
         return sb.toString();
     }
     

@@ -26,6 +26,7 @@
  */
 package au.org.intersect.sydma.webapp.util;
 
+
 /**
  * 
  * 
@@ -34,6 +35,6 @@ package au.org.intersect.sydma.webapp.util;
 public interface MailHelper
 {
 
-    public abstract void sendMessage(String mailFrom, String subject, String mailTo, String message);
+    public abstract void sendMessage(String mailFrom, String subject, String[] mailTo, String message);
 
 }

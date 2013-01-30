@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+   
+    <definition extends="contentLightboxable" name="fileannotation/create">
+        <put-attribute name="body" value="/WEB-INF/views/fileannotation/create.jspx" cascade="true"/>      
+    </definition>
+    
+    <definition extends="contentLightboxable" name="fileannotation/edit">
+        <put-attribute name="body" value="/WEB-INF/views/fileannotation/edit.jspx" cascade="true"/>      
+    </definition>
+        
+    <definition extends="contentLightboxable" name="fileannotation/delete">
+        <put-attribute name="body" value="/WEB-INF/views/fileannotation/delete.jspx" cascade="true"/>      
+    </definition>
+    
+    <definition extends="contentLightboxable" name="fileannotation/invalidPath">
+        <put-attribute name="body" value="/WEB-INF/views/fileannotation/invalidPath.jspx" cascade="true"/>      
+    </definition>
+    
+    <definition extends="contentLightboxable" name="fileannotation/alreadyExist">
+        <put-attribute name="body" value="/WEB-INF/views/fileannotation/alreadyExist.jspx" cascade="true"/>      
+    </definition>
+
+    <definition extends="contentLightboxable" name="fileannotation/doesNotExist">
+        <put-attribute name="body" value="/WEB-INF/views/fileannotation/doesNotExist.jspx" cascade="true"/>      
+    </definition>
+</tiles-definitions>

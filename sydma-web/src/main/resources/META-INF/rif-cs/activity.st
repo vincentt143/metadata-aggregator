@@ -6,7 +6,7 @@
     <key>$researchProject.keyForRifCs$</key>
     <originatingSource>$researchProject.originatingSource$</originatingSource>
     <activity type="project">
-        <identifier type="local">15 211 513 464</identifier>
+        <identifier type="local">project-$researchProject.id$</identifier>
 
         <name type="primary">
             <namePart>$researchProject.name$</namePart>

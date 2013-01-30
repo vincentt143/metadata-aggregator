@@ -27,12 +27,15 @@
 
 package au.org.intersect.sydma.webapp.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,10 +52,14 @@ import au.org.intersect.sydma.webapp.controller.propertyeditor.ResearchSubjectCo
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
 import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.exception.NoneUniqueNameException;
 import au.org.intersect.sydma.webapp.permission.PermissionType;
 import au.org.intersect.sydma.webapp.service.PermissionService;
+import au.org.intersect.sydma.webapp.service.PermissionServiceImpl;
+import au.org.intersect.sydma.webapp.service.ResearchGroupService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
 import au.org.intersect.sydma.webapp.util.RifCsWriter;
+import au.org.intersect.sydma.webapp.util.TokenInputHelper;
 
 /**
  * Research Group Controller.
@@ -61,31 +68,59 @@ import au.org.intersect.sydma.webapp.util.RifCsWriter;
 @Controller
 public class ResearchGroupController
 {
+    private static final String VOCABULARY = "vocabulary";
+    private static final String VIEW_PAGE = "researchgroup/view";
     private static final String EDIT_PAGE = "researchgroup/edit";
     private static final String RESEARCH_GROUP_REQUEST_MODEL = "researchGroup";
 
     private static List<Breadcrumb> breadcrumbs = new ArrayList<Breadcrumb>();
     private static List<Breadcrumb> breadcrumbsForEditing = new ArrayList<Breadcrumb>();
+    private static List<Breadcrumb> breadcrumbsForViewing = new ArrayList<Breadcrumb>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionServiceImpl.class);
 
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private TokenInputHelper tokenInputHelper;
+    
+    @Autowired
+    private ResearchGroupService researchGroupService;
+
     static
     {
         breadcrumbs.add(Breadcrumb.getHome());
-        breadcrumbs.add(new Breadcrumb("Create Research Group"));
+        breadcrumbs.add(new Breadcrumb("sections.group.create.title"));
         breadcrumbsForEditing.add(Breadcrumb.getHome());
-        breadcrumbsForEditing.add(new Breadcrumb("Edit Research Group"));
+        breadcrumbsForEditing.add(new Breadcrumb("sections.group.edit.title"));
+        breadcrumbsForViewing.add(Breadcrumb.getHome());
+        breadcrumbsForViewing.add(new Breadcrumb("sections.group.view.title"));
     }
 
     @Autowired
     private RifCsWriter rifCsWriter;
-    
 
     @InitBinder
     public void initDataBinder(WebDataBinder binder)
     {
-        binder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());     
+        binder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());
+    }
+
+    @RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
+    public String viewResearchGroup(@PathVariable("id") Long id, final Model model, Principal principal)
+    {
+        return permissionService.canViewGroup(id, principal, new PermissionService.ResearchGroupAction()
+        {
+            @Override
+            public String act(ResearchGroup researchGroup, User user)
+            {
+                model.addAttribute(Breadcrumb.BREADCRUMBS, breadcrumbsForViewing);
+                model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, researchGroup);
+                return VIEW_PAGE;
+            }
+        });
+
     }
 
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
@@ -95,51 +130,60 @@ public class ResearchGroupController
                 new PermissionService.ResearchGroupAction()
                 {
                     @Override
-                    public String act(ResearchGroup researchGroup, User user)
+                    public String act(ResearchGroup group, User user)
                     {
+                        model.addAttribute(VOCABULARY, tokenInputHelper.appendJson(group.getKeywords()));
                         model.addAttribute("breadcrumbs", breadcrumbsForEditing);
-                        model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, researchGroup);
+                        model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, group);
                         return EDIT_PAGE;
                     }
+
                 });
     }
 
     @RequestMapping(value = "/editResearchGroup", method = RequestMethod.PUT)
     public String editResearchGroup(@RequestParam(value = "id") final Long id,
-            @Valid final ResearchGroup researchGroup, final BindingResult result, final Model model,
-            final HttpServletRequest request, java.security.Principal principal)
+            @RequestParam(VOCABULARY) final String keywords, @Valid final ResearchGroup researchGroup,
+            final BindingResult result, final Model model, final HttpServletRequest request, Principal principal)
     {
+        LOGGER.info("Binding result: " + result);
         return permissionService.canGroup(PermissionType.EDIT_GROUP, id, principal,
                 new PermissionService.ResearchGroupAction()
                 {
                     @Override
                     public String act(ResearchGroup group, User user)
                     {
-                        if (result.hasErrors())
+                        if (!group.getVersion().equals(researchGroup.getVersion()))
                         {
+                            model.addAttribute(VOCABULARY,
+                                    tokenInputHelper.buildJsonOnValidationError(keywords, researchGroup));
                             model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, researchGroup);
+                            model.addAttribute("version_error", true);
                             return EDIT_PAGE;
                         }
 
-                        if (researchGroup.isDuplicate())
+                        if (!result.hasErrors())
                         {
-                            String[] nameErrorCode = {""};
-                            String[] nameErrorArg = {""};
-                            FieldError nameError = new FieldError("researchDataset", "name", researchGroup.getName(),
-                                    true, nameErrorCode, nameErrorArg, "Group already exists.");
-                            result.addError(nameError);
-                            return EDIT_PAGE;
+                            try
+                            {
+                                researchGroupService.editGroup(researchGroup, keywords);
+                                return "redirect:/";
+                            }
+                            catch (NoneUniqueNameException e)
+                            {
+                                String[] nameErrorCode = {""};
+                                String[] nameErrorArg = {""};
+                                FieldError nameError = new FieldError("researchGroup", "name", researchGroup.getName(),
+                                        true, nameErrorCode, nameErrorArg, "Group already exists.");
+                                result.addError(nameError);
+                            }
                         }
+                        // Proceed with error handling
 
-                        // Must look for ID as there is no path on the frontend.
-                        User previousPI = group.getPrincipalInvestigator();
-                        researchGroup.setDirectoryPath(group.getDirectoryPath());
-                        researchGroup.setIsPhysical(group.getIsPhysical());
-                        researchGroup.merge();
-
-                        group.updateRifCsIfNeeded(rifCsWriter, previousPI);
-
-                        return "redirect:/";
+                        model.addAttribute(VOCABULARY,
+                                tokenInputHelper.buildJsonOnValidationError(keywords, researchGroup));
+                        model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, researchGroup);
+                        return EDIT_PAGE;
                     }
                 });
     }

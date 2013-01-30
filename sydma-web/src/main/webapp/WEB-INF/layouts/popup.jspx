@@ -17,7 +17,7 @@
         <util:load-footer-scripts />
         <util:load-custom-scripts/>
 	
-		<spring:message code="application_name" var="app_name" />
+		<spring:theme code="application.title" var="app_name" />
 		<title><spring:message code="welcome_h3" arguments="${app_name}" /></title>
 	</head>
 	<body>

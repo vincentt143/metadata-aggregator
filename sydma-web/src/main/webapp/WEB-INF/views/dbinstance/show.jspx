@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+    	<spring:message code="dbinstance.query.show.title" text="?Database Query?" arguments="${researchDatabaseQuery.name}" htmlEscape="true"/>
+    </h1>
+
+    <form:form class="formbuilder" modelAttribute="researchDatabaseQuery" autocomplete="off" method="post">
+        <form:hidden path="id" />
+        <c:set var="databaseQuery" value="${researchDatabaseQuery}" />
+        <fieldset>
+            <legend>
+                <spring:message code="dbinstance.sql.legend" text="?Schema?" />
+            </legend>
+			
+            <ol>
+            	<li>
+	                <span class="field_label">
+	                	<spring:message code="dbinstance.schema.query.name" text="?dbinstance.schema.query.name?" />:
+	                </span>
+	                <span class="field_value">
+	                    <c:out value="${databaseQuery.name}" escapeXml="true" />
+	                </span>
+                </li>
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="dbinstance.schema.sql.description" text="?dbinstance.schema.sql.description?" />:
+	                </span>
+	                <span class="field_value">
+	                    <c:out value="${databaseQuery.description}" escapeXml="true" />
+	                </span>
+                </li>
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="dbinstance.schema.sql.query" text="?dbinstance.schema.sql.query?" />:
+	                </span>
+	                <span class="field_value">
+	                    <c:out value="${databaseQuery.query}" escapeXml="true" />
+	                </span>
+                </li>         
+            </ol>
+        </fieldset>
+        <div class="buttons">
+        	<input id="cancel_button" class="clear-button button" type="submit" name="_submit" value="Return"/> 
+        </div>
+    </form:form>
+    
+</div>

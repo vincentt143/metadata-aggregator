@@ -29,11 +29,15 @@ package au.org.intersect.sydma.cucumber.steps;
 
 //TODO CHECKSTYLE-OFF: ImportOrderCheck
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.persistence.TypedQuery;
 
@@ -57,8 +61,12 @@ import cuke4duke.annotation.I18n.EN.Then;
 import cuke4duke.annotation.I18n.EN.When;
 import cuke4duke.spring.StepDefinitions;
 
+import au.org.intersect.sydma.webapp.domain.AccessLevel;
+import au.org.intersect.sydma.webapp.domain.PermissionEntry;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
+import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 
 /**
  * Steps to test directory browsing related functionality
@@ -71,6 +79,8 @@ public class DirectorySteps
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(DirectorySteps.class);
+
+    private String pathSeparator = "/";
 
     @Autowired
     private WebDriver browser;
@@ -194,16 +204,15 @@ public class DirectorySteps
     @Then("^I select (?:directory|file) \"([^\"]*)\"$")
     public void iSelectDirectoryOrFile(String directoryName) throws InterruptedException
     {
-        WebElement element = browser.findElement(By.xpath("//a[@title = '" + directoryName + "'] "));
+        WebElement element = findElement(By.xpath("//a[@title = '" + directoryName + "'] "));
         element.click();
-        Thread.sleep(2000);
     }
 
     @Then("^I should be able to see (?:directory|file) \"([^\"]*)\"$")
     public void iShouldSeeDirectoryOrFile(String fileName) throws InterruptedException
     {
         WebElement directory = findElement(By.xpath("//li[a[@title = '" + fileName + "']]"));
-        assertNotNull(directory);       
+        assertNotNull(directory);
     }
 
     @Then("^I should not be able to see (?:directory|file) \"([^\"]*)\"$")
@@ -215,7 +224,7 @@ public class DirectorySteps
         {
             try
             {
-                browser.findElement(By.xpath("//li[a[@title = '" + fileName + "']]"));               
+                browser.findElement(By.xpath("//li[a[@title = '" + fileName + "']]"));
                 retry++;
                 Thread.sleep(500);
             }
@@ -223,15 +232,15 @@ public class DirectorySteps
             {
                 // good
                 return;
-            }   
+            }
         }
-        fail("Should not see file: " + fileName);    
+        fail("Should not see file: " + fileName);
     }
 
     @When("^I open directory \"([^\"]*)\"$")
     public void iOpenDirectory(String linkText) throws InterruptedException
     {
-        WebElement element = browser.findElement(By.xpath("//li[a[text() = '" + linkText + "']]/ins"));
+        WebElement element = findElement(By.xpath("//li[a[text() = '" + linkText + "']]/ins"));
         element.click();
         LOG.info("Opening directory " + linkText);
         Thread.sleep(1000);
@@ -240,89 +249,17 @@ public class DirectorySteps
     @Then("^I drag (?:file|directory) \"([^\"]*)\" into \"([^\"]*)\"$")
     public void iDragElementTitle(String from, String to)
     {
-        WebElement fromElement = browser.findElement(By.xpath("//a[@title='" + from + "']"));
-        WebElement toElement = browser.findElement(By.xpath("//a[@title='" + to + "']"));
+        WebElement fromElement = findElement(By.xpath("//a[@title='" + from + "']"));
+        WebElement toElement = findElement(By.xpath("//a[@title='" + to + "']"));
 
         (new Actions(browser)).dragAndDrop(fromElement, toElement).perform();
-    }
-
-    @Then("^I should not see any ajax lightbox$")
-    public void iShouldNotSeeAjaxLightbox() throws InterruptedException
-    {
-        int retryLimit = 5;
-        int retry = 0;
-        while (retry < retryLimit)
-        {
-            try
-            {
-                browser.findElement(By.id("ajax_content"));
-                fail("No ajax lightbox should be loaded");
-            }
-            catch (org.openqa.selenium.NoSuchElementException ex)
-            {
-                // good
-            }
-            retry++;
-            Thread.sleep(1000);
-        }
-    }
-
-    @Then("^I click \"([^\"]*)\" in the ajax lightbox$")
-    public void iClickInTheAjaxLightbox(String buttonId) throws InterruptedException
-    {
-        int retryLimit = 5;
-        int retry = 0;
-        while (retry < retryLimit)
-        {
-            Thread.sleep(1000);
-            try
-            {
-                WebElement fromElement = browser.findElement(By.id(buttonId));
-                fromElement.click();
-                return;
-            }
-            catch (org.openqa.selenium.NoSuchElementException ex)
-            {
-                retry++;                
-            }
-        }
-        fail("No element with id " + buttonId + " was loaded in lightbox");
-    }
-
-    @Then("^I wait for lightbox to close$")
-    public void iWaitForLightboxClose() throws InterruptedException
-    {
-        int retryLimit = 5;
-        int retry = 0;
-        while (retry < retryLimit)
-        {
-            try
-            {
-                browser.findElement(By.xpath("//div[@id='fancybox-content']/div[@class='sydma_content']"));
-                retry++;
-                Thread.sleep(1000);
-            }
-            catch (org.openqa.selenium.NoSuchElementException ex)
-            {
-                // all good, lightbox has closed
-                break;
-            }
-        }
     }
 
     @Then("^I should be able to see (?:file|directory) \"([^\"]*)\" in \"([^\"]*)\"$")
     public void iShouldBeAbleToSeeInDirectory(String titleToCheck, String containerDirectoryTitle)
     {
-        WebElement containerElement;
-        try
-        {
-            containerElement = browser.findElement(By.xpath("//li[a[@title='" + containerDirectoryTitle + "']]"));
-        }
-        catch (org.openqa.selenium.NoSuchElementException ex)
-        {
-            fail("Expected directory with title: " + containerDirectoryTitle);
-            return;
-        }
+        WebElement containerElement = findElement(By.xpath("//li[a[@title='" + containerDirectoryTitle + "']]"));
+
         try
         {
             containerElement.findElement(By.xpath("//a[@title='" + containerDirectoryTitle + "']"));
@@ -332,6 +269,194 @@ public class DirectorySteps
             fail("Expected file or directory with title: " + titleToCheck + " within " + containerDirectoryTitle);
         }
 
+    }
+
+    @Then("^I should (have|not have) directory \"([^\"]*)\" under dataset \"([^\"]*)\" and path \"([^\"]*)\"$")
+    public void iShouldHaveOrNotDirectoryUnder(String haveNotHave, String directoryName, String datasetName,
+            String relativePath) throws InterruptedException
+    {
+        String datasetAbsolutePath = getDirectoryPathForDatasetWithName(datasetName);
+        String directoryPathToCheck = datasetAbsolutePath + pathSeparator + relativePath;
+
+        boolean hasDirectory = hasDirectoryUnder(directoryName, directoryPathToCheck);
+
+        if ("have".equals(haveNotHave))
+        {
+            assertTrue("Directory " + directoryName + " should be found under " + directoryPathToCheck, hasDirectory);
+        }
+        else
+        {
+            assertFalse("Directory " + directoryName + " should not be found under " + directoryPathToCheck,
+                    hasDirectory);
+        }
+
+    }
+
+    @Then("^I should (have|not have) file \"([^\"]*)\" under dataset \"([^\"]*)\" and path \"([^\"]*)\"$")
+    public void iShouldNotHaveFileUnder(String haveNotHave, String fileName, String datasetName, String relativePath)
+        throws InterruptedException
+    {
+        String datasetAbsolutePath = getDirectoryPathForDatasetWithName(datasetName);
+        String directoryPathToCheck = datasetAbsolutePath + pathSeparator + relativePath;
+
+        boolean hasFile = hasFileUnder(fileName, directoryPathToCheck);
+
+        if ("have".equals(haveNotHave))
+        {
+            assertTrue("File " + fileName + " should be found under " + directoryPathToCheck, hasFile);
+        }
+        else
+        {
+            assertFalse("File " + fileName + " should not be found under " + directoryPathToCheck, hasFile);
+        }
+    }
+
+    @Then("^user \"([^\"]*)\" should have full access to directory \"([^\"]*)\" in dataset \"([^\"]*)\"$")
+    public void userShouldHaveFullAccessToDirectory(String username, String directoryName, String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/");
+
+        PermissionEntry entry = PermissionEntry.findPermissionEntrysByPathEqualsAndUser(directoryAbsolutePath, user)
+                .getSingleResult();
+        assertEquals(entry.getAccessLevel(), AccessLevel.FULL_ACCESS);
+    }
+
+    @Then("^user \"([^\"]*)\" should have viewing access to directory \"([^\"]*)\" in dataset \"([^\"]*)\"$")
+    public void userShouldHaveViewingAccessToDirectory(String username, String directoryName, String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/");
+
+        PermissionEntry entry = PermissionEntry.findPermissionEntrysByPathEqualsAndUser(directoryAbsolutePath, user)
+                .getSingleResult();
+        assertEquals(entry.getAccessLevel(), AccessLevel.VIEWING_ACCESS);
+    }
+
+    @Then("^user \"([^\"]*)\" should have full access to sub-directory \"([^\"]*)\" of directory \"([^\"]*)\" in"
+            + " dataset \"([^\"]*)\"$")
+    public void userShouldHaveFullAccessToChildDirectory(String username, String subDirectoryName,
+            String directoryName, String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/").concat(subDirectoryName)
+                .concat("/");
+
+        PermissionEntry entry = PermissionEntry.findPermissionEntrysByPathEqualsAndUser(directoryAbsolutePath, user)
+                .getSingleResult();
+        assertEquals(entry.getAccessLevel(), AccessLevel.FULL_ACCESS);
+    }
+
+    @Then("^user \"([^\"]*)\" should not have a permission entry in sub-directory \"([^\"]*)\" of directory "
+            + "\"([^\"]*)\" in dataset \"([^\"]*)\"$")
+    public void userShouldNotHavePermissionENtryToChildDirectory(String username, String subDirectoryName,
+            String directoryName, String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/").concat(subDirectoryName)
+                .concat("/");
+
+        List<PermissionEntry> entries = PermissionEntry.findPermissionEntrysByPathEqualsAndUser(directoryAbsolutePath,
+                user).getResultList();
+        assertEquals(entries.size(), 0);
+    }
+
+    @Given("^user \"([^\"]*)\" has full access to directory \"([^\"]*)\" in dataset \"([^\"]*)\"$")
+    public void userHasFullAccessToDirectory(String username, String directoryName, String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/");
+
+        PermissionEntry entry = new PermissionEntry();
+        entry.setAccessLevel(AccessLevel.FULL_ACCESS);
+        entry.setUser(user);
+        entry.setPath(directoryAbsolutePath);
+        entry.merge();
+    }
+
+    @Given("^user \"([^\"]*)\" has full access to sub-directory \"([^\"]*)\" of directory \"([^\"]*)\" in"
+            + " dataset \"([^\"]*)\"$")
+    public void userHasFullAccessToChildDirectory(String username, String subDirectoryName, String directoryName,
+            String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/").concat(subDirectoryName)
+                .concat("/");
+
+        PermissionEntry entry = new PermissionEntry();
+        entry.setAccessLevel(AccessLevel.FULL_ACCESS);
+        entry.setUser(user);
+        entry.setPath(directoryAbsolutePath);
+        entry.merge();
+    }
+
+    @Given("^user \"([^\"]*)\" has viewing access to sub-directory \"([^\"]*)\" of directory \"([^\"]*)\" in"
+            + " dataset \"([^\"]*)\"$")
+    public void userHasViewingAccessToChildDirectory(String username, String subDirectoryName, String directoryName,
+            String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/").concat(subDirectoryName)
+                .concat("/");
+
+        PermissionEntry entry = new PermissionEntry();
+        entry.setAccessLevel(AccessLevel.VIEWING_ACCESS);
+        entry.setUser(user);
+        entry.setPath(directoryAbsolutePath);
+        entry.merge();
+    }
+
+    @Given("^user \"([^\"]*)\" has viewing access to directory \"([^\"]*)\" in dataset \"([^\"]*)\"$")
+    public void userHasViewingAccessToDirectory(String username, String directoryName, String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/");
+
+        PermissionEntry entry = new PermissionEntry();
+        entry.setAccessLevel(AccessLevel.VIEWING_ACCESS);
+        entry.setUser(user);
+        entry.setPath(directoryAbsolutePath);
+        entry.merge();
+    }
+
+    @Given("^user \"([^\"]*)\" has no access to directory \"([^\"]*)\" in dataset \"([^\"]*)\"$")
+    public void userHasNoAccessToDirectory(String username, String directoryName, String datasetName)
+    {
+        User user = User.findUsersByUsernameEquals(username).getSingleResult();
+        ResearchDataset dataset = ResearchDataset.findResearchDatasetsByNameEquals(datasetName).getSingleResult();
+
+        String datasetAbsolutePath = PathBuilder.datasetPath(dataset).getPath();
+        String directoryAbsolutePath = datasetAbsolutePath.concat(directoryName).concat("/");
+
+        PermissionEntry entry = new PermissionEntry();
+        entry.setAccessLevel(AccessLevel.NO_ACCESS);
+        entry.setUser(user);
+        entry.setPath(directoryAbsolutePath);
+        entry.merge();
     }
 
     @Before
@@ -345,6 +470,34 @@ public class DirectorySteps
     public void after() throws IOException
     {
         cleanupFiles();
+    }
+
+    private boolean hasFileUnder(String fileName, String pathToCheck)
+    {
+        File directoryToCheck = new File(pathToCheck);
+        File[] files = directoryToCheck.listFiles();
+        for (File file : files)
+        {
+            if (fileName.equals(file.getName()) && file.isFile())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasDirectoryUnder(String directoryName, String pathToCheck)
+    {
+        File directoryToCheck = new File(pathToCheck);
+        File[] files = directoryToCheck.listFiles();
+        for (File file : files)
+        {
+            if (directoryName.equals(file.getName()) && file.isDirectory())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void prepareUploadRoot()
@@ -403,7 +556,6 @@ public class DirectorySteps
     {
         return basePath + "/" + path;
     }
-    
 
     private WebElement findElement(final By locator)
     {

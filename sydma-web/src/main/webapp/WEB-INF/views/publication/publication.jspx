@@ -1,0 +1,47 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+    <jsp:output omit-xml-declaration="yes" />
+    
+    <tiles:useAttribute name="publishMode"/>
+    <c:choose>
+        <c:when test="${publishMode == 'edit'}">
+            <spring:message var="dialogTitle" code="publication.dialog.edit" text="?Edit Publication?"/>      
+            <spring:message var="submitText" code="publication.dialog.edit.submit" text="?Edit?"/>
+            <c:url var="formAction" value="/publication/edit"/>                  
+        </c:when>
+        <c:otherwise>
+            <spring:message var="dialogTitle" code="publication.dialog.add" text="?Add Publication?"/>
+            <spring:message var="submitText" code="publication.dialog.add.submit" text="?Add?"/>
+            <c:url var="formAction" value="/publication/add"/>
+        </c:otherwise>
+    </c:choose>
+    
+    <div id="publication-dialog" title="${dialogTitle}" class="sydma_content" >
+        
+        <form:form class="formbuilder" modelAttribute="publication" method="post" action="${formAction }" autocomplete="off">
+            <ol>
+                <form:hidden path="id"/>
+                <form:hidden path="version"/>
+                <menu:form-text-area characters="1000" code="publication.citations" path="citations" required="true"/>
+                
+                <c:set var="errorSet">
+					<form:errors path="url" />
+				</c:set>
+				<c:if test="${not empty errorSet}">
+					<c:set var="cssStyle" value="error" />
+				</c:if>
+                <li class="${cssStyle}">
+                	<form:errors path="url" cssClass="error-text" element="p" />
+                	<label for="publication_url">URL<em>*</em></label>
+                	<input id="publication_url" type="text" maxlength="400" value="${publication.url}" name="url"/>
+                </li>
+                <span><spring:message code="url.validation.descrption" text="?Include Protocol?"/></span>
+                
+                <div>
+                    <input type="submit" value="${submitText }"/>
+                </div>            
+            </ol>
+        </form:form>
+    </div>
+</jsp:root>    

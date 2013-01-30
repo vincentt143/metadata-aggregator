@@ -24,9 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+//TODO CHECKSTYLE-OFF: ImportOrder
 package au.org.intersect.sydma.webapp.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,21 +49,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import au.org.intersect.dms.core.domain.FileInfo;
-import au.org.intersect.dms.core.domain.JobItem;
+import flexjson.JSONSerializer;
+
 import au.org.intersect.dms.core.errors.ConnectionClosedError;
 import au.org.intersect.dms.core.errors.PathNotFoundException;
-import au.org.intersect.dms.core.service.dto.JobStatus;
 import au.org.intersect.sydma.webapp.controller.propertyeditor.TrimString;
+import au.org.intersect.sydma.webapp.domain.PermissionEntry;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
+import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.dto.DirectoryName;
 import au.org.intersect.sydma.webapp.dto.FilePathInfo;
+import au.org.intersect.sydma.webapp.permission.PermissionType;
 import au.org.intersect.sydma.webapp.permission.path.Path;
 import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 import au.org.intersect.sydma.webapp.security.SecurityContextFacade;
+import au.org.intersect.sydma.webapp.service.FileManagementService;
 import au.org.intersect.sydma.webapp.service.FilePathService;
+import au.org.intersect.sydma.webapp.service.PermissionService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
 
 /**
@@ -70,6 +75,7 @@ import au.org.intersect.sydma.webapp.util.Breadcrumb;
  * 
  * @version $Rev: 29 $
  */
+// TODO CHECKSTYLE-OFF: ClassFanOutComplexity
 @Controller
 @RequestMapping("/managedataset/**")
 public class ManageDatasetController extends AbstractControllerWithDmsConnection
@@ -92,6 +98,7 @@ public class ManageDatasetController extends AbstractControllerWithDmsConnection
 
     private static final String ROOT_PATH_ATTR = "nodeRootPath";
     private static final String ROOT_NAME_ATTR = "nodeRootName";
+    private static final String ROOT_PERMISSION_ATTR = "nodeRootPermission";
     private static final String GROUP_ATTR = "group";
     private static final String PROJECT_ATTR = "project";
     private static final String DATASET_ATTR = "dataset";
@@ -110,162 +117,250 @@ public class ManageDatasetController extends AbstractControllerWithDmsConnection
 
     private static final String ERROR_ATTR = "executionError";
 
+    private static final String PATH_SEPARATOR = "/";
+
+    private static final String ACCESS_DENIED_VIEW = "accessDenied";
+    private static final String MOVE_DENIED_VIEW = "managedataset/moveDenied";
+
     @Autowired
     private FilePathService filePathService;
 
     @Autowired
     private SecurityContextFacade securityContextFacade;
-    
+
+    @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
+    private FileManagementService fileManagementService;
+
     @InitBinder
-    public void setBinder(WebDataBinder dataBinder) 
+    public void setBinder(WebDataBinder dataBinder)
     {
-        dataBinder.registerCustomEditor(String.class, new TrimString());      
+        dataBinder.registerCustomEditor(String.class, new TrimString());
     }
 
-    private void addBreadCrumb(String groupName, String projectName, String datasetName, Model model)
+    private List<Breadcrumb> addBreadCrumb(String datasetName)
     {
         List<Breadcrumb> breadcrumbs = new ArrayList<Breadcrumb>();
         breadcrumbs.add(Breadcrumb.getHome());
-        breadcrumbs.add(new Breadcrumb(groupName));
-        breadcrumbs.add(new Breadcrumb(projectName));
-        breadcrumbs.add(new Breadcrumb(datasetName));
-        model.addAttribute(Breadcrumb.BREADCRUMBS, breadcrumbs);
+        breadcrumbs.add(new Breadcrumb(datasetName, false));
+        return breadcrumbs;
     }
 
     @RequestMapping("/browse/dataset/{datasetId}")
-    public String browseDataset(@PathVariable("datasetId") Long datasetId, Model model)
+    public String browseDataset(@PathVariable("datasetId") final Long datasetId, final Model model, Principal principal)
     {
-        ResearchDataset dataset = ResearchDataset.findResearchDataset(datasetId);
-        ResearchProject project = dataset.getResearchProject();
-        ResearchGroup group = project.getResearchGroup();
+        return permissionService.canDataset(PermissionType.VIEW_DATASET, datasetId, principal,
+                new PermissionService.ResearchDatasetAction()
+                {
+                    @Override
+                    public String act(ResearchDataset dataset, User user)
+                    {
+                        if (dataset.getIsPhysical())
+                        {
+                            return "accessDenied";
+                        }
 
-        // add breadcrumbs
-        String datasetName = dataset.getName();
-        String projectName = project.getName();
-        String groupName = group.getName();
-        addBreadCrumb(groupName, projectName, datasetName, model);
+                        ResearchProject project = dataset.getResearchProject();
+                        ResearchGroup group = project.getResearchGroup();
 
-        String virtualRootPath = filePathService.createVirtualPath(group.getId(), project.getId(), datasetId);
+                        String datasetName = dataset.getName();
+                        model.addAttribute(Breadcrumb.BREADCRUMBS, addBreadCrumb(datasetName));
 
-        model.addAttribute(ROOT_NAME_ATTR, datasetName);
-        model.addAttribute(ROOT_PATH_ATTR, virtualRootPath);
+                        String virtualRootPath = filePathService.createVirtualPath(group.getId(), project.getId(),
+                                datasetId);
 
-        model.addAttribute(GROUP_ATTR, group);
-        model.addAttribute(PROJECT_ATTR, project);
-        model.addAttribute(DATASET_ATTR, dataset);
+                        // at dataset level we only allow create directory
+                        List<PermissionType> applicableActions = new ArrayList<PermissionType>(1);
+                        applicableActions.add(PermissionType.CREATE_DIRECTORY);
+                        List<PermissionType> allowedActions = permissionService.restrictDirectoryActions(
+                                applicableActions, virtualRootPath, user);
 
-        return BROWSE_VIEW;
+                        List<String> allowedActionList = new ArrayList<String>(allowedActions.size());
+                        for (PermissionType permission : allowedActions)
+                        {
+                            allowedActionList.add(permission.getPermissionTypeName());
+                        }
+
+                        JSONSerializer serializer = new JSONSerializer();
+                        model.addAttribute(ROOT_PERMISSION_ATTR, serializer.serialize(allowedActionList));
+                        model.addAttribute(ROOT_NAME_ATTR, datasetName);
+                        model.addAttribute(ROOT_PATH_ATTR, virtualRootPath);
+
+                        model.addAttribute(GROUP_ATTR, group);
+                        model.addAttribute(PROJECT_ATTR, project);
+                        model.addAttribute(DATASET_ATTR, dataset);
+
+                        return BROWSE_VIEW;
+                    }
+                });
+
     }
 
     @RequestMapping(value = "/directory/create", method = RequestMethod.GET)
-    public String createDirectoryRender(@RequestParam(FILE_PATH_ATTR) String virtualPath, Model model)
+    public String createDirectoryRender(@RequestParam(FILE_PATH_ATTR) final String virtualPath, final Model model,
+            final Principal principal)
     {
-        model.addAttribute(FILE_PATH_ATTR, virtualPath);
-        model.addAttribute(DIRECTORY_NAME_ATTR, new DirectoryName());
-        return CREATE_DIR_VIEW;
+        return permissionService.canDirectory(PermissionType.CREATE_DIRECTORY, virtualPath, principal,
+                new PermissionService.DirectoryAction()
+                {
+                    @Override
+                    public String act(Path path, User user)
+                    {
+                        model.addAttribute(FILE_PATH_ATTR, virtualPath);
+                        model.addAttribute(DIRECTORY_NAME_ATTR, new DirectoryName());
+                        return CREATE_DIR_VIEW;
+                    }
+                });
     }
 
     @RequestMapping(value = "/createDirectory", method = RequestMethod.POST)
-    public String createDirectoryPost(@RequestParam(FILE_PATH_ATTR) String virtualPath,
-            @RequestParam(CONNECTION_ID_ATTR) Integer connectionId, Model model,
-            @Valid @ModelAttribute(DIRECTORY_NAME_ATTR) DirectoryName directoryName, BindingResult result)
+    public String createDirectoryPost(@RequestParam(FILE_PATH_ATTR) final String virtualPath,
+            @RequestParam(CONNECTION_ID_ATTR) final Integer connectionId, final Model model,
+            @Valid @ModelAttribute(DIRECTORY_NAME_ATTR) final DirectoryName directoryName, final BindingResult result,
+            final Principal principal)
     {
-        if (!result.hasErrors())
-        {
-            Path pathInfo = PathBuilder.buildFromString(virtualPath);
-            String absolutePath = filePathService.resolveRelativePath(pathInfo);
-            String directory = pathInfo.getFilePath();
-            try
-            {
-                boolean createSuccess = getDmsService().createDir(connectionId, absolutePath,
-                        directoryName.getDirectoryName());
-
-                if (!createSuccess)
+        return permissionService.canDirectory(PermissionType.CREATE_DIRECTORY, virtualPath, principal,
+                new PermissionService.DirectoryAction()
                 {
-                    String[] codes = {"manageDataset.directory.create.fail"};
-                    Object[] args = {};
-                    FieldError fieldError = new FieldError(FILE_PATH_ATTR, DIRECTORY_NAME_ATTR,
-                            directoryName.getDirectoryName(), false, codes, args, "Failed to create directory");
-                    result.addError(fieldError);
-                    model.addAttribute(FILE_PATH_ATTR, virtualPath);
-                    return CREATE_DIR_VIEW;
-                }
+                    @Override
+                    public String act(Path path, User user)
+                    {
+                        if (!result.hasErrors())
+                        {
+                            String absolutePath = filePathService.resolveToRelativePath(path);
+                            String filePath = path.getPath();
+                            try
+                            {
+                                boolean createSuccess = getDmsService().createDir(connectionId, absolutePath,
+                                        directoryName.getDirectoryName());
 
-            }
-            // TODO CHECKSTYLE-OFF: IllegalCatch
-            catch (PathNotFoundException e)
-            {
-                return handlePathNotFoundException(directory, e, model);
-            }
-            catch (ConnectionClosedError e)
-            {
-                // connection closed is handled by other handlers
-                throw e;
-            }
-            catch (Exception e)
-            {
-                String[] codes = {"manageDataset.directory.create.exception"};
-                String errorMessage = "An error occured";
-                if (e.getMessage() != null)
-                {
-                    errorMessage = e.getMessage();
-                }
-                Object[] args = {errorMessage};
-                FieldError fieldError = new FieldError(FILE_PATH_ATTR, DIRECTORY_NAME_ATTR,
-                        directoryName.getDirectoryName(), false, codes, args, errorMessage);
-                result.addError(fieldError);
-            }
-        }
-        // Check for error again incase new errors have been added during execution
-        if (result.hasErrors())
-        {
-            model.addAttribute(FILE_PATH_ATTR, virtualPath);
-            return CREATE_DIR_VIEW;
-        }
-        return SUCCESS_AJAX_VIEW;
+                                if (!createSuccess)
+                                {
+                                    String[] codes = {"manageDataset.directory.create.fail"};
+                                    Object[] args = {};
+                                    FieldError fieldError = new FieldError(FILE_PATH_ATTR, DIRECTORY_NAME_ATTR,
+                                            directoryName.getDirectoryName(), false, codes, args,
+                                            "Failed to create directory");
+                                    result.addError(fieldError);
+                                    model.addAttribute(FILE_PATH_ATTR, virtualPath);
+                                    return CREATE_DIR_VIEW;
+                                }
+                            }
+                            // TODO CHECKSTYLE-OFF: IllegalCatch
+                            catch (PathNotFoundException e)
+                            {
+                                return handlePathNotFoundException(filePath, e, model);
+                            }
+                            catch (ConnectionClosedError e)
+                            {
+                                // connection closed is handled by other handlers
+                                throw e;
+                            }
+                            catch (Exception e)
+                            {
+                                String[] codes = {"manageDataset.directory.create.exception"};
+                                String errorMessage = "An error occured";
+                                if (e.getMessage() != null)
+                                {
+                                    //Overwrite the original exception message
+                                    //errorMessage = e.getMessage();
+                                    errorMessage = "Cannot create as there is a directory with the same name";
+                                }
+                                Object[] args = {errorMessage};
+                                FieldError fieldError = new FieldError(FILE_PATH_ATTR, DIRECTORY_NAME_ATTR,
+                                        directoryName.getDirectoryName(), false, codes, args, errorMessage);
+                                result.addError(fieldError);
+                            }
+                        }
+                        // Check for error again incase new errors have been added during execution
+                        if (result.hasErrors())
+                        {
+                            model.addAttribute(FILE_PATH_ATTR, virtualPath);
+                            return CREATE_DIR_VIEW;
+                        }
+                        return SUCCESS_AJAX_VIEW;
+                    }
+                });
     }
 
     @RequestMapping(value = "/directory/delete", method = RequestMethod.GET)
-    public String deleteDirectoryRender(@RequestParam(FILE_PATH_ATTR) String virtualPath, Model model)
+    public String deleteDirectoryRender(@RequestParam(FILE_PATH_ATTR) final String virtualPath, final Model model,
+            Principal principal)
     {
-        FilePathInfo pathInfo = filePathService.parseVirtualPath(virtualPath);
-        String directory = pathInfo.getDirectory();
-        model.addAttribute(NAMED_PATH_ATTR, directory);
-        model.addAttribute(FILE_PATH_ATTR, virtualPath);
-        return DELETE_DIR_VIEW;
+        return permissionService.canDirectory(PermissionType.DELETE_DIRECTORY, virtualPath, principal,
+                new PermissionService.DirectoryAction()
+                {
+                    @Override
+                    public String act(Path path, User user)
+                    {
+                        FilePathInfo pathInfo = filePathService.parseVirtualPath(virtualPath);
+                        String directory = pathInfo.getDirectory();
+                        model.addAttribute(NAMED_PATH_ATTR, directory);
+                        model.addAttribute(FILE_PATH_ATTR, virtualPath);
+                        return DELETE_DIR_VIEW;
+                    }
+                });
     }
 
     @RequestMapping(value = "/file/delete", method = RequestMethod.GET)
-    public String deleteFileRender(@RequestParam(FILE_PATH_ATTR) String virtualPath, Model model)
+    public String deleteFileRender(@RequestParam(FILE_PATH_ATTR) final String virtualPath, final Model model,
+            final Principal principal)
     {
-        FilePathInfo pathInfo = filePathService.parseVirtualPath(virtualPath);
-        String directory = pathInfo.getDirectory();
-        model.addAttribute(NAMED_PATH_ATTR, directory);
-        model.addAttribute(FILE_PATH_ATTR, virtualPath);
-        return DELETE_FILE_VIEW;
+        return permissionService.canDirectory(PermissionType.DELETE_FILE, virtualPath, principal,
+                new PermissionService.DirectoryAction()
+                {
+                    @Override
+                    public String act(Path path, User user)
+                    {
+                        FilePathInfo pathInfo = filePathService.parseVirtualPath(virtualPath);
+                        String directory = pathInfo.getDirectory();
+                        model.addAttribute(NAMED_PATH_ATTR, directory);
+                        model.addAttribute(FILE_PATH_ATTR, virtualPath);
+                        return DELETE_FILE_VIEW;
+                    }
+                });
     }
 
     /**
      * Deletes files and directories
      */
     @RequestMapping(method = RequestMethod.POST, value = "/delete")
-    public String delete(@RequestParam Integer connectionId, @RequestParam(FILE_PATH_ATTR) String virtualPath,
-            @RequestParam(FILE_TYPE_ATTR) String fileType, Model model)
+    public String delete(@RequestParam final Integer connectionId,
+            @RequestParam(FILE_PATH_ATTR) final String virtualPath,
+            @RequestParam(FILE_TYPE_ATTR) final String fileType, final Model model, final Principal principal)
     {
-        Path pathInfo = PathBuilder.buildFromString(virtualPath);
-        String absolutePath = filePathService.resolveRelativePath(pathInfo);
-        String directory = pathInfo.getFilePath();
+        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+        Path path = PathBuilder.buildFromString(virtualPath);
+        final String view;
+        if (("directory".equals(fileType) && permissionService.canDirectoryAction(PermissionType.DELETE_DIRECTORY,
+                path, user))
+                || ("file".equals(fileType) && permissionService.canDirectoryAction(PermissionType.DELETE_FILE, path,
+                        user)))
+        {
+            view = performDelete(fileType, virtualPath, path, connectionId, model);
+        }
+        else
+        {
+            view = ACCESS_DENIED_VIEW;
+        }
+        return view;
+    }
 
-        FileInfo fileToDelete = new FileInfo();
-        fileToDelete.setAbsolutePath(absolutePath);
-        List<FileInfo> fileInfos = new ArrayList<FileInfo>();
-        fileInfos.add(fileToDelete);
+    private String performDelete(String fileType, String virtualPath, Path path, Integer connectionId, Model model)
+    {
+        String directory = "";
+        if (path.isFilePath())
+        {
+            directory = path.getFilePath();
+        }
 
         String errorMessage = "An error occured";
         boolean deleteSuccess = false;
         try
         {
-            deleteSuccess = getDmsService().delete(connectionId, fileInfos);
+            deleteSuccess = fileManagementService.deleteFileOrDirectory(path, connectionId);
         }
         // TODO CHECKSTYLE-OFF: IllegalCatch
         catch (PathNotFoundException e)
@@ -277,14 +372,6 @@ public class ManageDatasetController extends AbstractControllerWithDmsConnection
             // connection closed is handled by other handlers
             throw e;
         }
-        catch (Exception e)
-        {
-            if (e.getMessage() != null)
-            {
-                errorMessage = e.getMessage();
-            }
-        }
-
         final String view;
         if (!deleteSuccess)
         {
@@ -304,110 +391,98 @@ public class ManageDatasetController extends AbstractControllerWithDmsConnection
         }
         else
         {
+            cleanUpPermissions(path, fileType);
             view = SUCCESS_AJAX_VIEW;
         }
         return view;
     }
 
     @RequestMapping(value = "/file/move", method = RequestMethod.GET)
-    public String moveFileRender(@RequestParam(MOVING_PATH_ATTR) String movingPath,
-            @RequestParam(DESTINATION_PATH_ATTR) String destinationPath, Model model)
+    public String moveFileRender(@RequestParam(MOVING_PATH_ATTR) final String movingPath,
+            @RequestParam(DESTINATION_PATH_ATTR) final String destinationPath, final Model model,
+            final Principal principal)
     {
-        Path movingPathInfo = PathBuilder.buildFromString(movingPath);
-        Path destinationPathInfo = PathBuilder.buildFromString(destinationPath);
+        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+        Path virtualMovingPath = PathBuilder.buildFromString(movingPath);
+        Path virtualDestinationPath = PathBuilder.buildFromString(destinationPath);
 
-        addPathAttrToModel(movingPath, movingPathInfo, destinationPath, destinationPathInfo, model);
-        return MOVE_FILE_VIEW;
-    }
-
-    @RequestMapping(value = "/move", method = RequestMethod.POST)
-    public String moveFile(@RequestParam(CONNECTION_ID_ATTR) Integer connectionId,
-            @RequestParam(MOVING_PATH_ATTR) String movingPath,
-            @RequestParam(DESTINATION_PATH_ATTR) String destinationPath, Model model)
-    {
-        Path movingPathInfo = PathBuilder.buildFromString(movingPath);
-        String movingAbsolutePath = filePathService.resolveRelativePath(movingPathInfo);
-        
-
-        Path destinationPathInfo = PathBuilder.buildFromString(destinationPath);
-        String destinationAbsolutePath = filePathService.resolveRelativePath(destinationPathInfo);
-
-        String executionError = performDelete(connectionId, movingAbsolutePath, destinationAbsolutePath);
-
-        if (executionError != null)
+        if (permissionService.canDirectoryAction(PermissionType.MOVE_DIRECTORY_FILE, virtualMovingPath, user)
+                && permissionService.canDirectoryAction(PermissionType.MOVE_DIRECTORY_FILE, virtualDestinationPath,
+                        user))
         {
+
+            Path movingPathInfo = PathBuilder.buildFromString(movingPath);
+            Path destinationPathInfo = PathBuilder.buildFromString(destinationPath);
+
             addPathAttrToModel(movingPath, movingPathInfo, destinationPath, destinationPathInfo, model);
-            model.addAttribute(ERROR_ATTR, executionError);
             return MOVE_FILE_VIEW;
         }
 
-        return SUCCESS_AJAX_VIEW;
+        model.addAttribute(MOVING_PATH_ATTR, getNamedPath(virtualMovingPath));
+        model.addAttribute(DESTINATION_PATH_ATTR, getNamedPath(virtualDestinationPath));
+
+        return MOVE_DENIED_VIEW;
     }
 
-    private String performDelete(Integer connectionId, String movingAbsolutePath, String destinationAbsolutePath)
+    @RequestMapping(value = "/move", method = RequestMethod.POST)
+    public String moveFile(@RequestParam(CONNECTION_ID_ATTR) Integer srcConnectionId,
+            @RequestParam(MOVING_PATH_ATTR) String movingPath,
+            @RequestParam(DESTINATION_PATH_ATTR) String destinationPath, Model model, Principal principal)
     {
-        String username = securityContextFacade.getAuthorizedUsername();
-        Integer destinationConnection = connectLocal();
+        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+        Path srcPath = PathBuilder.buildFromString(movingPath);
+        Path destPath = PathBuilder.buildFromString(destinationPath);
 
-        List<String> copySource = new ArrayList<String>(1);
-        copySource.add(movingAbsolutePath);
-
-        Long jobId = getDmsService().copy(username, connectionId, copySource, destinationConnection,
-                destinationAbsolutePath);
-        String executionError = null;
-        LOG.info("movingAbsolutePath " + movingAbsolutePath);
-        LOG.info("destinationAbsolutePath " + destinationAbsolutePath);
-        
-        try
+        if (permissionService.canDirectoryAction(PermissionType.MOVE_DIRECTORY_FILE, srcPath, user)
+                && permissionService.canDirectoryAction(PermissionType.MOVE_DIRECTORY_FILE, destPath, user))
         {
-            while (true)
-            {
+            String username = securityContextFacade.getAuthorizedUsername();
 
-                JobItem jobItem = getDmsService().getJobStatus(username, jobId);
-                String status = jobItem.getStatus();
-                LOG.info("Deletion job status " + status);
-                if (JobStatus.FINISHED.toString().equals(status))
-                {
-                    break;
-                }
-                if (JobStatus.ABORTED.toString().equals(status))
-                {
-                    executionError = "Move aborted";
-                    break;
-                }
-                if (JobStatus.CANCELLED.toString().equals(status))
-                {
-                    executionError = "Move cancelled";
-                    break;
-                }
-                // TODO CHECKSTYLE-OFF: Magic Number
-                Thread.sleep(100);
+            Integer destConnectionId = connectLocal(principal.getName());
+
+            // TODO: CLEAN UP
+            boolean moveSuccess = fileManagementService.moveFileOrDirectory(username, srcPath, destPath,
+                    srcConnectionId, destConnectionId);
+            if (moveSuccess)
+            {
+                permissionService.updatePermissionEntries(srcPath, destPath);
             }
 
-            List<FileInfo> filesToDelete = new ArrayList<FileInfo>(1);
-            FileInfo srcToDelete = new FileInfo();
-            srcToDelete.setAbsolutePath(movingAbsolutePath);
-            filesToDelete.add(srcToDelete);
-            boolean deleteSuccess = getDmsService().delete(connectionId, filesToDelete);
-            if (!deleteSuccess)
+            return SUCCESS_AJAX_VIEW;
+        }
+        return ACCESS_DENIED_VIEW;
+    }
+
+    private void cleanUpPermissions(Path path, String fileType)
+    {
+        // Remove permissions for the deleted file or directory
+        List<PermissionEntry> affectedEntries = PermissionEntry.findPermissionEntrysByPathEquals(path.getPath())
+                .getResultList();
+        if (!affectedEntries.isEmpty())
+        {
+            for (PermissionEntry entry : affectedEntries)
             {
-                executionError = "Move failed during delete phase";
+                // TODO: Do we need to log this in the permission activity log?
+                entry.remove();
             }
         }
-        catch (Exception e)
-        {            
-            executionError = "" + e.getMessage();
+        // Clean up children permissions if directory is deleted
+        if ("directory".equals(fileType))
+        {
+            List<PermissionEntry> childEntries = PermissionEntry.findChildPath(path.getPath()).getResultList();
+            for (PermissionEntry childEntry : childEntries)
+            {
+                childEntry.remove();
+            }
         }
-        return executionError;
-
     }
 
     private void addPathAttrToModel(String movingPath, Path movingPathInfo, String destinationPath,
             Path destinationPathInfo, Model model)
     {
-        String movingNamedpath = movingPathInfo.getFilePath();
-        String destinationNamedpath = destinationPathInfo.getFilePath();
-        
+        String movingNamedpath = getNamedPath(movingPathInfo);
+        String destinationNamedpath = getNamedPath(destinationPathInfo);
+
         if (StringUtils.isEmpty(destinationNamedpath))
         {
             destinationNamedpath = "Dataset top level";
@@ -418,6 +493,35 @@ public class ManageDatasetController extends AbstractControllerWithDmsConnection
         model.addAttribute(MOVING_PATH_ATTR, movingPath);
         model.addAttribute(DESTINATION_PATH_ATTR, destinationPath);
 
+    }
+
+    private String getNamedPath(Path pathInfo)
+    {
+
+        if (pathInfo.isDatasetPath() || pathInfo.isFilePath())
+        {
+            Long datasetId = pathInfo.getDatasetId();
+            ResearchDataset dataset = ResearchDataset.findResearchDataset(datasetId);
+
+            String entityPath = dataset.getName();
+            String directoryPath = "";
+            if (pathInfo.isFilePath())
+            {
+                directoryPath = pathInfo.getFilePath();
+            }
+            // truncate path separator at end
+            if (directoryPath.length() > 1
+                    && PATH_SEPARATOR.equals(String.valueOf(directoryPath.charAt(directoryPath.length() - 1))))
+            {
+                directoryPath = directoryPath.substring(0, directoryPath.length() - 1);
+            }
+            return entityPath + directoryPath;
+        }
+        else
+        {
+            // We don't handle none-dataset path
+            throw new IllegalArgumentException("Unexpected path type");
+        }
     }
 
     private String handlePathNotFoundException(String path, PathNotFoundException e, Model model)
@@ -437,4 +541,5 @@ public class ManageDatasetController extends AbstractControllerWithDmsConnection
 
         return PATH_NOT_FOUND_VIEW;
     }
+
 }

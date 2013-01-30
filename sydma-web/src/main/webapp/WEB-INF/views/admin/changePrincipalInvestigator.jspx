@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:sec="http://www.springframework.org/security/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<spring:message code="label_home_index" htmlEscape="false" var="title" />
+	<spring:message code="application_name" htmlEscape="false"
+		var="app_name" />
+
+	<h1>
+		<spring:theme code="sections.change.pi.title"
+			text="?sections.change.pi.title?" />
+	</h1>
+	<p></p>
+	<b><spring:message code="rds.name" text="?rds.name?" />: </b>
+	<c:out value="${rdsRequest.name}" />
+	<br /> <b><spring:message code="rds.field.of.research.code"
+			text="?rds.field.of.research.code?" />: </b>
+	<c:if test="${not empty rdsRequest.subjectCode}">
+		<c:out value="${rdsRequest.subjectCode.displayName}" />
+	</c:if>
+
+	<c:if test="${not empty rdsRequest.subjectCode2}">
+		<br />
+		<b><spring:message code="rds.field.of.research.code.optional"
+				text="?rds.field.of.research.code.optional?" />: </b>
+		<c:out value="${rdsRequest.subjectCode2.displayName}" />
+	</c:if>
+	<c:if test="${not empty rdsRequest.subjectCode3}">
+		<br />
+		<b><spring:message code="rds.field.of.research.code.optional"
+				text="?rds.field.of.research.code.optional?" />: </b>
+		<c:out value="${rdsRequest.subjectCode3.displayName}" />
+	</c:if>
+
+	<br /> <b><spring:message code="rds.principal.investigator"
+			text="?rds.principal.investigator?" />: </b>
+	<c:out value="${rdsRequest.principalInvestigator}" />
+
+	<c:if test="${not empty rdsRequest.dataManagementContact}">
+		<br />
+		<b><spring:message code="rds.data.management.contact"
+				text="?rds.data.management.contact?" />: </b>
+		<c:out value="${rdsRequest.dataManagementContact}" />
+	</c:if>
+	<br /> <b><spring:message code="rds.description" text="?rds.name?" />:
+	</b>
+	<c:out value="${rdsRequest.description}" />
+	<br />
+	<c:url value='${submitUrl}' var="submitUrl" />
+
+	<form:form id="approve_form" modelAttribute="groupDirectory"
+		class="formbuilder" method="post" action="${submitUrl}">
+		<input id="submit_hidden_input" type="hidden" name="Approve"
+			value="Approve" />
+		<!-- Default submit value to get around submit via enter in ie-->
+		<fieldset>
+			<legend>
+				<spring:theme code="sections.change.pi.title"
+					text="?sections.change.pi.title?" />
+			</legend>
+
+			<ol>
+				<menu:form-entry characters="20" path="principalInvestigator"
+					code="change.rds.principal.investigator" required="true"
+					cssClass="principal_investigator_auto" />
+			</ol>
+			<div class="buttons">
+				<input class="clear-button button" type="reset" value="Reset" /> 
+				<input id="update_submit" class="submit-button button" type="submit"
+					value="Change PI" name="update_submit" title="Change PI" />
+			</div>
+		</fieldset>
+	</form:form>
+
+	<c:url var="principalInvestigatorUrl"
+		value="/usermanagement/searchUnikey" />
+	<script type="text/javascript">
+		(function() {
+			/*
+				Bind triggers to the various buttons to submit or reject.
+				by default the hidden input has values to Approve the rds request
+			 */
+			var $form = jQuery("#approve_form");
+			var $rejectButton = jQuery("#reject_button");
+			var onReject = function() {
+				jQuery("#submit_hidden_input").attr("name",
+						$rejectButton.attr("name"));
+				jQuery("#submit_hidden_input").attr("value",
+						$rejectButton.attr("value"));
+				$form.submit();
+			};
+			$rejectButton.click(onReject);
+			var onApprove = function() {
+				$form.submit();
+			};
+			jQuery("#approve_button").click(onApprove);
+		})();
+
+		jQuery(document)
+				.ready(
+						function() {
+							var principalInvestigatorUrl = "${principalInvestigatorUrl}";
+							Sydma.autocompleteUser(
+									".principal_investigator_auto",
+									principalInvestigatorUrl);
+						});
+	</script>
+</div>

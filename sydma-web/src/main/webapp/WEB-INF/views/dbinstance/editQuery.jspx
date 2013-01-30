@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+    	<spring:message code="dbinstance.query.edit.title" text="?Edit SQL Query?" htmlEscape="true"/>
+    </h1>
+
+    <p class="required-warning">
+        <spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false" />
+    </p>
+    <c:url var="formAction" value="/dbinstance/editQuery" />
+    <form:form class="formbuilder" modelAttribute="researchDatabaseQuery" method="put" action="${formAction}" autocomplete="off">
+        <input type="hidden" name="queryId" value="${researchDatabaseQuery.id}"/>
+        <input type="hidden" name="datasetId" value="${datasetId}"/>
+        <form:hidden path="id" />
+        <form:hidden path="version" />
+		<fieldset>
+            <legend>
+                <spring:message code="dbinstance.sql.legend" text="?Schema?" />
+            </legend>
+			
+            <ol>
+            	<menu:form-entry characters="100" code="dbinstance.schema.query.name" path="name" required="true" />
+            	<span>Please enter a brief description about the query.</span>
+            	<menu:form-text-area characters="1000" code="dbinstance.schema.sql.description" path="description" required="true" />
+            	<span>Please type/paste SQL query into the text box below.</span>
+            	<menu:form-text-area characters="1000" code="dbinstance.schema.sql.query" path="query" required="true" />
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input id="cancel_button" class="clear-button button" type="submit" name="_submit" value="Cancel"/> 
+            <input id="delete_button" class="submit-button button" type="submit" name="_submit" value="Edit"/>
+        </div>
+    </form:form>
+    
+</div>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
     xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:display="urn:jsptld:http://displaytag.sf.net"
+    xmlns:publication="urn:jsptagdir:/WEB-INF/tags/publication"
     xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
 
     <jsp:directive.page contentType="text/html;charset=UTF-8" />
@@ -18,41 +20,97 @@
         <spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false" />
     </p>
     <c:url var="formAction" value="/researchdataset/new" />
-    <form:form class="formbuilder" modelAttribute="researchDataset" method="post" action="${formAction }" autocomplete="off">
+    <form:form class="formbuilder" modelAttribute="researchDataset" method="post" action="" autocomplete="off" id="datasetForm">
 
 		<input type="hidden" name="projectId" value="${researchProject.id }"/>
-        <fieldset>
+        <fieldset id="dataset-tab">
             <legend>
                 <spring:message code="researchDataset.legend" text="?researchDataset.legend?" />
             </legend>
-
-            <ol>
+            <ul class="tabs">
+                <li><a href="#dataset-tab-basic"><spring:message code="researchDataset.tab.basic" text="?Basic?"/></a></li>
+                <li><a href="#dataset-tab-publication"><spring:message code="researchDataset.tab.publication" text="?Publication?"/></a></li>
+				<li><a href="#dataset-tab-keywords"><spring:message code="vocabulary.keyword.tab" text="?vocabulary.keyword.tab?"/></a></li>
+            </ul>
+            <ol id="dataset-tab-basic">
                 <menu:form-entry characters="100" path="name" code="researchDataset.name" required="true" />
                 <menu:form-entry characters="100" path="subjectCode" code="researchDataset.field.of.research.code" required="true" cssClass="subject_code_auto"/>
+                <div>
                 <span>Unsure what your Field of Research Subject Code is? <a target="_blank"
                     	href="http://www.abs.gov.au/ausstats/abs@.nsf/0/6BB427AB9696C225CA2574180004463E?opendocument">
                         Click Here</a> to see a full list of the codes. </span>   
+                </div>
                 <menu:form-entry characters="100" path="subjectCode2" code="researchGroup.field.of.research.code" required="false" cssClass="subject_code_auto"/>
-				<menu:form-entry characters="100" path="subjectCode3" code="researchGroup.field.of.research.code" required="false" cssClass="subject_code_auto"/>             
+				<menu:form-entry characters="100" path="subjectCode3" code="researchGroup.field.of.research.code" required="false" cssClass="subject_code_auto"/>
+                <menu:form-entry characters="10" path="dateFrom" code="researchDataset.date.from" required="false" cssClass=""/>
+                <menu:form-entry characters="10" path="dateTo" code="researchDataset.date.to" required="false" cssClass=""/>             
                 <menu:form-select path="physicalLocation" code="researchDataset.physicalLocation" required="false" items="${buildings}" label="label" value="id" includeBlank="true"/>
                 <menu:form-entry characters="100" path="additionalLocationInformation" code="researchDataset.additionalLocationInformation" required="false" />
+                                   
                 <menu:form-text-area characters="1000" path="description" lines="10" code="researchDataset.description"
                     required="true" />                    
             </ol>
+             <ol id="dataset-tab-publication">
+                <li id="publication_section">                   
+                    <publication:publication modelAttribute="researchDataset"/>
+                </li>                  
+            </ol>
+			<ol id="dataset-tab-keywords">
+				<input type="hidden" id="vocabulary" name="vocabulary" value=""/>
+				<li>
+					<h3><spring:message code="vocabulary.keyword.title.new" text="?Manage keywords?"/></h3>
+				</li>
+				<li>
+					<div class="inputs">
+	            		<spring:message code="vocabulary.keyword.message" text="?vocabulary.keyword.message?" arguments="Dataset"/>
+            		</div>
+            	</li>
+				<li>
+					<div class="inputs">
+						<label for="token-input-keywords" type="hidden" id="accessibility">Keyword(s)</label>
+						<ul type="text" name="keywords" id="keywords" class="token-input-list"/>
+					</div>
+				</li>
+            </ol>
         </fieldset>
         <div class="buttons">
-            <input class="clear-button button" type="reset" value="Reset"></input> 
-            <input class="submit-button button" type="submit" value="Submit"></input>
+            <input class="clear-button button" type="reset" value="Reset" id="clear"></input> 
+            <input class="submit-button button" type="button" value="Submit" id="submit-form"></input>
         </div>
     </form:form>
+
+	<c:url var="searchKeywords" value="/vocabulary/searchKeywords">
+		<c:param name="id" value="${researchProject.researchGroup.id}" />
+	</c:url>
     <c:url var="subjectCodeUrl" value="/subjectcode/search"/>
     <script type="text/javascript">
-    
-    jQuery(document).ready(function()
-    {
-        var subjectCodeUrl = "${subjectCodeUrl}";
-        Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);
+    $(document).ready(function(){
+    	var subjectCodeUrl = "${subjectCodeUrl}";
+    	Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);
+    	
+    	var dpOpt = 
+    	{
+    	  	"maxDate" : "+0" //no later than today  
+    	};
+    	Sydma.datepicker({"targetSelector" : "#dateFrom"}, dpOpt);
+    	Sydma.datepicker({"targetSelector": "#dateTo"}, dpOpt);
+    	
+    	jQuery("#dataset-tab").tabs();
+    	
+        var opt = 
+    	{
+            prePopulate : false,
+    		prePopulateKeywords : [],
+    		formAction : "${formAction}",
+    		formId : "#datasetForm", 
+            searchUrl : "${searchKeywords}"
+    	};
+        Sydma.keywords.init(opt);   	
+
+        $('#clear').click(function()
+        {
+            $("#keywords").tokenInput("clear");
+        });        
     });
-    
     </script>
 </div>

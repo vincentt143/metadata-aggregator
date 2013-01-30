@@ -3,9 +3,14 @@
 
 package au.org.intersect.sydma.webapp.domain;
 
+import au.org.intersect.sydma.webapp.domain.DBBackup;
 import au.org.intersect.sydma.webapp.domain.DBSchema;
+import au.org.intersect.sydma.webapp.domain.DBUser;
+import au.org.intersect.sydma.webapp.domain.ResearchDatabaseQuery;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
+import au.org.intersect.sydma.webapp.domain.User;
 import java.lang.String;
+import java.util.List;
 
 privileged aspect ResearchDatasetDB_Roo_JavaBean {
     
@@ -31,6 +36,70 @@ privileged aspect ResearchDatasetDB_Roo_JavaBean {
     
     public void ResearchDatasetDB.setDbName(String dbName) {
         this.dbName = dbName;
+    }
+    
+    public String ResearchDatasetDB.getDbHostname() {
+        return this.dbHostname;
+    }
+    
+    public void ResearchDatasetDB.setDbHostname(String dbHostname) {
+        this.dbHostname = dbHostname;
+    }
+    
+    public String ResearchDatasetDB.getDescription() {
+        return this.description;
+    }
+    
+    public void ResearchDatasetDB.setDescription(String description) {
+        this.description = description;
+    }
+    
+    public String ResearchDatasetDB.getState() {
+        return this.state;
+    }
+    
+    public void ResearchDatasetDB.setState(String state) {
+        this.state = state;
+    }
+    
+    public DBBackup ResearchDatasetDB.getDBBackupUsed() {
+        return this.dBBackupUsed;
+    }
+    
+    public void ResearchDatasetDB.setDBBackupUsed(DBBackup dBBackupUsed) {
+        this.dBBackupUsed = dBBackupUsed;
+    }
+    
+    public String ResearchDatasetDB.getDateOfRestoration() {
+        return this.dateOfRestoration;
+    }
+    
+    public void ResearchDatasetDB.setDateOfRestoration(String dateOfRestoration) {
+        this.dateOfRestoration = dateOfRestoration;
+    }
+    
+    public User ResearchDatasetDB.getLastRestoredBy() {
+        return this.lastRestoredBy;
+    }
+    
+    public void ResearchDatasetDB.setLastRestoredBy(User lastRestoredBy) {
+        this.lastRestoredBy = lastRestoredBy;
+    }
+    
+    public List<ResearchDatabaseQuery> ResearchDatasetDB.getDbQueries() {
+        return this.dbQueries;
+    }
+    
+    public void ResearchDatasetDB.setDbQueries(List<ResearchDatabaseQuery> dbQueries) {
+        this.dbQueries = dbQueries;
+    }
+    
+    public List<DBUser> ResearchDatasetDB.getDbUsers() {
+        return this.dbUsers;
+    }
+    
+    public void ResearchDatasetDB.setDbUsers(List<DBUser> dbUsers) {
+        this.dbUsers = dbUsers;
     }
     
 }

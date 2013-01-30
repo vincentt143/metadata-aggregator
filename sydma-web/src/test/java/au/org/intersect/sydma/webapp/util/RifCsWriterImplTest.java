@@ -85,6 +85,7 @@ public class RifCsWriterImplTest
         user.setEmail("me@sydney.edu.au");
         user.setSurname("Smith");
         user.setGivenname("Fred");
+        user.setId(1L);
 
         group = new ResearchGroup();
         group.setName("My group name");
@@ -354,6 +355,7 @@ public class RifCsWriterImplTest
         User pi = mock(User.class);
         when(pi.isPrincipalInvestigatorForAnAdvertisedGroup()).thenReturn(false);
         when(pi.getKeyForRifCs()).thenReturn("pi-key");
+        when(pi.getId()).thenReturn(1L);
         writer.writePrincipalInvestigatorRifCs(pi, group);
         File pIFile = new File(folder.getRoot().getAbsolutePath() + File.separator 
                 + pi.getKeyForRifCs().concat(".xml"));
@@ -370,6 +372,7 @@ public class RifCsWriterImplTest
         User pi = mock(User.class);
         when(pi.isPrincipalInvestigatorForAnAdvertisedGroup()).thenReturn(true);
         when(pi.getKeyForRifCs()).thenReturn("pi-key");
+        when(pi.getId()).thenReturn(1L);
         writer.writePrincipalInvestigatorRifCs(pi, group);
         File pIFile = new File(folder.getRoot().getAbsolutePath() + File.separator 
                 + pi.getKeyForRifCs().concat(".xml"));

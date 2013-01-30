@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<definition extends="withSidebar" name="rstudio/index">
+		<put-attribute name="body" value="/WEB-INF/views/rstudio/index.jspx" cascade="true" />
+		<put-attribute name="activeTab" value="rstudio.tab" cascade="true" />
+		<put-attribute name="leftMenu" value="/WEB-INF/views/rstudio/leftMenu.jspx" cascade="true" />
+	</definition>
+	<definition extends="withSidebar" name="rstudio/createAccount">
+		<put-attribute name="body" value="/WEB-INF/views/rstudio/createAccount.jspx" cascade="true" />
+		<put-attribute name="activeTab" value="rstudio.tab" cascade="true" />
+		<put-attribute name="leftMenu" value="/WEB-INF/views/rstudio/leftMenu.jspx" cascade="true" />
+	</definition>
+
+</tiles-definitions>

@@ -12,7 +12,6 @@ privileged aspect PermissionEntry_Roo_ToString {
         sb.append("AccessLevel: ").append(getAccessLevel()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("Path: ").append(getPath()).append(", ");
-        sb.append("User: ").append(getUser()).append(", ");
         sb.append("Version: ").append(getVersion());
         return sb.toString();
     }

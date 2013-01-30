@@ -44,12 +44,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import au.org.intersect.sydma.webapp.controller.propertyeditor.ResearchSubjectCodePropertyEditor;
-import au.org.intersect.sydma.webapp.domain.AccessLevel;
 import au.org.intersect.sydma.webapp.domain.RdsRequest;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
-import au.org.intersect.sydma.webapp.permission.path.Path;
-import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 import au.org.intersect.sydma.webapp.service.PermissionService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
 
@@ -69,22 +66,20 @@ public class PhysicalCollectionController
     private static final String HOME_VIEW = "redirect:/";
 
     private static List<Breadcrumb> breadcrumbs = new ArrayList<Breadcrumb>();
-    
+
     static
     {
         breadcrumbs.add(Breadcrumb.getHome());
-        breadcrumbs.add(new Breadcrumb("Describe Sydney Research Data"));
+        breadcrumbs.add(new Breadcrumb("sections.physical.title"));
     }
-    
 
     @Autowired
     private PermissionService permissionService;
-    
 
     @InitBinder
-    public void setBinder(WebDataBinder dataBinder) 
+    public void setBinder(WebDataBinder dataBinder)
     {
-        dataBinder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());      
+        dataBinder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());
     }
 
     @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -100,7 +95,7 @@ public class PhysicalCollectionController
     {
         if (!result.hasErrors())
         {
-         // check for duplicate in research group
+            // check for duplicate in research group
             boolean groupIsUnique;
             boolean rdsIsUnique;
             groupIsUnique = ResearchGroup.findResearchGroupsByNameEquals(phyCol.getName()).getResultList().isEmpty();
@@ -117,21 +112,15 @@ public class PhysicalCollectionController
             {
                 phyCol.setIsPhysical(true);
                 phyCol.persist();
-                Path pathToGroup = PathBuilder.groupPath(phyCol);
-                permissionService.addPermission(phyCol.getPrincipalInvestigator(), 
-                        pathToGroup, AccessLevel.FULL_ACCESS);
-                
             }
         }
         if (result.hasErrors())
         {
-            
+
             model.addAttribute(BREADCRUMB_ATTR, breadcrumbs);
-            return PHY_COL_CREATE_VIEW;    
+            return PHY_COL_CREATE_VIEW;
         }
-        
-        
-        
+
         return HOME_VIEW;
     }
 

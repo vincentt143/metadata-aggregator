@@ -4,6 +4,7 @@
      xmlns:spring="http://www.springframework.org/tags" 
      xmlns:form="http://www.springframework.org/tags/form"
      xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+     xmlns:theme="urn:jsptagdir:/WEB-INF/tags/util"
      xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
 
   <jsp:directive.page contentType="text/html;charset=UTF-8"/>
@@ -11,7 +12,7 @@
   <spring:message code="label_home_index" htmlEscape="false" var="title"/>
     <spring:message code="application_name" htmlEscape="false" var="app_name"/>
     <h1>
-      <spring:message code="rds.title" text="?rds.title?"/>
+    	<spring:theme code="sections.rds.request.title" text="?sections.rds.request.title?" />
     </h1>
     <p>
     	<spring:message code="form.provide.information" text="?form.provide.information?"/>
@@ -23,20 +24,22 @@
 	<form:form class="formbuilder" modelAttribute="rdsRequest" method="post" action="createRdsRequest" autocomplete="off">
 		<fieldset>
 			<legend>
-				<spring:message code="rds.legend" text="?rds.legend?"/>
+				<spring:theme code="sections.rds.form.title" text="?sections.rds.form.title?"/>
 			</legend>
 
 			<ol>
 				<menu:form-entry characters="100" path="name" code="rds.name" required="true"/>
-				<menu:form-entry characters="100" path="subjectCode" code="rds.field.of.research.code"  required="true" cssClass="subject_code_auto"/>
-				<span>Unsure what your Field of Research Subject Code is? 
-					<a target="_blank" href="http://www.abs.gov.au/ausstats/abs@.nsf/0/6BB427AB9696C225CA2574180004463E?opendocument"> Click Here</a>
-				to see a full list of the codes.
-				</span>
+				<menu:form-entry characters="100" path="subjectCode" code="rds.field.of.research.code" required="true" cssClass="subject_code_auto"/>
+				<div>
+					<span>Unsure what your Field of Research Subject Code is? 
+						<a target="_blank" href="http://www.abs.gov.au/ausstats/abs@.nsf/0/6BB427AB9696C225CA2574180004463E?opendocument"> Click Here</a>
+					to see a full list of the codes.
+					</span>
+				</div>
 				<menu:form-entry characters="100" path="subjectCode2" code="rds.field.of.research.code" required="false" cssClass="subject_code_auto"/>
 				<menu:form-entry characters="100" path="subjectCode3" code="rds.field.of.research.code" required="false" cssClass="subject_code_auto"/>
-				<menu:form-entry characters="20" path="principalInvestigator" code="rds.principal.investigator"  required="true"/>
-				<menu:form-entry characters="20" path="dataManagementContact" code="rds.data.management.contact"  required="false"/>
+				<menu:form-entry characters="20" path="principalInvestigator" code="rds.principal.investigator" required="true" cssClass="principal_investigator_auto"/>
+				<menu:form-entry characters="20" path="dataManagementContact" code="rds.data.management.contact"  required="false" cssClass="data_management_contact_auto"/>
 				<menu:form-entry characters="5" path="amountOfStorage" code="rds.amount.of.storage"  required="true"/>
 				<menu:form-text-area characters="1000" path="description" lines="10" code="rds.description" required="true"/>				
 			</ol>
@@ -48,12 +51,19 @@
 	</form:form>
     
     <c:url var="subjectCodeUrl" value="/subjectcode/search"/>
+    <c:url var="principalInvestigatorUrl" value="/usermanagement/searchUnikey" />
+    <c:url var="dataManagementContactUrl" value="/usermanagement/searchUnikey" />
     <script type="text/javascript">
     
     jQuery(document).ready(function()
     {
         var subjectCodeUrl = "${subjectCodeUrl}";
+        var principalInvestigatorUrl = "${principalInvestigatorUrl}";
+		var dataManagementContactUrl = "${dataManagementContactUrl}";
+		
         Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);
+    	Sydma.autocompleteUser(".principal_investigator_auto", principalInvestigatorUrl);
+    	Sydma.autocompleteUser(".data_management_contact_auto", dataManagementContactUrl);
     });
     
     </script>

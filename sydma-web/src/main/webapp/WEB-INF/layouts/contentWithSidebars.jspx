@@ -7,7 +7,7 @@
 	version="2.0">
 	<tiles:insertAttribute name="leftMenu" />
 	<!-- start content -->
-	<div id="content" class="withtabs">
+	<div id="content">
 		<div id="w4" class="sydma">
 			<tiles:insertAttribute name="lightboxable" />
 			<tiles:insertAttribute name="unlightboxable" />

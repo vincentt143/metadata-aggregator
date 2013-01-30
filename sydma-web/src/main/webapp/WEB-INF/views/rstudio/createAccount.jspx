@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" version="2.0">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<spring:message code="label_admin_index" htmlEscape="false" var="title" />
+	<util:panel id="title" title="${title}">
+		<h3>
+			<spring:message code="rstudio.create.account.title"
+				htmlEscape="false" />
+		</h3>
+	</util:panel>
+	<spring:message code="rstudio.create.account.configure"
+		htmlEscape="false" />
+	<spring:message code="rstudio.create.account.no.unikey"
+		htmlEscape="false" />
+	<spring:message code="rstudio.create.account.name" htmlEscape="false" />
+	<br />
+	
+	<c:url var="createAccountUrl" value="${submitUrl}"></c:url>
+	<form:form modelAttribute="passwordDto" class="formbuilder" method="post" action="${createAccountUrl}">
+        <fieldset>
+            <legend>
+                <spring:message code="rstudio.account.password.legend" text="?rstudio.account.password.legend?" />
+            </legend>
+			<form:errors cssClass="error-text" element="p" /> 
+			<p>
+				Your current R Studio username is:
+				<c:out value="${currentUser.rstudioUsername}" escapeXml="true" />
+			</p>
+            <ol>
+ 				<menu:form-password characters="100" path="password" code="userManagement.password" required="true" />	
+ 				<menu:form-password-check value="passwordCheck" characters="150" code="userManagement.retype.password" required="true" />
+			</ol>
+        </fieldset>
+        <div class="buttons">
+            <input class="clear-button button" type="reset" value="Clear"></input> 
+            <input class="submit-button button" type="submit" value="Submit" id="submit"></input>
+        </div>
+	
+	</form:form>
+</div>

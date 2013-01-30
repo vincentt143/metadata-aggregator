@@ -1,6 +1,7 @@
 @CHARSET "UTF-8";
 
 @import url('ajax_form.css');
+@import url('transfer.css');
 
 .js-show
 {
@@ -18,14 +19,24 @@
 }	
 
 #content.withtabs
-	{
-		margin-left:0;
-	}
+{
+	margin-left:0;
+	margin-right:16.37em;
+}
+	
+#content
+{
+	width: 700px;
+	margin-right:0em;
+}
+
 #homeIndexDisplay h4 {
 	width: 220px;
 	display: inline-block;
 	margin-left: 5px;
 	margin-right: 5px;
+	*display: inline;
+	zoom: 1;
 }
 
 #homeIndexDisplay select {
@@ -66,6 +77,24 @@
 	padding: 0.5em;
 }
 
+.sidebar  dl.feature dl dt,
+.sidebar  dl.feature dl dd	
+{
+	font-size:1em;
+}
+
+.sidebar  dl.feature dl dt
+{
+	color:black;
+	background:none;
+	border-bottom:1px solid #12416C;
+	margin-right:2em;
+}		
+.sidebar  dl.feature dl dd	
+{
+	border-bottom:2px solid #12416C;	
+}
+
 #content li {
 	font-size: 1em;
 }
@@ -80,7 +109,7 @@
 }
 
 .sydma .jstree {
-	overflow-x: auto;
+	overflow-x: visible;
 }
 
 .sydma .tab_navigation {
@@ -107,7 +136,7 @@ input.tab_navigaiton { margin-left: 630px; }
 	vertical-align: bottom;
 }
 
-.sydma .transfer_tabs li,.sydma .transfer_tabs li a, #permissionsTabs li, #permissionsTabs li a {
+.sydma_content .tabs li,.sydma_content .tabs li a, #permissionsTabs li, #permissionsTabs li a {
 	background-image: none;
 }
 
@@ -125,13 +154,58 @@ table.login td.label {
 }
 
 /* CSS extracted from jQuery modifications */
-.ui-widget-header {
-	border: 1px solid #aed0ea;
-	background: transparent
-		url(images/ui-bg_highlight-soft_100_deedf7_1x100.png) 50% 50% repeat-x;
+form.formbuilder .ui-widget-header {
+	border: 0px solid;
+	background: none;
 	color: #222222;
 	font-weight: bold;
 }
+
+.ui-widget-content
+{
+	border: 0px;
+}
+	
+#content form.formbuilder fieldset .ui-tabs-nav li
+{
+	border: 1px solid #F9CF66;
+	margin-left: 5px;
+	top: 1px;
+}
+	
+.sydma_content form.formbuilder fieldset .ui-tabs-nav li
+{
+	border: 1px solid #F9CF66;
+	margin-left: 5px;
+	top: 2px;
+	padding: 0.5em 0.5em 1em;
+}
+
+.sydma_content form.formbuilder fieldset .ui-tabs-nav li.ui-state-active
+{
+	background-color: #FDFCDE;
+}
+
+.sydma_content form.formbuilder fieldset .ui-tabs-nav li
+{
+	background-color: #F9CF66;
+}
+/**
+	IE-7 forcing color to link
+*/
+#content form.formbuilder fieldset .ui-tabs-nav li a,
+.sydma_content form.formbuilder fieldset .ui-tabs-nav li a
+{
+	color: #125687;
+	text-decoration: none;
+}	
+
+#content form.formbuilder fieldset .ui-tabs-nav li a:hover,
+.sydma_content form.formbuilder fieldset .ui-tabs-nav li a:hover	
+{
+	text-decoration: none;
+	font-weight: normal;
+}	
 
 /*Interaction states*/
 .ui-state-default,.ui-widget-content .ui-state-default,.ui-widget-header .ui-state-default,.ui-widget button
@@ -142,11 +216,6 @@ table.login td.label {
 	font-weight: normal;
 	color: #2779aa;
 	text-decoration: none;
-}
-
-.ui-state-default a,.ui-state-default a:link,.ui-state-default a:visited
-	{
-	color: transparent text-decoration:  none;
 }
 
 .ui-state-hover,.ui-widget-content .ui-state-hover,.ui-widget-header .ui-state-hover,.ui-state-focus,.ui-widget-content .ui-state-focus,.ui-widget-header .ui-state-focus
@@ -180,67 +249,74 @@ table.login td.label {
 	text-decoration: none;
 }
 
-.sydma ul li.ui-state-default.ui-state-hover {
+.sydma_content ul li.ui-state-default.ui-state-hover {
 	font-weight: normal;
 }
 
-.sydma ul.ui-tabs-nav {
-	background-image: url('../images/common/bc_bg.gif');
+.sydma_content ul.ui-tabs-nav {
+/*	background-image: url('../images/common/bc_bg.gif');
 	background-repeat: repeat-x;
 	height: 30px;
 	line-height: 30px;
-	color: #888;
-	border: solid 1px #cacaca;
-	overflow: hidden;
+	color: #888;*/
+	border-bottom: solid 1px #F9CF66;
+	border-radius: 0px;
+	/*overflow: hidden;
 	margin: 1em 1.4em 0 1.4em;
 	padding: 0;
-	font-weight: normal;
+	font-weight: normal;*/
 }
 
-.sydma ul li.ui-state-default {
-	list-style-type: none;
+.sydma_content ul li.ui-state-default {
+/*	list-style-type: none;
 	padding-left: 10px;
 	display: inline-block;
-	float: left;
+	float: left;*/
 }
 
-.sydma ul li.ui-state-default a {
-	display: inline-block;
+.sydma_content ul li.ui-state-default a {
+/*	display: inline-block;
 	background-image: url('../images/common/bc_separator.gif');
 	background-repeat: no-repeat;
 	background-position: right;
+  margin-right: 10px;
 	padding-right: 15px;
 	line-height: 23px;
 	text-decoration: none;
 	color: #999;
-	outline: none;
+	outline: none; */
 }
 
-.sydma ul li.ui-state-default a:hover {
-	font-weight: normal;
-	color: #000;
+.sydma #permissionsTabs ul li a { 
+/*	background-image: url('../images/common/bc_separator.gif'); */
 }
 
-.sydma ul li.ui-state-active a {
+
+.sydma_content ul li.ui-state-default a:hover {
+/*	font-weight: normal;
+	color: #000;*/
+}
+
+.sydma_content ul li.ui-state-active a {
+/*	font-weight: bold;
+	color: #000;*/
+}
+
+.sydma_content ul li.ui-state-active.ui-state-hover a:hover {
 	font-weight: bold;
-	color: #000;
 }
 
-.sydma ul li.ui-state-active.ui-state-hover a:hover {
-	font-weight: bold;
+.sydma_content ul li.ui-state-default.done a {
+/*	color: #CCC; */
 }
 
-.sydma ul li.ui-state-default.done a {
-	color: #CCC;
-}
-
-.sydma ul li.ui-state-default.ui-state-active.done a {
-	color: #000;
+.sydma_content ul li.ui-state-default.ui-state-active.done a {
+/*	color: #000;*/
 }
 
 ul.ui-widget li 
 {
-	list-style:none;
+/*	list-style:none;*/
 }
 
 
@@ -361,4 +437,252 @@ ul.ui-widget li
 	cursor:pointer;
 }
 
+#content img.help_image
+{
+	border-color: black;
+	border-width: 2px 2px 2px 2px;
+	border-style: solid;
+	display: block;   
+	margin-left: auto;   
+	margin-right: auto;
+}
 
+/*duplicate table style */
+
+.sydma_content table {
+	font-size: .9em;
+	margin: 1em 0 1em 1px;
+	border-spacing: 0;
+	border-collapse: collapse;
+	border: 1px solid #dbd3c2;
+	border-bottom: 1px solid #4d483c;	
+	width: 100%;
+}
+
+.sydma_content table.layout,table.layout {
+	border: none;
+}
+
+.sydma_content table.layout td,table.layout td,
+.sydma_content table.layout th,table.layout th
+	{
+	border: none;
+}
+
+.sydma_content caption {
+	caption-side: bottom;
+	text-align: right;
+	margin: .2em 0;
+	color: #999;
+}
+
+.sydma_content table td,.sydma_content table th {
+	margin: 0;
+	padding: .4em;
+	background: none;
+	border: 1px solid #dbd3c2;
+	font-size: 1.2em;
+}
+
+.sydma_content table th {
+	font-weight: bold;
+	background: #fae0a9;
+	border: 1px solid #dbd3c2;
+	border-bottom: 2px solid #4d483c;
+	vertical-align: middle;
+}
+
+.sydma_content table.tabledata_blue {
+	width: auto;
+	table-layout:fixed;
+	word-wrap:break-word;
+}
+
+
+.sydma_content .corner_right
+{
+	position:absolute;
+	right:15px;
+}
+
+/*icon before link style*/
+
+.sydma_content .icon
+{
+	padding-left:20px;	
+	position:relative;
+}
+
+.sydma_content .icon:before
+{
+	content:"";
+	position:absolute;
+	left:0px;
+	bottom:0px;
+	height:13px;
+	width:15px;
+	margin-right:5px;
+	background-image:url('images/ui-icons_3d3d3d_256x240.png');
+}
+
+.sydma_content .icon-stop
+{
+}
+
+.sydma_content .icon-stop:before
+{		
+	background-position: 0px -130px;			
+}
+
+
+.sydma_content .icon-storage
+{
+}
+
+.sydma_content .icon-storage:before
+{		
+	background-position: -110px -98px;		
+}
+
+.sydma_content .icon-warn
+{
+}
+
+.sydma_content .icon-warn:before
+{		
+	background-position: 0px -145px;			
+}
+
+/** datepicker **/
+
+/*
+ * Over-write usyd css style
+ * Why would ANYONE bind a style to #content img???? sigh 
+ */
+#content img.ui-datepicker-trigger 
+{
+	padding:0;
+}
+
+/*
+ * Aligns picker image with input row
+ */
+.sydma_content img.ui-datepicker-trigger
+{
+	vertical-align:top;
+	padding:0;
+}
+
+#padlock_icon
+{
+	padding: 0 !important;
+}
+
+ul.search-results
+{
+	border-bottom: 0.1em solid #DBD3C2; /*grey*/
+	padding: 0 !important;
+}
+
+ul.search-results li
+{
+	border-top: 0.1em solid #DBD3C2; /*grey*/
+	padding: 0.5em 0 0.5em 2em !important;
+}
+
+ul.search-results li p.summary, em.subtitle
+{
+	margin-left: 2em !important;
+}
+
+ul.search-results li em.subtitle
+{	
+	color: #CE1126;
+}	
+
+ul.search-results li span.advertised-status
+{	
+	color: #888888;
+}	
+
+div.solrPagination
+{
+	font-weight: bold;
+	margin-top: 2em;
+	text-align: center;
+}	
+
+div.solrPagination a
+{
+	border: 1px solid #125687;
+	font-weight: normal;
+	padding: 0.2em 0.5em;
+	text-decoration: none !important;
+	color: #125687;
+	margin: 0.2em;
+}
+
+div.solrPagination span
+{
+	margin: 0.2em;
+}		
+	
+div.solrPagination a:HOVER
+{
+	background-color: #125687;
+	color: #FFFFFF;	
+}
+
+p.search-stats
+{
+	border-top: 0.1em solid #DBD3C2;
+	padding-top: 0.6em;
+	text-align: right;
+}
+
+#search-button 
+{
+	margin-bottom: -1px !important;
+	margin-left: 3px !important;
+	padding-top: 2px !important;
+}		
+
+/**
+Revert color change made by jQuery UI
+*/
+.sydma_content .ui-widget-content #publication_section a
+{
+	color:#125687;
+}
+
+/**
+Removing jQuery autocomplete bullet points on autocomplete
+*/
+.ui-menu-item
+{
+	display: block;
+}
+
+/**
+	IE7 fixes
+*/
+
+#content #w4
+{
+	margin-top: 1em;
+}
+
+#content FORM.formbuilder SELECT
+{
+	width: 15em;
+}
+
+.ui-widget-content A
+{
+	color: #125687;
+}
+
+#accessibility
+{
+	display: none;
+}

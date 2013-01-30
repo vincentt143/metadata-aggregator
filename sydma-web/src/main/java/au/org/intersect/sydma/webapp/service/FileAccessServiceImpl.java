@@ -27,14 +27,17 @@
 
 package au.org.intersect.sydma.webapp.service;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import au.org.intersect.dms.core.domain.FileInfo;
+import au.org.intersect.dms.core.domain.FileType;
+import au.org.intersect.dms.core.service.DmsService;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 
 /**
@@ -50,73 +53,65 @@ public class FileAccessServiceImpl implements FileAccessService
     private static final String TEST_WRITABLE_FILE_NAME = "test_writable";
 
     @Autowired
-    private FilePathService filePathService;
+    private DmsAccessPointService dapService;
 
     @Override
     public boolean prepareDatasetFileSpace(ResearchDataset researchDataset)
     {
         Long datasetId = researchDataset.getId();
 
-        String directoryPath = filePathService.resolveDatasetAbsolutePath(researchDataset);
+        Integer conn = dapService.connectLocal(DmsAccessPointService.SYSTEM_USER);
+
+        String path = "/" + researchDataset.getResearchProject().getResearchGroup().getDirectoryPath();
 
         if (LOG.isDebugEnabled())
         {
-            LOG.debug("Allocating space [" + directoryPath + "] for dataset with id [" + datasetId + "]");
+            LOG.debug("Allocating space [" + path + "] for dataset with id [" + datasetId + "]");
         }
 
-        File directory = new File(directoryPath);
-        if (!directory.isDirectory())
-        {
-            return directory.mkdir();
-        }
-        return true;
+        return dapService.getDmsService().createDir(conn, path, datasetId.toString());
     }
 
     @Override
     public boolean verifyGroupPath(String filePath)
     {
-        String groupAccessPath = filePathService.resolveGroupAbsolutePath(filePath);
+        Integer conn = dapService.connectLocal(DmsAccessPointService.SYSTEM_USER);
+        DmsService dms = dapService.getDmsService();
 
-        File groupDirectory = new File(groupAccessPath);
+        try
+        {
+            FileInfo info = dms.getFileInfo(conn, filePath);
+            return info != null && info.getFileType() == FileType.DIRECTORY && testDirectory(conn, filePath);
+        }
+        catch (au.org.intersect.dms.core.errors.PathNotFoundException e)
+        {
+            return false;
+        }
 
-        return testDirectory(groupDirectory);
     }
 
-    private boolean testDirectory(File directory)
+    private boolean testDirectory(Integer conn, String filePath)
     {
-        if (directory.isDirectory())
+        List<FileInfo> list = dapService.getDmsService().getList(conn, filePath);
+        if (list == null || list.size() > 0)
         {
-            try
-            {
-                if (testDirectoryEmpty(directory) && testDirectoryWritable(directory))
-                {
-                    return true;
-                }
-            }
-            catch (IOException e)
-            {
-                // do nothing
-            }
+            return false;
         }
-        if (LOG.isDebugEnabled())
+        return testCanCreateDir(conn, filePath);
+    }
+
+    private boolean testCanCreateDir(Integer conn, String filePath)
+    {
+        String tempDirName = filePath + "/" + TEST_WRITABLE_FILE_NAME;
+        if (dapService.getDmsService().createDir(conn, filePath, TEST_WRITABLE_FILE_NAME))
         {
-            LOG.debug("Verification for directory " + directory + " failed");
+            FileInfo info = dapService.getDmsService().getFileInfo(conn, tempDirName);
+            List<FileInfo> list = new ArrayList<FileInfo>(1);
+            list.add(info);
+            dapService.getDmsService().delete(conn, list);
+            return true;
         }
         return false;
-    }
-
-    private boolean testDirectoryEmpty(File directory)
-    {
-        String[] directoryContent = directory.list();
-
-        return directoryContent.length == 0;
-    }
-
-    private boolean testDirectoryWritable(File directory) throws IOException
-    {
-        File file = File.createTempFile(TEST_WRITABLE_FILE_NAME, null, directory);
-        file.delete(); // delete the temp file
-        return true;
     }
 
 }

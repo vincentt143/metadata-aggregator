@@ -6,7 +6,7 @@
     <key>$researchGroup.keyForRifCs$</key>
     <originatingSource>$researchGroup.originatingSource$</originatingSource>
     <party type="group">
-        <identifier type="local">15 211 513 464</identifier>
+        <identifier type="local">group-$researchGroup.id$</identifier>
 
         <name type="primary">
             <namePart>$researchGroup.name$</namePart>

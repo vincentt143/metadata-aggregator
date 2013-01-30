@@ -1,0 +1,21 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+	<jsp:output omit-xml-declaration="yes" />
+    <jsp:directive.attribute name="cssClass" type="java.lang.String"
+        required="false" description="css class to assign to input" />
+
+	<jsp:directive.attribute name="path" type="java.lang.String"
+		required="true" description="path of form input" />
+	<jsp:directive.attribute name="code" type="java.lang.String"
+		required="true"
+		description="code of form input (may differ from path if it's more than one word)" />
+
+	<spring:bind path="${path}">
+		<form:input path="${path}" cssClass="${cssClass}" hidden="true"/>
+	</spring:bind>
+
+</jsp:root>
+
+

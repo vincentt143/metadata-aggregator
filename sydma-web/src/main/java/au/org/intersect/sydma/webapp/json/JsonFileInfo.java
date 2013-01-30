@@ -27,27 +27,44 @@
 
 package au.org.intersect.sydma.webapp.json;
 
+import java.util.List;
+
 import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.roo.addon.tostring.RooToString;
 
 /**
  * 
- *
+ * 
  * @version $Rev: 29 $
  */
 @RooJavaBean
+@RooToString
+// TODO CHECKSTYLE-OFF: MultipleStringLiteralsCheck
 public class JsonFileInfo
 {
     public static final String ENTITY_TYPE = "ENTITY";
     public static final String DATASET_TYPE = "DATASET";
     public static final String DIRECTORY_TYPE = "DIRECTORY";
-    
-    private String nodeId;     
+
+    private String nodeId;
     private String name;
-    private String absolutePath;        
-    private String fileType;       
+    private String absolutePath;
+    private String fileType;
     private String modificationDate;
-    private Long size;   
-    
+    private Long size;
+    private List<String> allowedActions;
+    private String annotation;
+    private boolean canUpload;
+
+    /**
+     * Used for groups and projects
+     * 
+     * @param name
+     * @param absolutePath
+     * @param fileType
+     * @param modificationDate
+     * @param size
+     */
     public JsonFileInfo(String name, String absolutePath, String fileType, String modificationDate, Long size)
     {
         this.name = name;
@@ -56,5 +73,52 @@ public class JsonFileInfo
         this.modificationDate = modificationDate;
         this.size = size;
         this.nodeId = "n" + absolutePath.replaceAll("\\W", "_");
+        this.canUpload = false;
     }
+
+    /**
+     * Used at the dataset level
+     * 
+     * @param name
+     * @param absolutePath
+     * @param fileType
+     * @param modificationDate
+     * @param size
+     */
+    public JsonFileInfo(String name, String absolutePath, String fileType, String modificationDate, Long size,
+            boolean canUpload)
+    {
+        this.name = name;
+        this.absolutePath = absolutePath;
+        this.fileType = fileType;
+        this.modificationDate = modificationDate;
+        this.size = size;
+        this.nodeId = "n" + absolutePath.replaceAll("\\W", "_");
+        this.canUpload = canUpload;
+    }
+
+    /**
+     * Used at the directory level
+     * 
+     * @param name
+     * @param absolutePath
+     * @param fileType
+     * @param modificationDate
+     * @param size
+     * @param allowedActions
+     * @param canUpload
+     */
+    public JsonFileInfo(String name, String absolutePath, String fileType, String modificationDate, Long size,
+            List<String> allowedActions, boolean canUpload)
+    {
+        this.name = name;
+        this.absolutePath = absolutePath;
+        this.fileType = fileType;
+        this.modificationDate = modificationDate;
+        this.size = size;
+        this.nodeId = "n" + absolutePath.replaceAll("\\W", "_");
+        this.allowedActions = allowedActions;
+        this.canUpload = canUpload;
+    }
+
 }

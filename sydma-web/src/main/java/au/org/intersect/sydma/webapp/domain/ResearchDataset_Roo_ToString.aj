@@ -11,13 +11,18 @@ privileged aspect ResearchDataset_Roo_ToString {
         StringBuilder sb = new StringBuilder();
         sb.append("AdditionalLocationInformation: ").append(getAdditionalLocationInformation()).append(", ");
         sb.append("DatabaseInstance: ").append(getDatabaseInstance()).append(", ");
+        sb.append("DateFrom: ").append(getDateFrom()).append(", ");
+        sb.append("DateTo: ").append(getDateTo()).append(", ");
+        sb.append("DbBackups: ").append(getDbBackups() == null ? "null" : getDbBackups().size()).append(", ");
         sb.append("Description: ").append(getDescription()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("IsPhysical: ").append(getIsPhysical()).append(", ");
         sb.append("KeyForRifCs: ").append(getKeyForRifCs()).append(", ");
+        sb.append("Keywords: ").append(getKeywords() == null ? "null" : getKeywords().size()).append(", ");
         sb.append("Name: ").append(getName()).append(", ");
         sb.append("PhysicalLocation: ").append(getPhysicalLocation()).append(", ");
         sb.append("PublicAccessRight: ").append(getPublicAccessRight()).append(", ");
+        sb.append("Publications: ").append(getPublications() == null ? "null" : getPublications().size()).append(", ");
         sb.append("PubliciseStatus: ").append(getPubliciseStatus()).append(", ");
         sb.append("ResearchProject: ").append(getResearchProject()).append(", ");
         sb.append("SubjectCode: ").append(getSubjectCode()).append(", ");

@@ -1,0 +1,32 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+	<jsp:output omit-xml-declaration="yes" />
+
+	<jsp:directive.attribute name="linkUrl" type="java.lang.String" required="false" rtexprvalue="true" description="The link URL" />
+	<jsp:directive.attribute name="linkUrlTheme" type="java.lang.String" required="false" rtexprvalue="true" description="The link URL from Theme" />
+	<jsp:directive.attribute name="linkText" type="java.lang.String" required="false" rtexprvalue="true" description="The link text" />
+	<jsp:directive.attribute name="activeTab" type="java.lang.String" required="true" rtexprvalue="true" description="The tab that shoulb be shown as active" />
+	<jsp:directive.attribute name="currentTab" type="java.lang.String" required="true" rtexprvalue="true" description="The current tab" />
+
+	<c:set value="" var="cssClass" />
+	<c:if test="${activeTab eq currentTab }">
+		<c:set value="active" var="cssClass" />
+	</c:if>
+
+	<li class="${cssClass}">
+		<span>
+                        <c:choose>
+			<c:when test="${linkUrl == null}">
+			   <spring:theme code="${linkUrlTheme}" var="url" />
+                        </c:when>
+                        <c:otherwise>
+                           <c:url value="${linkUrl}" var="url" />
+			</c:otherwise>
+                        </c:choose>
+                        <a href="${url}">
+				<span>
+					<spring:theme code="${linkText}" text="#{linkText}" />
+				</span>
+			</a>
+		</span>
+	</li>
+</jsp:root>

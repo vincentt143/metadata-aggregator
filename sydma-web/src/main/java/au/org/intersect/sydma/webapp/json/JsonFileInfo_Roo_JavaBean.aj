@@ -5,6 +5,7 @@ package au.org.intersect.sydma.webapp.json;
 
 import java.lang.Long;
 import java.lang.String;
+import java.util.List;
 
 privileged aspect JsonFileInfo_Roo_JavaBean {
     
@@ -54,6 +55,30 @@ privileged aspect JsonFileInfo_Roo_JavaBean {
     
     public void JsonFileInfo.setSize(Long size) {
         this.size = size;
+    }
+    
+    public List<String> JsonFileInfo.getAllowedActions() {
+        return this.allowedActions;
+    }
+    
+    public void JsonFileInfo.setAllowedActions(List<String> allowedActions) {
+        this.allowedActions = allowedActions;
+    }
+    
+    public String JsonFileInfo.getAnnotation() {
+        return this.annotation;
+    }
+    
+    public void JsonFileInfo.setAnnotation(String annotation) {
+        this.annotation = annotation;
+    }
+    
+    public boolean JsonFileInfo.isCanUpload() {
+        return this.canUpload;
+    }
+    
+    public void JsonFileInfo.setCanUpload(boolean canUpload) {
+        this.canUpload = canUpload;
     }
     
 }

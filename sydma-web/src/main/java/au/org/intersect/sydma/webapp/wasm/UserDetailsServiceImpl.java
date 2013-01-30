@@ -53,6 +53,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
     {
         LOGGER.debug("Authenticating sKey: " + sKey);
         WASMAuth auth = wasmService.getAuth(null, sKey, WASMService.SKEY_MODE);
+        // WASMAuth auth = dummyAuth();
         if (!auth.isSuccessful() || auth.getPrincipal() == null)
         {
             return new CredentialsExpiredUserDetails();
@@ -65,6 +66,18 @@ public class UserDetailsServiceImpl implements UserDetailsService
         createUnikeyUser(principal, givenname, surname, email);
         User user = User.findUsersByUsernameEquals(principal).getSingleResult();           
         return new AuthenticatedUserDetails(principal, user.getGrantedAuthorities());
+    }
+    
+    private WASMAuth dummyAuth()
+    {
+    	String[] lines = new String[]{"loginName:ictintersect2",
+    			"givenNames:researchers",
+    			"surname:intersect",
+    			"email:carlos@localhost",
+    			"msgID:1",
+    			"status:OK",
+    			"sKey:skey"};
+    	return new WASMAuth(java.util.Arrays.asList(lines),1);
     }
 
     /**

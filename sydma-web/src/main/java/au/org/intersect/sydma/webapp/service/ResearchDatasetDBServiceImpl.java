@@ -30,178 +30,267 @@ package au.org.intersect.sydma.webapp.service;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Savepoint;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import au.org.intersect.sydma.webapp.domain.DBAccess;
 import au.org.intersect.sydma.webapp.domain.DBSchema;
 import au.org.intersect.sydma.webapp.domain.DBUser;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchDatasetDB;
-import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.dto.DBInstanceDto;
+import au.org.intersect.sydma.webapp.exception.NoneUniqueNameException;
 import au.org.intersect.sydma.webapp.exception.ResearchDatasetDBAlreadyExistsException;
 import au.org.intersect.sydma.webapp.exception.ResearchDatasetDBDoesNotExistException;
-import au.org.intersect.sydma.webapp.exception.ResearchDatasetDBSchemaException;
 import au.org.intersect.sydma.webapp.exception.ResearchDatasetDBSqlException;
 import au.org.intersect.sydma.webapp.util.DBConnectionHelper;
+import au.org.intersect.sydma.webapp.util.DBHostnameHelper;
+import au.org.intersect.sydma.webapp.util.DBPasswordHelper;
 
 /**
  * Manages creation of db schema for dataset
  * 
  * @version $Rev: 29 $
  */
-@Service
 @Transactional("sydmaPU")
+// TODO CHECKSTYLE-OFF: IllegalCatch
 public class ResearchDatasetDBServiceImpl implements ResearchDatasetDBService
 {
     private static final Logger LOG = LoggerFactory.getLogger(ResearchDatasetDBServiceImpl.class);
-
-    private static final String DEFAULT_PASSWORD = "password";
+    private static final int DB_STATEMENT_RETRY = 3;
 
     @Autowired
     private DBConnectionHelper dbConnectionHelper;
-    
+
     @Autowired
-    private DBSchemaService dbSchemaService;
+    private DBHostnameHelper dbHostnameHelper;
+
+    @Autowired
+    private DBPasswordHelper dbPasswordHelper;
+
+    @Autowired
+    private FileAccessService fileAccessService;
     
     public ResearchDatasetDBServiceImpl()
     {
-        
-    }
-    
-
-    @Override
-    public DBUser grantUserAccessToDataset(User user, ResearchDataset dataset)
-    {
-
-        ResearchDatasetDB datasetDB = dataset.getDatabaseInstance();
-        if (datasetDB == null)
-        {
-            throw new ResearchDatasetDBDoesNotExistException();
-        }
-        Connection connection = startConnection();
-        Savepoint savepoint;
-        try
-        {
-            savepoint = connection.setSavepoint();
-        }
-        catch (SQLException e1)
-        {
-            throw new ResearchDatasetDBSqlException("Failed to create connection savepoint");
-        }
-        try
-        {
-            DBUser dbUser = grantUserAccessToDatasetDB(user, datasetDB, connection);
-            return dbUser;
-        }
-        // TODO CHECKSTYLE-OFF: Illegal Catch
-        catch (RuntimeException e)
-        {
-            rollBack(connection, savepoint);
-            throw e;
-        }
-        finally
-        {
-            closeConnection(connection);
-        }
-    }
-
-
-    private DBUser grantUserAccessToDatasetDB(User user, ResearchDatasetDB datasetDB, Connection connection)
-    {
-        DBUser dbUser = user.getDbUser();
-        if (dbUser == null)
-        {
-            //if user doesn't exist we default to a standard password
-            LOG.info("DB User does not exist, creating new one");
-            dbUser = this.createDBUser(user, DEFAULT_PASSWORD, connection);
-        }
-        boolean success = dbSchemaService.grantUser(dbUser.getDbUsername(), datasetDB.getDbName(), connection);
-        LOG.info("Granting user access: " + success);
-        return dbUser;
-    }
-
-    private DBUser createDBUser(User user, String password, Connection connection)
-    {
-        String dbUsername = "user_" + user.getId();
-        DBUser dbUser = new DBUser(dbUsername, password);
-        user.setDbUser(dbUser);   
-        dbUser.setUser(user);
-        user.merge();
-        dbSchemaService.createUser(dbUsername, password, connection);
-        
-        return dbUser;
     }
 
     @Override
-    public ResearchDatasetDB createDBForDatasetAndGrantUser(ResearchDataset dataset, DBSchema dbSchema, User user)
+    public void commitReverseEngineeredDatabase(List<String> ddlCommands, ResearchDatasetDB datasetDB, DBSchema schema)
+        throws NoneUniqueNameException
     {
-        
-        if (dataset.getDatabaseInstance() != null)
-        {
-            throw new ResearchDatasetDBAlreadyExistsException(
-                    "A Database Instance already exists for Dataset id:[" + dataset.getId() + "]");
-        }
-
-
-        Connection connection = startConnection();
-        Savepoint savepoint;
+        Connection connection = null;
         try
         {
-            savepoint = connection.setSavepoint();
-        }
-        catch (SQLException e1)
-        {
-            throw new ResearchDatasetDBSqlException("Failed to create connection savepoint");
-        }
-        try
-        {
-
-            ResearchDatasetDB datasetDB = this.createDBForDataset(dbSchema, dataset, connection);
-
-            // create user
-
-            this.grantUserAccessToDatasetDB(user, datasetDB, connection);
-
-            finishConnection(connection, savepoint);
-            return datasetDB;
-        }
-        // TODO CHECKSTYLE-OFF: Illegal Catch
-        catch (RuntimeException e)
-        {
-            LOG.error("Exception occurred, will perform rollback ", e);
-            rollBack(connection, savepoint);
-            throw e;
-        }
-        finally
-        {
-            closeConnection(connection);
-        }
-    }
-
-    private ResearchDatasetDB createDBForDataset(DBSchema dbSchema, ResearchDataset dataset, Connection connection)
-    {
-        String dbName = "dataset_" + dataset.getId();
-        String schemaSql;
-        try
-        {
-            schemaSql = dbSchema.loadSchemaSql();
+            DBSchema existingSchema = DBSchema.findDBSchema(schema.getName());
+            if (existingSchema != null)
+            {
+                throw new NoneUniqueNameException("Schema name already in use");
+            }
+            connection = startConnection();
+            schema.setFilename(schema.getName() + ".sql");
+            schema.createNewSchemaFile(ddlCommands);
+            datasetDB.setDbSchema(schema);
+            schema.persist();
         }
         catch (IOException e)
         {
-            LOG.info("ERROR LOADING FILE", e);
-            throw new ResearchDatasetDBSchemaException("Failed to load dataset schema", e);
+            LOG.error("Cannot write schema file to folder: ", e);
         }
-        ResearchDatasetDB datasetDB = new ResearchDatasetDB(dbName, dbSchema, dataset);
-        dbSchemaService.createDatabase(dbName, connection);
-        dbSchemaService.createSchemaInDB(dbName, schemaSql, connection);
-        dataset.setDatabaseInstance(datasetDB);
-        dataset.merge();
+        finally
+        {
+            closeConnection(connection);
+        }
+    }
+
+    @Override
+    public ResearchDatasetDB createDBForDataset(ResearchDataset dataset, DBInstanceDto dbInstanceDto)
+    {
+
+        if (dataset.getDatabaseInstance() != null)
+        {
+            throw new ResearchDatasetDBAlreadyExistsException("A Database Instance already exists for Dataset id:["
+                    + dataset.getId() + "]");
+        }
+
+        Connection connection = startConnection();
+        DBUser faDbUser = null;
+        DBUser uaDbUser = null;
+        DBUser vaDbUser = null;
+
+        // Create DB Instance and load schema
+        ResearchDatasetDB datasetDB = null;
+        try
+        {
+            datasetDB = createDBInstanceWithSchema(dbInstanceDto, dataset, connection);
+            initializeSchema(datasetDB, connection);
+            // Create Users of full access, update access and view access
+
+            faDbUser = createDBUserWithGrant(datasetDB, DBAccess.FULL_ACCESS, connection);
+            uaDbUser = createDBUserWithGrant(datasetDB, DBAccess.UPDATE_ACCESS, connection);
+            vaDbUser = createDBUserWithGrant(datasetDB, DBAccess.VIEW_ACCESS, connection);
+
+            finishConnection(connection);
+        }
+        catch (RuntimeException e)
+        {
+            LOG.error("RunTimeException encountered while creating db instance, will rollback", e);
+            if (faDbUser != null)
+            {
+                faDbUser.dropUser(connection);
+            }
+            if (uaDbUser != null)
+            {
+                uaDbUser.dropUser(connection);
+            }
+            if (vaDbUser != null)
+            {
+                vaDbUser.dropUser(connection);
+            }
+
+            if (datasetDB != null)
+            {
+                datasetDB.dropInstance(connection);
+            }
+
+            throw e;
+        }
+        finally
+        {
+            closeConnection(connection);
+        }
+
         return datasetDB;
+
+    }
+
+    @Override
+    public void deleteDBForDataset(ResearchDataset dataset)
+    {
+        ResearchDatasetDB dbInstance = dataset.getDatabaseInstance();
+        if (dbInstance == null)
+        {
+
+            throw new ResearchDatasetDBDoesNotExistException("Database Instance does not exist for dataset with id:"
+                    + dataset.getId());
+        }
+        List<DBUser> dbUsers = dbInstance.getDbUsers();
+        Connection connection = startConnection();
+        try
+        {
+            // the record in sydma database will always be deleted regardless of
+            // success of sql commands
+            for (DBUser dbUser : dbUsers)
+            {
+                dropUser(dbUser, connection);
+            }
+            dropDbInstance(dbInstance, connection);
+        }
+        catch (Exception e)
+        {
+            // suppress
+        }
+        finally
+        {
+            closeConnection(connection);
+        }
+
+        dbInstance.remove();
+        dataset.setDatabaseInstance(null);
+        dataset.merge();
+    }
+
+    @Override
+    public boolean changeDBPassword(DBUser dbUser)
+    {
+        String password = dbPasswordHelper.assignPassword();
+
+        Connection connection = startConnection();
+        try
+        {
+            dbUser.changeUserDBPassword(connection, password);
+            dbUser.setDbPassword(password);
+            dbUser.merge();
+        }
+        catch (Exception e)
+        {
+            LOG.error("Change password to database failed for user " + dbUser.getDbUsername());
+            return false;
+        }
+
+        return true;
+    }
+
+    private void dropUser(DBUser dbUser, Connection connection)
+    {
+        int retries = 0;
+        while (retries < DB_STATEMENT_RETRY)
+        {
+            retries++;
+            try
+            {
+                dbUser.dropUser(connection);
+                break;
+            }
+            catch (Exception e)
+            {
+                LOG.error("Exception encountered while dropping user, will suppress", e);
+            }
+        }
+    }
+
+    private void dropDbInstance(ResearchDatasetDB dbInstance, Connection connection)
+    {
+        int retries = 0;
+        while (retries < DB_STATEMENT_RETRY)
+        {
+            retries++;
+            try
+            {
+                dbInstance.dropInstance(connection);
+                break;
+            }
+            catch (Exception e)
+            {
+                LOG.error("Exception encountered while deleting db instance, will suppress", e);
+            }
+        }
+    }
+
+    private DBUser createDBUserWithGrant(ResearchDatasetDB datasetDB, DBAccess dbAccess, Connection connection)
+    {
+
+        String dbPassword = dbPasswordHelper.assignPassword();
+        DBUser dbUser = new DBUser(dbPassword, dbAccess, datasetDB);
+        datasetDB.addDBUser(dbUser);
+        datasetDB.merge();
+        dbUser.createAndGrantUser(connection);
+        return dbUser;
+    }
+
+    private ResearchDatasetDB createDBInstanceWithSchema(DBInstanceDto dbInstanceDto, ResearchDataset dataset,
+            Connection connection)
+    {
+
+        String dbHostname = dbHostnameHelper.assignHostname(dataset);
+
+        ResearchDatasetDB datasetDB = new ResearchDatasetDB(dbInstanceDto.getDescription(),
+                dbInstanceDto.getDbSchema(), dbHostname, dataset);
+        dataset.setDatabaseInstance(datasetDB);
+        datasetDB.persist();
+
+        datasetDB.createInstance(connection);
+
+        return datasetDB;
+    }
+
+    private void initializeSchema(ResearchDatasetDB datasetDB, Connection connection)
+    {
+        datasetDB.createSchema(connection);
     }
 
     private Connection startConnection()
@@ -210,7 +299,6 @@ public class ResearchDatasetDBServiceImpl implements ResearchDatasetDBService
         try
         {
             con.setAutoCommit(false);
-            LOG.info("AUTO COMMIT " + con.getAutoCommit());
         }
         catch (SQLException e)
         {
@@ -220,7 +308,7 @@ public class ResearchDatasetDBServiceImpl implements ResearchDatasetDBService
         return con;
     }
 
-    private void finishConnection(Connection connection, Savepoint savepoint)
+    private void finishConnection(Connection connection)
     {
         try
         {
@@ -228,9 +316,8 @@ public class ResearchDatasetDBServiceImpl implements ResearchDatasetDBService
         }
         catch (SQLException e)
         {
-            // TODO Auto-generated catch block
             LOG.error("Failed to commit connection changes", e);
-            rollBack(connection, savepoint);
+            rollBack(connection);
         }
     }
 
@@ -238,7 +325,10 @@ public class ResearchDatasetDBServiceImpl implements ResearchDatasetDBService
     {
         try
         {
-            connection.close();
+            if (connection != null)
+            {
+                connection.close();
+            }
         }
         catch (SQLException e)
         {
@@ -246,28 +336,36 @@ public class ResearchDatasetDBServiceImpl implements ResearchDatasetDBService
         }
     }
 
-    private void rollBack(Connection connection, Savepoint savepoint)
+    private void rollBack(Connection connection)
     {
         try
         {
-            connection.rollback(savepoint);
+            connection.rollback();
         }
         catch (SQLException e)
         {
             LOG.error("Failed to rollback connection", e);
         }
     }
-    
-    
-    
-    public void setDBSchemaService(DBSchemaService dbSchemaService)
-    {
-        this.dbSchemaService = dbSchemaService;
-    }
-    
 
     public void setDbConnectionHelper(DBConnectionHelper dbConnectionHelper)
     {
         this.dbConnectionHelper = dbConnectionHelper;
     }
+
+    public void setDbHostnameHelper(DBHostnameHelper dbHostnameHelper)
+    {
+        this.dbHostnameHelper = dbHostnameHelper;
+    }
+
+    public void setDbPasswordHelper(DBPasswordHelper dbPasswordHelper)
+    {
+        this.dbPasswordHelper = dbPasswordHelper;
+    }
+
+    public void setFileAccessService(FileAccessService fileAccessService)
+    {
+        this.fileAccessService = fileAccessService;
+    }
+
 }

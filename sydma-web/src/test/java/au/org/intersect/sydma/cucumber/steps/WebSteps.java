@@ -39,8 +39,8 @@ import java.util.Date;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -121,6 +121,24 @@ public class WebSteps
     {
         findElement(By.id(optionId)).click();
     }
+    
+    @Then("^option \"([^\"]*)\" should be disabled$")
+    public void disabledElement(String optionId)
+    {
+        assertFalse(findElement(By.id(optionId)).isEnabled());
+    }
+    
+    @Then("^I click on the dropdown box$")
+    public void clickOnTokenInputBox()
+    {
+        findElement(By.className("token-input-dropdown-item2")).click();
+    }
+    
+    @Then("^I remove the selected user from the dropdown box")
+    public void removeUserFromTokenBox()
+    {
+        findElement(By.className("token-input-delete-token")).click();
+    }
 
     @Given("^I select role \"([^\"]*)\" from select \"([^\"]*)\"$")
     public void selectRoleWithText(String visibleText, String selectId) throws InterruptedException
@@ -163,11 +181,24 @@ public class WebSteps
         findElement(By.xpath("//input[@value='" + buttonValue + "']")).click();
     }
 
+    @When("I click on query \"([^\"]*)\"$")
+    public void iClickLinkWithValue(String linkName) throws InterruptedException
+    {
+        findElement(By.xpath("//a[@id='" + linkName + "']")).click();
+    }
+    
+    @When("I click on link \"([^\"]*)\"$")
+    public void iClickOnLinkWithValue(String linkName) throws InterruptedException
+    {
+        findElement(By.xpath("//a[text()='" + linkName + "']/@href")).click();
+    }
+    
     @When("^I fill in \"([^\"]*)\" with \"([^\"]*)\"$")
     public void iFillIn(String field, String value)
     {
         WebElement fieldElement = findElement(By.xpath("//input[@id='" + field + "']"));
         fieldElement.clear();
+        fieldElement.click();
         fieldElement.sendKeys(value);
     }
 
@@ -185,7 +216,14 @@ public class WebSteps
         String xPath = checkText(text);
         findElement(By.xpath(xPath));
     }
-
+    
+    @Then("^element with id \"([^\"]*)\" contains text \"([^\"]*)\"$")
+    public void elementWithIdContainsText(String id, String text) throws InterruptedException
+    {
+        WebElement fieldElement = findElement(By.id(id));
+        assertTrue(fieldElement.getText().contains(text));
+    }
+    
     @Then("^I should see an alert that says \"([^\"]*)\"$")
     public void iShouldSeeAlert(String expectedAlertMessage)
     {
@@ -216,6 +254,12 @@ public class WebSteps
         findElement(By.xpath("//input[@id='" + buttonId + "']")).click();
     }
 
+    @Then("^I tick checkbox \"([^\"]*)\"$")
+    public void iTickCheckbox(String checkbox) throws InterruptedException
+    {
+        findElement(By.xpath("//input[@id='" + checkbox + "']")).click();
+    }
+    
     @Then("^I should see \"([^\"]*)\" in the cell \"([^\"]*)\" in the table \"([^\"]*)\"$")
     public void iShouldSeeContentInTheTableCell(String expectedCellContent, String cellClassName, String tableName)
     {

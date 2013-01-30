@@ -4,9 +4,9 @@
                  xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/home/orca/schemata/registryObjects.xsd">
 <registryObject group="My group name">
     <key>www.sydney.edu.au-metadata-aggregator-research-dataset-201</key>
-    <originatingSource>?</originatingSource>
+    <originatingSource>www.sydney.edu.au</originatingSource>
     <collection type="dataset">
-        <identifier type="local">?</identifier>
+        <identifier type="local">dataset-201</identifier>
 
         <name type="primary">
             <namePart>Dataset1</namePart>
@@ -29,7 +29,7 @@
 
         <!-- Sydney Uni -->
         <relatedObject>
-            <key>15211513464</key>
+            <key>sydney.edu.au/stc/PTY/0006</key>
             <relation type="isPartOf"/>
         </relatedObject>
 

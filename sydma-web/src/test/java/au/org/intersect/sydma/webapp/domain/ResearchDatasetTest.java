@@ -33,9 +33,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.TypedQuery;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import au.org.intersect.sydma.webapp.service.DatasetReadyToPublishMailService;
 import au.org.intersect.sydma.webapp.util.RifCsWriter;
@@ -45,6 +56,9 @@ import au.org.intersect.sydma.webapp.util.RifCsWriter;
  * 
  * @version $Rev: 29 $
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({User.class, Role.class})
+
 public class ResearchDatasetTest
 {
 
@@ -73,6 +87,7 @@ public class ResearchDatasetTest
         researchGroup.setPrincipalInvestigator(principalInvestigator);
         researchProject.setResearchGroup(researchGroup);
         dataset.setResearchProject(researchProject);
+        dataset.setIsPhysical(false);
         otherUser = new User();
         otherUser.setId(2L);
         otherUser.setEmail(NON_PI_EMAIL);
@@ -106,6 +121,36 @@ public class ResearchDatasetTest
         dataset.setPubliciseStatus(PubliciseStatus.NOT_ADVERTISED);
 
         dataset.advertise("pi-username", right1, rifCsWriter, mailService, "some url");
+        assertEquals(PubliciseStatus.ADVERTISED, dataset.getPubliciseStatus());
+        assertEquals(right1, dataset.getPublicAccessRight());
+        verifyZeroInteractions(mailService);
+    }
+
+    @Test
+    public void testAdvertiseANonAdvertisedPhysicalDatasetMarksItAsAdvertisedIfUserIsResearchDataManager()
+    {
+        User researchDataManagerUser = mock(User.class);
+        Role rdmRole = new Role();
+        String roleName = Role.RoleNames.ROLE_RESEARCH_DATA_MANAGER.toString();
+        rdmRole.setName(roleName);
+        Set<Role> rdmRoles = new HashSet<Role>();
+        rdmRoles.add(rdmRole);
+        when(researchDataManagerUser.getRoles()).thenReturn(rdmRoles);
+
+        PowerMockito.mockStatic(User.class);
+        TypedQuery<User> userQuery = mock(TypedQuery.class);
+        when(userQuery.getSingleResult()).thenReturn(researchDataManagerUser);
+        Mockito.when(User.findUsersByUsernameEquals("anotheruser")).thenReturn(userQuery);
+
+        PowerMockito.mockStatic(Role.class);
+        TypedQuery<Role> roleQuery = mock(TypedQuery.class);
+        when(roleQuery.getSingleResult()).thenReturn(rdmRole);
+        Mockito.when(Role.findRolesByNameEquals(roleName)).thenReturn(roleQuery);
+
+        dataset.setPubliciseStatus(PubliciseStatus.NOT_ADVERTISED);
+        dataset.setIsPhysical(true);
+
+        dataset.advertise("anotheruser", right1, rifCsWriter, mailService, "some url");
         assertEquals(PubliciseStatus.ADVERTISED, dataset.getPubliciseStatus());
         assertEquals(right1, dataset.getPublicAccessRight());
         verifyZeroInteractions(mailService);

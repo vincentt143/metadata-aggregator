@@ -1,0 +1,90 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:display="urn:jsptld:http://displaytag.sf.net"
+	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+	<c:if test="${param.sqlerror}">
+		<ol class="errors">
+			<li class="error">
+				<p class="error-text">
+					<spring:message code="dbinstance.run.error.message"
+						text="?dbinstance.run.error.message?" />
+				</p> <span> <spring:message code="dbinstnace.run.error.query"
+						text="?dbinstnace.run.error.query?" arguments="${param.q}"
+						htmlEscape="true" /> </span></li>
+		</ol>
+	</c:if>
+	<div>
+		<fieldset>
+			<legend />
+			<!-- View saved queries in a given database instance -->
+			<display:table requestURI="/dbinstance/view?datasetId=${dataset.id }"
+				requestURIcontext="true" uid="query" name="dbQuery" defaultsort="1" pagesize="8">
+
+				<display:column sortable="true" title="Query Name" headerClass="ajax_links" 
+						style="width: 60% word-wrap: break-word">
+					<c:out value="${query.name}" />
+				</display:column>
+
+				<display:column sortable="false" title="Actions" class="ajax_links" style="width: 40%" >
+					<!-- All can view -->
+					<c:url value='/dbinstance/show/${query.id}' var="showQueryUrl">
+						<c:param name="datasetId" value="${dataset.id }" />
+					</c:url>
+					<a href="${showQueryUrl}"> <spring:message code="dbinstance.show.link" text="?dbinstance.show.link?" /> </a>
+					<c:out value=" | " />
+					<c:url value='/dbinstance/run' var="runQueryUrl">
+						<c:param name="id" value="${query.id }" />
+						<c:param name="datasetId" value="${dataset.id }" />
+					</c:url>
+					<a href="${runQueryUrl}" id="run" class="no_ajax"> <spring:message code="dbinstance.run.link" text="?dbinstance.run.link?" /> </a>
+					
+					<c:if test="${canEdit}">
+						<c:url value='/dbinstance/editQuery/${query.id}'
+							var="editQueryUrl">
+							<c:param name="id" value="${query.id }" />
+							<c:param name="datasetId" value="${dataset.id }" />
+						</c:url>
+						<c:out value=" | " />
+						<a href="${editQueryUrl}" > <spring:message code="dbinstance.edit.link" text="?dbinstance.edit.link?" /> </a>
+					</c:if>
+
+					<c:if test="${canDelete}">
+						<c:url value='/dbinstance/deleteQuery/${query.id}' var="deleteQueryUrl">
+							<c:param name="datasetId" value="${dataset.id }" />
+						</c:url>
+						<c:out value=" | " />
+						<a href="${deleteQueryUrl}" > <spring:message code="dbinstance.delete.link" text="?dbinstance.delete.link?" />
+						</a>
+					</c:if>
+				</display:column>
+
+				<display:setProperty name="basic.empty.showtable" value="true" />
+				<display:setProperty name="paging.banner.group_size" value="5" />
+				<display:setProperty name="paging.banner.onepage" value=" " />
+				<display:setProperty name="paging.banner.placement" value="bottom" />
+			</display:table>
+		</fieldset>
+	</div>
+
+	<c:if test="${dbQueryPermission}">
+		<div class="buttons">
+			<c:url var="newQueryUrl" value="/dbinstance/query">
+				<c:param name="datasetId" value="${dataset.id}" />
+			</c:url>
+			<input class="submit-button button" type="submit" value="New Query"
+				name="_submit" id="new query"/>
+		</div>
+	</c:if>
+	
+	<c:url var="downloadUrl" value="/dbinstance/run">
+		<c:param name="" value="" />
+	</c:url>
+	<script>
+        // inserting class to display:table pagelinks span. Adding to the whole table causes a problem with the download
+        $("span.pagelinks").addClass("ajax_links");
+    </script>
+</jsp:root>

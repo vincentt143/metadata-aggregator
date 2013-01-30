@@ -1,0 +1,162 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	
+	<spring:message code="label_help_index" htmlEscape="false" var="title" />
+	<util:panel id="title" title="${title}">
+		<h3>
+			Frequently Asked Questions
+		</h3>
+		<p>
+			<a href="#loginUnikey">I have a UniKey account. How do I log in?</a><br/>
+			<a href="#loginExternal">I do not have a UniKey account. How do I log in?</a><br/>
+			<a href="#requestRdsSpace">How do I get research data storage space for my research group?</a><br/>
+			<a href="#upload">How do I upload research data?</a><br/>
+			<a href="#download">How do I download research data?</a><br/>
+			<a href="#view">How do I view my research data?</a><br/>
+			<a href="#delete">How do I delete research data?</a><br/>
+			<a href="#move">How do I move research data?</a><br/>
+			<a href="#addingExternalUsers">How do I allow users without UniKey to access the system?</a><br/>
+			<a href="#addingPermissions">How do I allow other users to access my data?</a><br/>
+			<a href="#fullAccess">What can a user with Full Access permissions do?</a><br/>
+			<a href="#editingAccess">What can a user with Editing Access permissions do?</a><br/>
+			<a href="#viewingAccess">What can a user with Viewing Access permissions do?</a><br/>
+			<a href="#revokePermissions">How do I revoke permissions?</a><br/>
+			<a href="#advertise">How do I advertise my research?</a><br/>
+			<a href="#furtherHelp">Who do I contact if I need further help?</a><br/>
+		</p>
+		<div>
+			<a name="loginUnikey"><nsbp/></a>
+			<p><strong>I have a UniKey account. How do I log in?</strong><br/></p>
+				<p>UniKey users can log in using their UniKey account credentials.
+				
+				When a user tries to access a protected area of My Research Data Manager they will be required to authenticate. 
+				Users with UniKey accounts can use their user and password by following the link to "Unikey User Login Page". When doing that, the user 
+				will be redirected to the UniKey login page. After successful authentication, the user will be redirected back to My Research Data Manager, with 
+				access to the areas of functionality they are entitled to use.
+				
+				<br/><br/></p>
+			<a name="loginExternal"><nsbp/></a>
+			<p><strong>I do not have a UniKey account. How do I log in?</strong><br/></p>
+				<p>Research Group Principal Investigators and the ICT support team can grant access to the application to users without a UniKey account.
+				When they are given access, they will receive an email with a temporary password and a link to log into the application. On first login, they will
+				be required to change their temporary password for a password of their choice.
+				<br/><br/></p>
+			<a name="requestRdsSpace"><nsbp/></a>
+			<p><strong>How do I get research data storage space for my research group?</strong><br/></p>
+				<p>If you are a member of a Research Group that needs to store their research data securely, you can request RDS (Research Data Store) storage 
+				space through My Research Data Manager. You do that by filling in the form under
+				<c:url value="/rds/new" var="rdsNew" /><a href="${rdsNew}">Request RDS space</a>.<br/>
+				When filling in the form, you need to provide the UniKey ID of the Pricipal Investigator (PI) of the Research Group. For the request to be
+				approved, the PI needs to have logged in to My Research Data Manager, so that the identity of the user can be confirmed.<br/>
+				When the request is approved, only the PI will have access to the data storage, and they will need to grant access to other users for them
+				to be able to access the data too.
+				<br/><br/></p>
+			<a name="upload"><nsbp/></a>
+			<p><strong>How do I upload research data?</strong><br/></p>
+				<p>A Research Group will have a set of Research Projects, and a Research Project will have a set of Datasets. Research Data is stored in Datasets.
+				If you are given access to upload data to a given Dataset, you can upload files and directories to it by going to the Upload tab. The first time you
+				attempt to upload or download Data, it will take some time for the page to load. It will also present a window requesting that you grant access to
+				your file system. If you want to be able to upload and download data to My Research Data Manager, you will need to accept the request.<br/>
+				Once you accept the request, you will be able to navigate through your file system, and select the files and directories you want to upload. <br/>
+				Then you need to select the destination by clicking on the 'Next' button, or on the 'Select Destination' tab. Once there, you will be able to select a 
+				destination Dataset. If a Dataset contains directories, you can upload your data to them too.
+				<br/><br/></p>
+			<a name="download"><nsbp/></a>
+			<p><strong>How do I download research data?</strong><br/></p>
+				<p>A Research Group will have a set of Research Projects, and a Research Project will have a set of Datasets. Research Data is stored in Datasets.
+				If you are given access to download data from a given Dataset, you can download files and directories from it by going to the Download tab. The first time 
+				you attempt to upload or download Data, it will take some time for the page to load. It will also present a window requesting that you grant access to
+				your file system. If you want to be able to upload and download data to My Research Data Manager, you will need to accept the request.<br/>
+				Once you accept the request, you will be able to navigate through the list of Datasets you have permission to download.<br/>
+				Then you need to select the destination by clicking on the 'Next' button, or on the 'Select Destination' tab. Once there, you will be able to select the
+				directory in your file system where you want to download your files to.
+				<br/><br/></p>
+			<a name="view"><nsbp/></a>
+			<p><strong>How do I view my research data?</strong><br/></p>
+				<p>To view your Research Data, navigate to the Dataset where the files have been uploaded, and click on the "View Dataset" link on the Dataset Actions.
+				<br/><br/></p>
+			<a name="delete"><nsbp/></a>
+			<p><strong>How do I delete research data?</strong><br/></p>
+				<p>If you have permissions to delete data, in the view dataset page, on selecting a file or directory, you should find a link to delete the 
+				selected object.
+				<br/><br/></p>
+			<a name="move"><nsbp/></a>
+			<p><strong>How do I move research data?</strong><br/></p>
+				<p>You can move data files inside a Dataset by dragging and dropping the file or directory to its destination directory.
+				<br/><br/></p>
+			<a name="addingExternalUsers"><nsbp/></a>
+			<p><strong>How do I allow users without UniKey to access the system?</strong><br/></p>
+				<p>Research Group Principal Investigators and the ICT support team can grant access to the application to users without a UniKey account.<br/>
+				To do that, you will click on "Create External User" under the "User Management" tab. Once the external user form has been submitted, the 
+				external user will receive an email with instructions to log into the system.
+				<br/><br/></p>
+			<a name="addingPermissions"><nsbp/></a>
+			<p><strong>How do I allow other users to access my data?</strong><br/></p>
+				<p>If you have full access or editing access over a part of a research group, you can grant permissions to other users.<br/>
+				Users can be given permissions at the Research Group, Project, Dataset, and even file and directory level. When you give permission over a given part
+				of the Research Group, you give permission to that given part and all its children. For example, if you give permission over a Research Project, you
+				are also giving the same level of permission over all its Datasets, directories, and files.<br />
+				A user with Full Access over a given part of the system can grant Full access, Editing access, and Viewing access over that part of the system, or any of its
+				children. A user with Editing Access can grant Editing Access and Viewing Access over that part of the system, or any of its children.
+				<br/><br/></p>
+			<a name="fullAccess"><nsbp/></a>
+			<p><strong>What can a user with Full Access permissions do?</strong><br/></p>
+				<p>If a user is given Full Access over an object in a Research Group, they can:</p>
+				<ul>
+					<li><p>Edit the description of the object, or any of their children.</p></li>
+					<li><p>Create new children. E.g. If you have Full Access permission over a Research Group, you can create new Projects.</p></li>
+					<li><p>Assign Full Access, Editing Access, or Viewing Access to the object, or any of its children.</p></li>
+					<li><p>View all the permissions for the Research Group.</p></li>
+					<li><p>Upload Files to Datasets.</p></li>
+					<li><p>Download Files from Datasets.</p></li>
+					<li><p>Move files within a Dataset.</p></li>
+					<li><p>Delete files within a Dataset.</p></li>
+				</ul>
+				<br/><br/>
+			<a name="editingAccess"><nsbp/></a>
+			<p><strong>What can a user with Editing Access permissions do?</strong><br/></p>
+				<p>If a user is given Editing Access over an object in a Research Group, they can: </p>
+				<ul>
+					<li><p>Edit the description of the object, or any of their children.</p></li>
+					<li><p>Assign Editing Access, or Viewing Access to the object, or any of its children.</p></li>
+					<li><p>View all the permissions for the Research Group.</p></li>
+					<li><p>Update Files to Datasets.</p></li>
+					<li><p>Download Files from Datasets.</p></li>
+				</ul>
+				<br/><br/>
+			<a name="viewingAccess"><nsbp/></a>
+			<p><strong>What can a user with Viewing Access permissions do?</strong><br/></p>
+				<p>If a user is given Viewing Access over an object in a Research Group, they can: </p>
+				<ul>
+					<li><p>Download Files from Datasets.</p></li>
+				</ul>
+				<br/><br/>
+			<a name="revokePermissions"><nsbp/></a>
+			<p><strong>How do I revoke permissions?</strong><br/></p>
+				<p>You can revoke the permissions you have granted, or the permissions created by users you granted permissions to. In the page "View permissions for this group" you will
+				find a link to revoke the permissions you are entitled to revoke.
+				<br/><br/></p>
+			<a name="advertise"><nsbp/></a>
+			<p><strong>How do I advertise my research?</strong><br/></p>
+				<p>My Research Data Manager allows researchers to advertise their research in <a href="http://ands.org.au/guides/research-data-australia.html">Research Data Australia</a>.
+				A Researcher with Full Access permission over a Dataset can mark it as ready for advertising, by selecting the "Advertise Dataset" link under the dataset actions.
+				The Principal Investigator will receive a notification for all Datasets that have been marked as ready for advertising, and will make the final call on whether the
+				dataset will be advertised in RDA.
+				If the Principal Investigator decides to advertise the Dataset, RDA will receive a record for the Research Group, Project, Dataset, and Principal Investigator
+				associated with the Group.
+				<br/><br/></p>
+			<a name="furtherHelp"><nsbp/></a>
+			<p><strong>Who do I contact if I need further help?</strong><br/></p>
+				<p>You can contact contact the HelpDesk by <a href="mailto:support@sydney.edu.au">email</a> or phone (Extension x16000) with any questions.
+				<br/><br/></p>
+			<!-- <a name="..."><nsbp/></a>
+			<strong>...?</strong><br/>
+				...
+				<br/><br/>  -->
+		</div>	
+	</util:panel>
+</jsp:root>

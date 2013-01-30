@@ -97,4 +97,10 @@ public class ResearchSubjectCode
         q.setParameter("subjectName", searchTerm);
         return q;
     }
+    
+    @Override
+    public String toString()
+    {
+        return subjectCode + " " + subjectName;
+    }
 }

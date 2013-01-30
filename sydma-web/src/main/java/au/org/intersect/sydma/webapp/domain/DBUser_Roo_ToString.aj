@@ -9,10 +9,11 @@ privileged aspect DBUser_Roo_ToString {
     
     public String DBUser.toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("AccessLevel: ").append(getAccessLevel()).append(", ");
+        sb.append("DatabaseInstance: ").append(getDatabaseInstance()).append(", ");
         sb.append("DbPassword: ").append(getDbPassword()).append(", ");
         sb.append("DbUsername: ").append(getDbUsername()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
-        sb.append("User: ").append(getUser()).append(", ");
         sb.append("Version: ").append(getVersion());
         return sb.toString();
     }

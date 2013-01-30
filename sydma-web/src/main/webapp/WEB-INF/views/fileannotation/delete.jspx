@@ -1,0 +1,37 @@
+<div class="sydma_content" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+
+    <h1>
+        <spring:message code="fileAnnotation.delete.heading" text="?Delete Annotation?" />
+    </h1>
+
+    <c:url value="/fileannotation/delete" var="submitUrl" />
+    <form:form id="delete_annotation" modelAttribute="fileAnnotation" class="formbuilder ajaxForm" method="post"
+        action="${submitUrl}"> 
+               
+        <form:hidden path="path"/>
+        <fieldset>
+            <legend>
+                <spring:message code="fileAnnotation.legend" text="?Annotation?" />
+            </legend>
+            <ol>             
+               
+                <li>                    
+                    <util:fieldview code="fileAnnotation.path" value="${namedPath}" />
+                </li>
+                <li>                    
+                    <util:fieldview code="fileAnnotation.annotation" value="${fileAnnotation.annotation}" />
+                </li>            
+                <li>
+                    <p><spring:message code="fileAnnotation.delete.description" text="?Delete?"/></p>
+                </li>                                                      
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input id="cancel_submit" class="cancel-button button" type="submit" value="Cancel" name="_submit"/>
+            <input id="confirm_submit" class="submit-button button" type="submit" value="Delete" name="_submit"/>
+        </div>
+    </form:form>        
+
+</div>

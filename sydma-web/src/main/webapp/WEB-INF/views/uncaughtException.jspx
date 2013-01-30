@@ -7,5 +7,16 @@
     <p>
       <spring:message code="error_uncaughtexception_problemdescription" />
     </p>
+       <c:if test="${not empty exception}">
+      <p>
+        <h4>
+          <spring:message code="exception_details" />
+        </h4>
+        <spring:message var="message" code="exception_message" />
+        <util:panel id="_message" title="${message}" openPane="false">
+          <c:out value="${exception.localizedMessage}" />
+        </util:panel>
+      </p>
+    </c:if>
   </util:panel>
 </div>

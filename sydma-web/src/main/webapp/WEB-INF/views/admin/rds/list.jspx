@@ -10,21 +10,40 @@
 	
     <tiles:useAttribute name="listType" />
     
-	<h3><spring:message code="${listType }.title" text="?Rds Request List?"/></h3> <br />
+	<h1>
+		<spring:theme code="${listType}.title" text="?Request List?"/>
+	</h1> 
+	<br />
 	
 	<table class="tabledata_blue" id="requestList">
 		<tbody>
 			<tr valign="top">
-				<th width="50%">Name</th>
-				<th width="50%">Principal Investigator</th>
+				<th width="20%">Name</th>
+				<th width="20%">Folder</th>
+				<th width="20%">Date/Time of request</th>
+				<th width="20%">Requester</th>
+				<th width="20%">Principal Investigator</th>				
+				<th width="20%">Actions</th>				
 			</tr>
 			<c:forEach items="${rdsRequests}" var="rdsRequest">
 				<tr class="white">
+					<td class="requestName"><c:out value="${rdsRequest.name}"></c:out></td>
+					<td class="requestName"><c:out value="${rdsRequest.researchGroup.directoryPath}"></c:out></td>
+					<td class="requestDate"><c:out value="${rdsRequest.timeAndDateOfRequest}"></c:out></td>
+					<td class="requester"><c:out value="${rdsRequest.requester}"></c:out></td>
+					<td class="principalInvestigator"><c:out value="${rdsRequest.principalInvestigator}"></c:out></td>
 					<td>
-						<c:url value='/admin/rds/show/${rdsRequest.id}' var="rdsRequestUrl" />
-						<a href="${rdsRequestUrl}"><c:out value="${rdsRequest.name}"></c:out></a>
+						<c:if test="${'APPROVED' == rdsRequest.requestStatus}">
+							<c:url value='/admin/changePrincipalInvestigator/${rdsRequest.id}' var="linkUrl" />
+							<c:set var="linkName" value="Change PI" />
+						</c:if>
+						<c:if test="${'CREATED' == rdsRequest.requestStatus}">
+							<c:url value='/admin/rds/show/${rdsRequest.id}' var="linkUrl" />
+							<c:set var="linkName" value="Approve" />
+						</c:if>
+						
+						<a href="${linkUrl}"><c:out value="${linkName}" /></a>
 					</td>
-					<td><c:out value="${rdsRequest.principalInvestigator}"></c:out></td>
 				</tr>
 			</c:forEach>
 

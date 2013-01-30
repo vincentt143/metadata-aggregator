@@ -27,13 +27,13 @@
 package au.org.intersect.sydma.webapp.service;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.util.MailHelper;
+import au.org.intersect.sydma.webapp.util.MailTemplateLoader;
 
 /**
  * 
@@ -42,10 +42,12 @@ import au.org.intersect.sydma.webapp.util.MailHelper;
  */
 public class DatasetReadyToPublishMailServiceImpl implements DatasetReadyToPublishMailService
 {
-    private static final StringTemplateGroup ST_GROUP = new StringTemplateGroup("datasetReadyToPublish");
 
     @Autowired
     private transient MailHelper mailHelper;
+    
+    @Autowired
+    private MailTemplateLoader mailTemplateLoader;
 
     private String mailFrom;
 
@@ -66,9 +68,10 @@ public class DatasetReadyToPublishMailServiceImpl implements DatasetReadyToPubli
         String advertiseUrl = baseUrl + "/researchdataset/publish/" + researchDataset.getId();
         String subject = "Research dataset '" + researchDataset.getName() + "' is ready for advertising";
         User pi = researchDataset.getResearchProject().getResearchGroup().getPrincipalInvestigator();
-        String mailTo = pi.getEmail();
+        String[] mailTo = new String[]{pi.getEmail()};
+        
+        StringTemplate template = mailTemplateLoader.loadTemplate("datasetReadyToPublishTemplate");
 
-        StringTemplate template = ST_GROUP.getInstanceOf("META-INF/email/datasetReadyToPublishTemplate");
         template.setAttribute("datasetName", researchDataset.getName());
         template.setAttribute("projectName", researchDataset.getResearchProject().getName());
         template.setAttribute("groupName", researchDataset.getResearchProject().getResearchGroup().getName());
@@ -77,5 +80,10 @@ public class DatasetReadyToPublishMailServiceImpl implements DatasetReadyToPubli
         template.setAttribute("surname", pi.getSurname());
         template.setAttribute("advertiseUrl", advertiseUrl);
         mailHelper.sendMessage(mailFrom, subject, mailTo, template.toString());
+    }
+
+    public void setMailTemplateLoader(MailTemplateLoader mailTemplateLoader)
+    {
+        this.mailTemplateLoader = mailTemplateLoader;
     }
 }

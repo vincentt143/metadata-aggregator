@@ -27,14 +27,13 @@
 
 package au.org.intersect.sydma.webapp.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,11 +43,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import au.org.intersect.dms.encrypt.EncryptionAgent;
 import au.org.intersect.dms.encrypt.EncryptionAgentException;
 import au.org.intersect.dms.tunnel.HddUtil;
+import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.exception.PermissionDeniedException;
 import au.org.intersect.sydma.webapp.json.JsonResponse;
-import au.org.intersect.sydma.webapp.permission.path.Path;
-import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 import au.org.intersect.sydma.webapp.security.SecurityContextFacade;
-import au.org.intersect.sydma.webapp.service.FilePathService;
+import au.org.intersect.sydma.webapp.service.DataTranferService;
+import au.org.intersect.sydma.webapp.service.JobDetail;
 
 /**
  * Controller for managing upload process
@@ -59,23 +59,22 @@ public class TransferJobController extends AbstractControllerWithDmsConnection
 {
     private static final Logger LOG = LoggerFactory.getLogger(TransferJobController.class);
 
-    private static final int HDD_CONNECTION = -1;
-
-    @Autowired
-    private FilePathService filePathService;
-
     @Autowired
     private SecurityContextFacade securityContextFacade;
 
     @Autowired
+    private DataTranferService dataTranferService;
+
+    @Autowired
+    @Qualifier("publicAgent")
     private EncryptionAgent agent;
-    
+
     @RequestMapping(method = RequestMethod.POST, value = "/jobCancel")
     @ResponseBody
     public String jobCancel(@RequestParam(value = "jobId") long jobId)
     {
         String username = securityContextFacade.getAuthorizedUsername();
-        Boolean resp = getDmsService().stopJob(username, jobId);        
+        Boolean resp = getDmsService().stopJob(username, jobId);
         JsonResponse jobResponse = new JsonResponse(resp, null);
         return jobResponse.toJson();
     }
@@ -86,38 +85,67 @@ public class TransferJobController extends AbstractControllerWithDmsConnection
             @RequestParam(value = "source_item") List<String> sourceItem,
             @RequestParam(value = "destination_connectionId") Integer destinationConnectionId,
             @RequestParam(value = "destination_item") String destinationItem,
-            @RequestParam(value = "encode", required = false) Boolean encode)
+            @RequestParam(value = "encode", required = false) Boolean encode, Principal principal) throws Exception
     {
-        Long jobId = createJob(sourceConnectionId, sourceItem, destinationConnectionId, destinationItem);
-        if (encode != null && encode)
+        try
         {
-            return encodeResponse(encode, jobId);
+            User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+
+            JobDetail jobDetail = dataTranferService.createJob(sourceConnectionId, sourceItem, destinationConnectionId,
+                    destinationItem, user);
+            if (encode != null && encode)
+            {
+                return encodeResponse(encode, jobDetail);
+            }
+
+            JsonResponse jobResponse = new JsonResponse(jobDetail, null);
+            return jobResponse.toJson();
         }
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("jobId", jobId.toString());
-        JsonResponse jobResponse = new JsonResponse(map, null);
-        return jobResponse.toJson();
-
+        catch (PermissionDeniedException exception)
+        {
+            JsonResponse jobResponse = new JsonResponse(null, "Permission Denied");
+            return jobResponse.toJson();
+        }
+        catch (Exception e)
+        {
+        	if (e instanceof InterruptedException)
+        	{
+        		Thread.currentThread().interrupt();
+        		return null;
+        	}
+        	else
+        	{
+        		LOG.error("Error creating job", e);
+                JsonResponse jobResponse = new JsonResponse(null, "Error ocurred: " + e.getMessage());
+                return jobResponse.toJson();
+        	}
+        }
     }
 
-    private Long createJob(Integer sourceConnectionId, List<String> sourceItem, Integer destinationConnectionId,
-            String destinationItem)
+    /**
+    private JobDetail createJob(Integer sourceConnectionId, List<String> sourceItem, Integer destinationConnectionId,
+            String destinationItem, Principal principal)
     {
-        String username = securityContextFacade.getAuthorizedUsername();
 
-        Integer connectionLocal = connectLocal();
+        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+        Integer connectionLocal = connectLocal(principal.getName());
 
-        String transferDestination;
-        List<String> transferSource;
-        Integer sourceConnection;
-        Integer destinationConnection;
+        final String transferDestination;
+        final List<String> transferSource;
+        final List<String> transferSourceDisplay = new ArrayList<String>();
+        final String transferDestinationDisplay;
+        final Integer sourceConnection;
+        final Integer destinationConnection;
         if (sourceConnectionId != HDD_CONNECTION)
         {
             transferSource = new ArrayList<String>();
             for (String source : sourceItem)
             {
-                transferSource.add(determineVirtualItem(source));
+                Path sourcePath = securePath(source, user, PermissionType.DOWNLOAD);
+                transferSource.add(determineVirtualItem(sourcePath));
+
+                String namedPath = getNamedPath(sourcePath);
+                transferSourceDisplay.add(namedPath);
             }
             sourceConnection = connectionLocal;
         }
@@ -125,36 +153,42 @@ public class TransferJobController extends AbstractControllerWithDmsConnection
         {
             transferSource = sourceItem;
             sourceConnection = sourceConnectionId;
+
+            transferSourceDisplay.addAll(sourceItem);
         }
 
         if (destinationConnectionId != HDD_CONNECTION)
         {
-            transferDestination = determineVirtualItem(destinationItem);
+            Path destinationPath = securePath(destinationItem, user, PermissionType.UPLOAD);
+            transferDestination = determineVirtualItem(destinationPath);
             destinationConnection = connectionLocal;
+            transferDestinationDisplay = getNamedPath(destinationPath);
         }
         else
         {
             transferDestination = destinationItem;
             destinationConnection = destinationConnectionId;
+
+            transferDestinationDisplay = destinationItem;
         }
 
-        Long jobId = getDmsService().copy(username, sourceConnection, transferSource, destinationConnection,
+        Long jobId = getDmsService().copy(user.getUsername(), sourceConnection, transferSource, destinationConnection,
                 transferDestination);
-        return jobId;
+        JobDetail jobDetail = new JobDetail(jobId, transferSourceDisplay, transferDestinationDisplay);
+        return jobDetail;
     }
-
-    private String encodeResponse(Boolean encode, Long jobId)
+    **/
+    
+    private String encodeResponse(Boolean encode, JobDetail jobDetail)
     {
         try
         {
-            byte[] encjobId = agent.process((jobId.toString()).getBytes());
+            byte[] encjobId = agent.process((jobDetail.getJobId().toString()).getBytes());
             String jobIdAsHexString = HddUtil.convertByteToHexString(encjobId);
 
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("jobId", jobId.toString());
-            map.put("encJobId", jobIdAsHexString);
+            jobDetail.setEncJobId(jobIdAsHexString);
 
-            JsonResponse jobResponse = new JsonResponse(map, null);
+            JsonResponse jobResponse = new JsonResponse(jobDetail, null);
             return jobResponse.toJson();
         }
         catch (EncryptionAgentException e)
@@ -163,13 +197,6 @@ public class TransferJobController extends AbstractControllerWithDmsConnection
                     + "Therefore this job will not be executed.");
         }
 
-    }
-
-    private String determineVirtualItem(String virtualPath)
-    {
-        Path path = PathBuilder.buildFromString(virtualPath);
-        String localItem = filePathService.resolveRelativePath(path);
-        return localItem;
     }
 
 }

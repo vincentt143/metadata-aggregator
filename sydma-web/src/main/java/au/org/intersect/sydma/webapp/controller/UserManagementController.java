@@ -28,27 +28,27 @@ package au.org.intersect.sydma.webapp.controller;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import au.org.intersect.sydma.webapp.domain.Role;
 import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.domain.UserType;
-import au.org.intersect.sydma.webapp.service.ExternalUserService;
+import au.org.intersect.sydma.webapp.json.JsonResponse;
+import au.org.intersect.sydma.webapp.service.PermissionService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
-import au.org.intersect.sydma.webapp.util.UrlHelper;
 
 /**
  * User Management Controller.
@@ -58,171 +58,79 @@ import au.org.intersect.sydma.webapp.util.UrlHelper;
 public class UserManagementController
 {
     private static final String USER_MANAGEMENT_REQUEST_MODEL = "user";
-    private static final String NEW_EXTERNAL_USER_PAGE = "usermanagement/new";
-    private static final String EDIT_EXTERNAL_USER_PAGE = "usermanagement/edit";
-    private static final String EDIT_ROLES_PAGE = "usermanagement/editroles";
+
+    private static final String EDIT_ROLES_PAGE = "usermanagement/edit";
     private static final String ACCESS_DENIED_PAGE = "accessDenied";
-    
-    private static final String REDIRECT_TO_LIST_PAGE = "redirect:/usermanagement/list";
-    private static final String REDIRECT_TO_ASSIGN_ROLE_PAGE = "redirect:/usermanagement/assignroles";
+
+    private static final String REDIRECT_TO_ASSIGN_ROLE_PAGE = "redirect:/usermanagement/list";
 
     private static List<Breadcrumb> breadcrumbs = new ArrayList<Breadcrumb>();
-    private static List<Breadcrumb> existingUsersBreadcrumbs = new ArrayList<Breadcrumb>();
-    private static List<Breadcrumb> unikeyUsersBreadcrumbs = new ArrayList<Breadcrumb>();
-    private static List<Breadcrumb> createUserBreadcrumbs = new ArrayList<Breadcrumb>();
-    private static List<Breadcrumb> editUserBreadcrumbs = new ArrayList<Breadcrumb>();
     private static List<Breadcrumb> assignRoleBreadcrumbs = new ArrayList<Breadcrumb>();
 
-    private static Breadcrumb index = new Breadcrumb("User Management", "/usermanagement/index");
+    private static Breadcrumb index = new Breadcrumb("sections.users.title", "/usermanagement/list");
 
     static
     {
         breadcrumbs.add(Breadcrumb.getHome());
-        breadcrumbs.add(new Breadcrumb("User Management"));
+        breadcrumbs.add(new Breadcrumb("sections.users.title"));
 
-        createUserBreadcrumbs.add(Breadcrumb.getHome());
-        createUserBreadcrumbs.add(index);
-        createUserBreadcrumbs.add(new Breadcrumb("Create New External User"));
-
-        editUserBreadcrumbs.add(Breadcrumb.getHome());
-        editUserBreadcrumbs.add(index);
-        editUserBreadcrumbs.add(new Breadcrumb("Edit External User"));
-
-        existingUsersBreadcrumbs.add(Breadcrumb.getHome());
-        existingUsersBreadcrumbs.add(index);
-        existingUsersBreadcrumbs.add(new Breadcrumb("External User List"));
-        
-        unikeyUsersBreadcrumbs.add(Breadcrumb.getHome());
-        unikeyUsersBreadcrumbs.add(index);
-        unikeyUsersBreadcrumbs.add(new Breadcrumb("Unikey User List"));
-        
         assignRoleBreadcrumbs.add(Breadcrumb.getHome());
         assignRoleBreadcrumbs.add(index);
-        assignRoleBreadcrumbs.add(new Breadcrumb("Unikey User List", "/usermanagement/assignroles"));
-        assignRoleBreadcrumbs.add(new Breadcrumb("Assign Role"));
+        assignRoleBreadcrumbs.add(new Breadcrumb("sections.users.unikey.assignrole.title"));
     }
 
     @Autowired
-    private ExternalUserService externalUserService;
-
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
-    public String newExternalUser(Model model)
-    {
-        model.addAttribute(Breadcrumb.BREADCRUMBS, createUserBreadcrumbs);
-        model.addAttribute(USER_MANAGEMENT_REQUEST_MODEL, new User());
-        return NEW_EXTERNAL_USER_PAGE;
-    }
+    private PermissionService permissionService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView getExistingUsers(Model model)
+    public String getUnikeyUsers(Model model, Principal principal)
     {
-        model.addAttribute(Breadcrumb.BREADCRUMBS, existingUsersBreadcrumbs);
-        model.addAttribute("externalUserList", User.findUsersByUserType(UserType.INTERNAL).getResultList());
-        List<User> userList = User.findUsersByUserType(UserType.INTERNAL).getResultList();
-        return new ModelAndView("usermanagement/list", "existingUserList", userList);
-    }
-
-    @RequestMapping(value = "/assignroles", method = RequestMethod.GET)
-    public ModelAndView getUnikeyUsers(Model model, Principal principal)
-    {
-        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
-
-        if (!user.hasAssignRolePermission())
-        {
-            return new ModelAndView(ACCESS_DENIED_PAGE);
-        }
-        
-        model.addAttribute(Breadcrumb.BREADCRUMBS, unikeyUsersBreadcrumbs);
-        model.addAttribute("unikeyList", User.findUsersByUserType(UserType.UNIKEY).getResultList());
-        List<User> userList = User.findUsersByUserType(UserType.UNIKEY).getResultList();
-        return new ModelAndView("usermanagement/assignroles", "unikeyList", userList);
-    }
-    
-    @RequestMapping(value = "/createExternalUser", method = RequestMethod.POST)
-    public String createExternalUser(@Valid User user, BindingResult result, Model model, HttpServletRequest request)
-    {    
-        if (user.isDuplicate())
-        {
-            duplicateError(result, user.getEmail());
-        }
-        
-        if (result.hasFieldErrors())
-        {
-            model.addAttribute(Breadcrumb.BREADCRUMBS, createUserBreadcrumbs);
-            model.addAttribute(USER_MANAGEMENT_REQUEST_MODEL, user);
-            return NEW_EXTERNAL_USER_PAGE;
-        }
-
-        externalUserService.createExternalUser(user, UrlHelper.getCurrentBaseUrl(request));
-        user.persist();
-        return REDIRECT_TO_LIST_PAGE;
-    }
-
-    @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
-    public String editExternalUser(@PathVariable("id") Long id, Model model)
-    {
-        List<User> users = User.findUsersByUserTypeAndIdEquals(UserType.INTERNAL, id).getResultList();
-        if (users.size() != 1)
+        if (!getUserFromPrincipal(principal).hasAssignRolePermission())
         {
             return ACCESS_DENIED_PAGE;
         }
-        
-        User user = User.findUser(id);
-        model.addAttribute(Breadcrumb.BREADCRUMBS, editUserBreadcrumbs);
-        model.addAttribute(USER_MANAGEMENT_REQUEST_MODEL, user);
-        return EDIT_EXTERNAL_USER_PAGE;
+        // TODO: Sort the list before passing to stop the randomization on the front-end
+        List<User> unikeyUsers = User.findUsersByUserType(UserType.UNIKEY).getResultList();
+        model.addAttribute(Breadcrumb.BREADCRUMBS, breadcrumbs);
+        model.addAttribute("unikeyList", unikeyUsers);
+
+        return "usermanagement/list";
     }
 
-    @RequestMapping(value = "/editroles/{id}", method = RequestMethod.GET)
-    public String editRoles(@PathVariable("id") Long id, Model model)
+    @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
+    public String editRoles(@PathVariable("id") Long id, Model model, Principal principal)
     {
+        if (!getUserFromPrincipal(principal).hasAssignRolePermission())
+        {
+            return ACCESS_DENIED_PAGE;
+        }
+
         List<User> users = User.findUsersByUserTypeAndIdEquals(UserType.UNIKEY, id).getResultList();
         if (users.size() != 1)
         {
             return ACCESS_DENIED_PAGE;
         }
-        
+
         model.addAttribute(Breadcrumb.BREADCRUMBS, assignRoleBreadcrumbs);
-        model.addAttribute(USER_MANAGEMENT_REQUEST_MODEL, users.get(0));      
+        model.addAttribute(USER_MANAGEMENT_REQUEST_MODEL, users.get(0));
         model.addAttribute("roles", Role.getAssignableRoles());
         return EDIT_ROLES_PAGE;
     }
-    
-    @RequestMapping(value = "/editExternalUser", method = RequestMethod.PUT)
-    public String editExternalUser(@Valid User user, BindingResult result, Model model)
+
+    @RequestMapping(value = "/edit", method = RequestMethod.POST)
+    public String editRoles(@Valid User user, BindingResult result, Model model, Principal principal)
     {
-        List<User> users = User.findUsersByUserTypeAndIdEquals(UserType.UNIKEY, user.getId()).getResultList();
-        if (users.size() != 1)
+        if (!getUserFromPrincipal(principal).hasAssignRolePermission())
         {
             return ACCESS_DENIED_PAGE;
-        }
-        
-        if (user.isDuplicate())
-        {
-            duplicateError(result, user.getEmail());
-        }
-        
-        if (result.hasErrors())
-        {
-            model.addAttribute(Breadcrumb.BREADCRUMBS, editUserBreadcrumbs);
-            model.addAttribute(USER_MANAGEMENT_REQUEST_MODEL, user);
-            return EDIT_EXTERNAL_USER_PAGE;
         }
 
-        User existingUser = User.findUser(user.getId());
-        existingUser.modify(user);
-        return REDIRECT_TO_LIST_PAGE;
-    }
-    
-    @RequestMapping(value = "/editRole", method = RequestMethod.PUT)
-    public String editRoles(@Valid User user, BindingResult result, Model model)
-    {
         List<User> users = User.findUsersByUserTypeAndIdEquals(UserType.UNIKEY, user.getId()).getResultList();
         if (users.size() != 1)
         {
             return ACCESS_DENIED_PAGE;
         }
-        
+
         if (result.hasFieldErrors())
         {
             model.addAttribute(Breadcrumb.BREADCRUMBS, assignRoleBreadcrumbs);
@@ -230,32 +138,157 @@ public class UserManagementController
             model.addAttribute("role", Role.getAssignableRoles());
             return EDIT_ROLES_PAGE;
         }
-        
+
         User existingUser = User.findUser(user.getId());
         if (user.getRoles() == null)
         {
             existingUser.assignNoRole();
-            return REDIRECT_TO_ASSIGN_ROLE_PAGE;
         }
-
-        existingUser.assignRole(user.getRoles());    
-
+        else
+        {
+            existingUser.assignRole(user.getRoles());
+        }
         return REDIRECT_TO_ASSIGN_ROLE_PAGE;
     }
-    
+
+    @RequestMapping("/searchAll")
+    @ResponseBody
+    public String indexAll(@RequestParam(value = "q") String search, Model model)
+    {
+        StringBuffer searchResult = new StringBuffer("[");
+
+        List<User> matchResult = User.findUsersByUsernameLikeOrGivennameLikeOrSurnameLike(search, search, search)
+                .getResultList();
+        boolean isFirst = true;
+        for (User user : matchResult)
+        {
+            if (isFirst)
+            {
+                isFirst = false;
+            }
+            else
+            {
+                searchResult.append(",");
+            }
+            searchResult.append("{\"id\":");
+            searchResult.append(user.getId());
+            searchResult.append(",\"name\":\"");
+            searchResult.append(user.getUsername());
+            searchResult.append("\",\"fullname\":\"");
+            searchResult.append(user.getFullname());
+            searchResult.append("\"}");
+        }
+        searchResult.append("]");
+        return searchResult.toString();
+    }
+
+    @RequestMapping("/searchUnikey")
+    @ResponseBody
+    public String indexUnikey(@RequestParam(value = "term") String search, Model model)
+    {
+        List<UserDTO> searchResult = new ArrayList<UserDTO>();
+
+        List<User> matchResult = User.findUsersByUsernameLikeOrGivennameLikeOrSurnameLike(search, search, search)
+                .getResultList();
+        for (User user : matchResult)
+        {
+            if (user.getUserType().equals(UserType.UNIKEY))
+            {
+                UserDTO userDTO = new UserDTO();
+                userDTO.setFullName(user.getFullname());
+                userDTO.setUserID(user.getUsername());
+                searchResult.add(userDTO);
+            }
+        }
+        Collections.sort(searchResult);
+        return new JsonResponse(searchResult, null).toJson();
+    }
 
     @RequestMapping(value = "/index")
-    public void index(Model model)
+    public String index(Model model, Principal principal)
     {
+        if (!permissionService.canCreateExternalUser(getUserFromPrincipal(principal)))
+        {
+            return ACCESS_DENIED_PAGE;
+        }
+
         model.addAttribute(Breadcrumb.BREADCRUMBS, breadcrumbs);
+        return "index";
     }
-    
-    private void duplicateError(BindingResult result, String email)
+
+    private User getUserFromPrincipal(Principal principal)
     {
-        String[] emailErrorCode = {""};
-        String[] emailErrorArg = {""};
-        FieldError emailError = new FieldError(USER_MANAGEMENT_REQUEST_MODEL, "email", email, true,
-                emailErrorCode, emailErrorArg, "Email already exists in the system");
-        result.addError(emailError);    
+        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+        return user;
     }
+
+    /**
+     * DTO for tokeninput.js
+     * 
+     * @version $Rev: 29 $
+     */
+    public class UserJson
+    {
+        private String id;
+        private String name;
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public void setId(String id)
+        {
+            this.id = id;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+    }
+
+    /**
+     * DTO to handle auto completion of fields
+     * 
+     * @version $Rev: 29 $
+     */
+    public class UserDTO implements Comparable<UserDTO>
+    {
+        private String fullName;
+
+        private String userID;
+
+        public String getFullName()
+        {
+            return fullName;
+        }
+
+        public void setFullName(String fullName)
+        {
+            this.fullName = fullName;
+        }
+
+        public String getUserID()
+        {
+            return userID;
+        }
+
+        public void setUserID(String userID)
+        {
+            this.userID = userID;
+        }
+
+        public int compareTo(UserDTO user)
+        {
+            int lastCmp = userID.compareTo(user.userID);
+            return lastCmp;
+        }
+    }
+
 }

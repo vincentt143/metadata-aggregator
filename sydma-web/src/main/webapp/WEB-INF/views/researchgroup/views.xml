@@ -7,6 +7,21 @@
         <put-attribute name="formAction" value="createResearchGroup" cascade="true"/>
     </definition>
     <definition extends="contentLightboxable" name="researchgroup/edit">
-        <put-attribute name="body" value="/WEB-INF/views/researchgroup/edit.jspx" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/edit.jspx" cascade="true"/>   
     </definition>
+    <definition extends="contentLightboxable" name="researchgroup/view">
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/view.jspx" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="researchgroup/managevocabulary">
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/manageVocabulary.jspx" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="researchgroup/createvocabulary">
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/createVocabulary.jspx" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="researchgroup/deletevocabulary">
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/deleteVocabulary.jspx" cascade="true"/>
+    </definition>    
+    <definition extends="contentLightboxable" name="researchgroup/editword">
+        <put-attribute name="body" value="/WEB-INF/views/researchgroup/editWord.jspx" cascade="true"/>
+    </definition>    
 </tiles-definitions>

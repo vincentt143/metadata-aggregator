@@ -6,6 +6,23 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
 
 (function()
 {
+
+    var debug = Sydma.getDebug("ActionControl");
+    var info = Sydma.getInfo("ActionControl");
+    
+    //used for ajaxView to notify if a controling action control should consider lightbox as complete
+    Sydma.ActionControl.markComplete = false;
+    
+    var ajaxLinkContainerSelector = ".ajax_links";
+    
+    var onCloseListener = {};
+    
+    //Allow scripts to be aware of when the lightbox has closed so they can do some cleanup if necessary
+    Sydma.ActionControl.registerOnCloseListener = function(key, listener)
+    {
+        onCloseListener[key] = listener;
+    };
+    
     /**
      * opt 
         onActionComplete : function()
@@ -44,6 +61,9 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
         //checks if isComplete is true, if not fire cancel function
         var onClose = function()
         {
+            jQuery.each(onCloseListener, function(key, listener){listener();});
+            
+                
             if (!isComplete)
             {
                 onActionCancel();
@@ -57,11 +77,11 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
         
         var onSubmitResponse = function(resp, textStatus, jqXHR)
         {
+            debug("Ajax Response ");
             waitingAjax = false;
             var $resp = jQuery(resp);
-            //Sydma.log("DEBUG::ActionControl::Ajax response", resp);
-            //Sydma.log("DEBUG::ActionControl::Ajax status", textStatus);
-            //Sydma.log("DEBUG::ActionControl::Ajax xhr", jqXHR);
+           
+
             if ($resp.find("#ajaxSuccess").length > 0 || resp == "")
             {
                 isComplete = true;
@@ -75,9 +95,19 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
             else
             {
                 var $ajaxContent = getAjaxContainer();
-                $ajaxContent.replaceWith(resp);
+                $ajaxContent.replaceWith(resp);                
+                prepareAjaxView();       
                 
-                prepareForm();
+                //TODO: Refactor this by refactoring ActionControl into a static instance controller
+                if (Sydma.ActionControl.markComplete)
+                {
+                    //Check if lightboxContent marked Action as complete
+                    Sydma.ActionControl.markComplete = false;
+                    if (jQuery.isFunction(onActionComplete))
+                    {
+                        onActionComplete();
+                    }
+                }
             }
         };
 
@@ -90,11 +120,49 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
             return false;
         };
         
-        var prepareForm = function()
+        var onAjaxLink = function(event)
         {
-            //getAjaxContainer().children().addClass("sydma_content");
-            //getAjaxContainer().parent().attr("id", "content");
+            event.preventDefault();
+            var $link = jQuery(this);
+            var href = $link.attr("href");            
+            var opt = 
+            {
+                "url" : href,
+                "type" : "GET",
+                "dataType" : "html",
+                "success" : onSubmitResponse
+            };
+            debug("OnAjaxLink::" + href);
+            jQuery.ajax(opt);
+            return false;
+        };
+        
+        var bindCapture = function()
+        {
+            var $link = jQuery(this);
+            var linkHref = $link.attr("href");
+            //href not null, not empty, doesn't start with hash
+            if (linkHref != null && linkHref != "" && linkHref.charAt(0) != '#')
+            {
+                debug("bindCapture::Binding ajaxLink", $link);
+                $link.click(onAjaxLink);
+            }
+        };
+        
+        var wireAjaxLink = function($ajaxContainer)
+        {
+            var $linkContainers = $ajaxContainer.find(ajaxLinkContainerSelector);
+            var $links = $linkContainers.find('a').not('.no_ajax');
+            
+            $links.each(bindCapture);            
+        };
+        
+        var prepareAjaxView = function()
+        {
             var $ajaxContainer = getAjaxContainer();
+            
+            wireAjaxLink($ajaxContainer);
+            
             var $form = $ajaxContainer.find("form");
             if ($form.length == 0)
             {
@@ -102,7 +170,7 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
                 return;
             }
             // since we replaced the form we need to rewire the submit
-            wireForm($form);
+            wireForm($form);            
             focusForm($form);
         };
         
@@ -126,8 +194,8 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
             }
                                                 
             postData = jQuery.extend(postData, ajaxData);
-            var ajaxInAction = function()
-            {
+            var ajaxInAction = function(arrData)
+            {           
                 if (showSpinner)
                 {
                     $form.children().css("visibility", "hidden");
@@ -146,16 +214,15 @@ Sydma.ActionControl = Sydma.ActionControl ? Sydma.ActionControl : {};
         
         //intercept submit for the form
         var wireForm = function($form)
-        {
-            //$form.bind("submit", onFormSubmit);
-            
-            useAjaxForm($form);
+        {   
+            Sydma.lockFormEnter($form);
+            useAjaxForm($form);            
         };
         
         var onLightboxShow = function()
         {
             jQuery("#fancybox-content").children().addClass("sydma_content");
-            prepareForm();           
+            prepareAjaxView();           
         };
 
         var showActionLightbox = function(url)

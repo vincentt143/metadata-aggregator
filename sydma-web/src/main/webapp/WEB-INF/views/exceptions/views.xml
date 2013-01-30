@@ -13,6 +13,8 @@
     <definition extends="contentLightboxable" name="researchDatasetDBException">
         <put-attribute name="body" value="/WEB-INF/views/exceptions/researchDatasetDBException.jspx" cascade="true"/>
     </definition>
-    
+    <definition extends="contentLightboxable" name="noEntityFoundException">
+        <put-attribute name="body" value="/WEB-INF/views/exceptions/noEntityFoundException.jspx" cascade="true"/>
+    </definition>   
     
 </tiles-definitions>

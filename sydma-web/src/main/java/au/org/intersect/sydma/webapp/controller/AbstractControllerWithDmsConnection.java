@@ -32,12 +32,12 @@ import javax.servlet.ServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import au.org.intersect.dms.core.errors.ConnectionClosedError;
 import au.org.intersect.dms.core.service.DmsService;
+import au.org.intersect.sydma.webapp.service.DmsAccessPointService;
 
 
 /**
@@ -51,24 +51,20 @@ public abstract class AbstractControllerWithDmsConnection
     private static final String AJAX_FLAG = "ajax";
 
     @Autowired
-    private DmsService dmsService;        
+    private DmsAccessPointService dapService;        
     
-    @Value("#{sydmaFileProperties['sydma.localFileServer']}")
-    private String localServer;
-    
-    protected Integer connectLocal()
+    protected Integer connectLocal(String username)
     {
         String protocol = "local";
-        String server = localServer;
-        String username = null;
+        String server = dapService.getLocalServerName();
         String password = null;
-        Integer connectionId = dmsService.openConnection(protocol, server, username, password);
+        Integer connectionId = dapService.getDmsService().openConnection(protocol, server, username, password);
         return connectionId;
     }
     
     protected DmsService getDmsService()
     {
-        return dmsService;
+        return dapService.getDmsService();
     }
     
     @ExceptionHandler(ConnectionClosedError.class)

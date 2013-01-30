@@ -9,9 +9,15 @@ privileged aspect ResearchDatasetDB_Roo_ToString {
     
     public String ResearchDatasetDB.toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("DateOfRestoration: ").append(getDateOfRestoration()).append(", ");
+        sb.append("DbHostname: ").append(getDbHostname()).append(", ");
         sb.append("DbName: ").append(getDbName()).append(", ");
+        sb.append("DbQueries: ").append(getDbQueries() == null ? "null" : getDbQueries().size()).append(", ");
         sb.append("DbSchema: ").append(getDbSchema()).append(", ");
+        sb.append("DbUsers: ").append(getDbUsers() == null ? "null" : getDbUsers().size()).append(", ");
+        sb.append("Description: ").append(getDescription()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
+        sb.append("State: ").append(getState()).append(", ");
         sb.append("Version: ").append(getVersion());
         return sb.toString();
     }

@@ -5,8 +5,5 @@
   <spring:message code="label_admin_index" htmlEscape="false" var="title"/>
   <util:panel id="title" title="${title}">
     <spring:message code="application_name" htmlEscape="false" var="app_name"/>
-    <h3>
-      <spring:message arguments="${app_name}" code="welcome_titlepane"/>
-    </h3>
   </util:panel>
 </div>

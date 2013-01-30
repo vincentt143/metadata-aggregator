@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" 
+	 xmlns:c="http://java.sun.com/jsp/jstl/core"
+     xmlns:spring="http://www.springframework.org/tags" 
+     xmlns:form="http://www.springframework.org/tags/form"
+     xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+     xmlns:tiles="http://tiles.apache.org/tags-tiles"
+     xmlns:display="urn:jsptld:http://displaytag.sf.net"
+     xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+
+  	<jsp:directive.page contentType="text/html;charset=UTF-8"/>
+  	<jsp:output omit-xml-declaration="yes"/>
+
+   	<spring:message code="label_researchgroup_new" htmlEscape="false" var="title"/>
+    <spring:message code="application_name" htmlEscape="false" var="app_name"/>
+    <h1>
+      	<spring:message code="researchGroup.manage.vocabulary.title" text="?researchGroup.manage.vocabulary.title?"/>
+    </h1>
+    
+    <p>
+    	<spring:message code="form.provide.information" text="?form.provide.information?"/>
+    </p>
+    
+    <p class="required-warning">
+		<spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false"/>
+	</p>
+	<c:url var="formAction" value="/researchgroup/addWord" />
+	<form:form class="formbuilder" modelAttribute="vocabulary" method="post" action="${formAction}" autocomplete="off">
+		<fieldset>
+			<input type="hidden" name="groupId" value="${researchGroup.id}"/>
+			<input type="hidden" name="browse" value="true" />
+			<form:hidden path="researchGroup" value="${researchGroup.id}" />
+			<legend>
+				<spring:message code="researchGroup.manage.vocabulary.legend" text="?researchGroup.manage.vocabulary.legend?" />
+			</legend>
+			<ol>
+				<menu:form-entry characters="255" path="keyword" code="manage.vocabulary.add.keyword" required="true"/>				
+			</ol>
+		</fieldset>
+		<div class="buttons">
+			<input id="submit" class="submit-button button" type="submit" value="Add" name="_submit"></input>
+		</div>
+	</form:form>
+	
+	<div>
+		<fieldset>
+			<display:table  uid="vocab" name="${vocabularyList}" pagesize="20" requestURIcontext="true" requestURI="/researchgroup/managevocabulary/${researchGroup.id}">
+				<display:column title="Keyword" style="width: 50%">
+					<c:out value="${vocab.keyword }" />
+				</display:column>
+				<display:column title="Actions" style="width: 50%" class="ajax_links">
+					<c:url value='/researchgroup/editword/${vocab.id}' var="editWordUrl">
+					</c:url>
+					<a href="${editWordUrl}"><c:out value="Edit" /></a>
+					<c:out value=" | " />
+					<c:url value='/researchgroup/deleteword/${researchGroup.id}' var="deleteWordUrl">
+						<c:param name="id" value="${vocab.id}" />
+					</c:url>
+					<a href="${deleteWordUrl}"><c:out value="Delete" /></a>
+				</display:column>
+				<display:setProperty name="basic.empty.showtable" value="true" />
+				<display:setProperty name="paging.banner.group_size" value="25" />
+				<display:setProperty name="paging.banner.onepage" value=" " />
+				<display:setProperty name="paging.banner.placement" value="bottom" />
+			</display:table>
+	        <div class="ajax_links corner_right">
+	            <c:url var="deleteUrl" value="/researchgroup/deletevocabulary">
+	                <c:param name="id" value="${researchGroup.id}"/>
+	            </c:url>
+	            <c:if test="${not isEmptyList}">
+		            <a href="${deleteUrl}" title="Delete all words" class="icon icon-stop">
+		                <c:out value="Delete All"/>
+		            </a>
+	            </c:if>
+        	</div>
+		</fieldset>   
+	</div>
+	<script>
+        // inserting class to display:table pagelinks span. Adding to the whole table causes a problem with the download
+        $("span.pagelinks").addClass("ajax_links");
+    </script>
+</div>

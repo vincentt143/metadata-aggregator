@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags"
+    xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+    xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:display="urn:jsptld:http://displaytag.sf.net"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" 
+    xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+        <spring:message code="dbinstance.view.title" text="View Instance" arguments="${dataset.name}" htmlEscape="true"/>
+    </h1>
+       	<c:url var="formAction" value="/dbinstance/view">
+			<c:param name="datasetId" value="${dataset.id}" />
+		</c:url>
+		<form:form class="formbuilder" method="post" action="${formAction}" autocomplete="off">
+        <fieldset>
+        	<legend>
+				<spring:message code="dbinstance.view.legend" text="?DB Instance?" />
+			</legend>
+        	<c:if test="${hasRestored}" >
+	        	<li>
+	            	<util:fieldview code="dbinstance.restore.database.reason" value="${datasetDB.state}" id="dbState_value"/>  
+	        	</li>
+	        	<li>
+	            	<util:fieldview code="dbinstance.restored.by" value="${datasetDB.lastRestoredBy.givenname} ${datasetDB.lastRestoredBy.surname}" id="dbState_value"/>  
+	        	</li>
+	        	<li>
+	            	<util:fieldview code="dbinstance.date.of.restoration" value="${datasetDB.dateOfRestoration}" id="dbState_value"/>  
+	        	</li>
+				<li>
+	            	<util:fieldview code="dbinstance.restored.from" value="${dBBackup.date}" id="dbState_value"/>  
+	        	</li>
+			</c:if>
+			
+			<tiles:insertTemplate template="listQuery.jspx"/>
+			
+            <ol>
+	           	<li>
+	           		<util:fieldview code="dbinstance.dbName" value="${datasetDB.dbName}" id="dbName_value" />                                                        
+                </li>    
+                <li>
+                	<util:fieldview code="dbinstance.description" value="${datasetDB.description}" id="dbDescription_value" />
+                                  
+                    <c:if test="${showEdit}">
+                        <span class="ajax_links">
+                            <c:url var="editUrl" value="/dbinstance/edit">
+                                <c:param name="datasetId" value="${dataset.id}"/>
+                            </c:url>
+                            <spring:message var="editLinkTxt" code="dbinstance.edit.link.title" text="?Edit Instance?"/>
+                            <a id="edit_dbinstance_link" title="${editLinkTxt}" href="${editUrl}"><c:out value="${editLinkTxt}"/></a>
+                        </span>
+                    </c:if>
+                </li>  
+                  
+                <li>
+                    <util:fieldview code="dbinstance.dbSchema" value="${datasetDB.dbSchema.name}" id="dbSchema_value"/>                                                        
+                    <c:if test="${showReverse }">
+                        <span class="ajax_links">
+                            <c:url var="reverseUrl" value="/dbinstance/reverse">
+                                <c:param name="datasetId" value="${dataset.id }"/>
+                            </c:url>
+                    		<spring:message var="reverseLinkTxt" code="dbinstance.reverse.link.title" text="?Reverse Engineer?"/>
+		                    <a id="reverse_dbinstance_link" title="${reverseLinkTxt}" href="${reverseUrl}"><c:out value="${reverseLinkTxt}"/></a>
+                        </span>
+                    </c:if>
+                </li>            
+                
+                <c:choose>
+                    <c:when test="${empty dbUser}">
+                        <!-- TEMP MEASURE -->
+                        You do not have access to this Database Instance
+                    </c:when>
+                    <c:otherwise>
+                        <li>
+                            <p>
+                            <spring:message code="dbinstance.accessInstructionDescription" text="?Instruction?"/>
+                            </p>
+                        </li>
+                        <li>
+                            <util:fieldview code="dbinstance.hostname" value="${datasetDB.dbHostname}" id="dbHostname_value"/>                            
+                        </li>
+                        <li>
+                            <util:fieldview code="dbinstance.username" value="${dbUser.dbUsername}" id="dbUsername_value"/>
+                          
+                        </li>
+                        <li>
+                            <util:fieldview code="dbinstance.password" value="${dbUser.dbPassword}" id="dbPassword_value"/>                           
+                        </li>
+                        
+                        <li>
+                            <c:url var="downloadUrl" value="/dbinstance/downloadconfig">
+                                <c:param name="datasetId" value="${dataset.id}"/>
+                            </c:url>
+                            <spring:message var="accessInfo" code="dbinstance.downloadInstruction" text="?Download Instructions?"/>
+                            <a href="${downloadUrl}" title="${accessInfo}" id="download_dbinfo_link" class="icon icon-storage">
+                                <c:out value="${accessInfo}"/>
+                            </a>
+                        </li>  
+                    </c:otherwise>
+                </c:choose>
+                
+            </ol>
+            <c:if test="${canChangePassword}"> 
+	            <c:url var="changePasswordUrl" value="/dbinstance/change">
+					<c:param name="datasetId" value="${dataset.id}" />
+				</c:url>
+	            <input class="button" type="submit" value="Change Database Password" name="_submit" /> 
+            </c:if>
+            <c:if test="${successfullyChanged}">
+            	<br/> <em>Password Successfully Changed</em>
+            </c:if>
+            
+            <c:if test="${showDelete}">                
+                <div class="ajax_links corner_right">
+                    <c:url var="deleteUrl" value="/dbinstance/delete">
+                        <c:param name="datasetId" value="${dataset.id}"/>
+                    </c:url>
+                    <spring:message var="deleteInstanceMsg" code="dbinstance.delete" text="?Delete Instance?"/>
+                    <a href="${deleteUrl}" title="${deleteInstanceMsg}" class="icon icon-stop">
+                        <c:out value="${deleteInstanceMsg}"/>
+                    </a>
+                </div>                                                
+            </c:if>
+        </fieldset>
+    	</form:form>
+
+    <script type="text/javascript">
+    
+    	(function()
+    	{
+    	    //Used to notify Action Control to consider action as complete
+			if (Sydma.ActionControl != null)
+		    {			    
+			    Sydma.ActionControl.markComplete = true;
+		    }
+    	})();
+    	
+    </script>
+</div>

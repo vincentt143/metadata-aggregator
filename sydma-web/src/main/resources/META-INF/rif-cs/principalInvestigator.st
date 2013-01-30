@@ -7,7 +7,7 @@
     <originatingSource>$researchGroup.originatingSource$</originatingSource>
 
     <party type="person">
-        <identifier type="local">15 211 513 464</identifier>
+        <identifier type="local">person-$user.id$</identifier>
 
         <name type="primary">
             <namePart type="family">$user.surname$</namePart>

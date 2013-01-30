@@ -6,8 +6,10 @@ package au.org.intersect.sydma.webapp.domain;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
 import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.domain.Vocabulary;
 import java.lang.Boolean;
 import java.lang.String;
+import java.util.List;
 import java.util.Set;
 
 privileged aspect ResearchGroup_Roo_JavaBean {
@@ -94,6 +96,14 @@ privileged aspect ResearchGroup_Roo_JavaBean {
     
     public void ResearchGroup.setResearchProjects(Set<ResearchProject> researchProjects) {
         this.researchProjects = researchProjects;
+    }
+    
+    public List<Vocabulary> ResearchGroup.getKeywords() {
+        return this.keywords;
+    }
+    
+    public void ResearchGroup.setKeywords(List<Vocabulary> keywords) {
+        this.keywords = keywords;
     }
     
 }

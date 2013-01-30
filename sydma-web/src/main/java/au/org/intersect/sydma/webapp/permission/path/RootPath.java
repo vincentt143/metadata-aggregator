@@ -40,4 +40,10 @@ public class RootPath extends AbstractPath
         return Path.SEPARATOR;
     }
 
+    @Override
+    public String getDisplayName()
+    {
+        return Path.SEPARATOR;
+    }
+
 }

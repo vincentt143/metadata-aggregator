@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+        <spring:message code="dbinstance.query.delete.title" text="?Delete Query?" htmlEscape="true"/>
+    </h1>
+	<c:url var="formAction" value="/dbinstance/deleteQuery" />
+    <form class="formbuilder" modelAttribute="researchDatabaseQuery" action="${formAction}" autocomplete="off" method="post" >
+        <input type="hidden" name="queryId" value="${researchDatabaseQuery.id}"/>
+        <input type="hidden" name="datasetId" value="${datasetId}"/>
+        <fieldset>
+            <legend>
+                <spring:message code="dbinstance.query.delete.title" text="?Delete?" />
+            </legend>
+            <ol>
+            	<li>
+            		<span class="field_label">
+                    	<spring:message code="dbinstance.schema.sql.query" text="?dbinstance.schema.sql.query?"/>:
+                    </span>
+                    <span id="query_name">
+                    	<c:out value="${researchDatabaseQuery.name}"/>
+                    </span>
+            	</li>
+            	<li>
+            		<span class="field_label">
+                    	<spring:message code="dbinstance.schema.sql.description" text="?dbinstance.schema.sql.description?" />:
+                    </span>
+                    <span id="query_description">
+                    	<c:out value="${researchDatabaseQuery.description}"/>
+                    </span>
+            	</li>
+            	<li>
+            		<span class="field_label">
+                		<spring:message code="dbinstance.schema.sql.query" text="?dbinstance.schema.sql.query?" />:
+                    </span>
+                    <span id="query">
+                    	<c:out value="${researchDatabaseQuery.query}"/>
+                    </span>
+            	</li>
+				<li>
+				<i class="icon icon-warn">
+					<spring:message code="dbinstance.delete.message" text="?dbinstance.delete.message?"/>
+				</i>
+				</li>
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input id="cancel_button" class="clear-button button" type="submit" name="_submit" value="Cancel"/> 
+            <input id="delete_button" class="submit-button button" type="submit" name="_submit" value="Delete"/>
+        </div>
+    </form>
+    
+</div>

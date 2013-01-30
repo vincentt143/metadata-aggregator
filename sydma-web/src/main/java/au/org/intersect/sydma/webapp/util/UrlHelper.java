@@ -38,7 +38,6 @@ public class UrlHelper
     public static String getCurrentBaseUrl(HttpServletRequest request)
     {
         String[] localProtocol = request.getProtocol().split("/");
-        return localProtocol[0].toLowerCase() + "://" + request.getServerName() + ":" + request.getLocalPort()
-                + request.getContextPath();
+        return localProtocol[0].toLowerCase() + "://" + request.getServerName() + request.getContextPath();
     }
 }

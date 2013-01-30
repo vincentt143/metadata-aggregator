@@ -55,7 +55,7 @@ public class RifCsWriterImpl implements RifCsWriter
     private static final String SYDNEY_UNI_KEY_ATTRIBUTE_NAME = "sydneyUniKey";
     private static final Logger LOG = LoggerFactory.getLogger(RifCsWriterImpl.class);
     private static final String DOT_XML = ".xml";
-    private static final String SYDNEY_UNI_KEY = "15211513464"; // currently is the ABN, to be confirmed
+    private static final String SYDNEY_UNI_KEY = "sydney.edu.au/stc/PTY/0006";
 
     private static final String HAS_SUBJECT_CODE_2 = "hasSubjectCode2";
     private static final String HAS_SUBJECT_CODE_3 = "hasSubjectCode3";

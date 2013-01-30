@@ -6,6 +6,9 @@ Sydma.actionMenu = Sydma.actionMenu ? Sydma.actionMenu : {};
 
 (function()
 {    
+
+    var debug = Sydma.getDebug("ActionMenu");
+    var info = Sydma.getInfo("ActionMenu");
     
     var actionBarTempLinkClass = "tempLink";
     var actionBarTempLinkSelector = "." + actionBarTempLinkClass;
@@ -32,7 +35,7 @@ Sydma.actionMenu = Sydma.actionMenu ? Sydma.actionMenu : {};
         var addLinks = function(actionVars)
         {            
             clearLinks();
-            Sydma.log("DEBUG::ActionMenu[" + containerSelector + "]::addLinks::actionVars", actionVars);
+            //debug("ActionMenu[" + containerSelector + "]::addLinks::actionVars", actionVars);
             for (var i in actionVars)
             {
                 var actionVar = actionVars[i];
@@ -90,7 +93,7 @@ Sydma.actionMenu = Sydma.actionMenu ? Sydma.actionMenu : {};
         
         var clean = function()
         {
-            Sydma.log("DEBUG::ActionMenu::clean");
+            debug("ActionMenu::clean");
             clearLinks();
             hide();
         };

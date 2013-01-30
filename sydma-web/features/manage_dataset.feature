@@ -1,4 +1,4 @@
-@passing
+@passing @dc2d @dc2f
 Feature: Test managing of dataset
 
 Background: 
@@ -8,15 +8,8 @@ Background:
 	And the project "Research Project Test" has a dataset "Dataset 1"
 	And the research group "Research Group Test" has directory "Group One Dir"
 	And the research dataset "Dataset 1" has a directory
-	And user "researcher" has full access to group "Research Group Test"
-	And I log in as "researcher"
-	
-Scenario: View dataset link present for dataset
-	Given I am on the browse rds page
-	And I select option "Research Group Test" from select "Research_Groups"
-	And I select option "Research Project Test" from select "Projects"
-	And I select option "Dataset 1" from select "Datasets"
-	Then I should see "View Dataset"
+	And user "ictintersect2" has full access to group "Research Group Test"
+	And I log in as "ictintersect2"
 	
 Scenario: Clicking view browse dataset should go to view dataset page
 	Given I am on the browse rds page
@@ -41,8 +34,10 @@ Scenario: Create Directory
 	Then I select directory "directoryA"	
 	Then I follow "Create Directory"
 	When I fill in "directoryName" with "Created Directory"
+	Then I wait for lightbox to fully open
 	Then I press "confirm_submit"	
-	Then I should be able to see directory "Created Directory"		
+	Then I should be able to see directory "Created Directory" 
+	And I should have directory "Created Directory" under dataset "Dataset 1" and path "/directoryA"		
 	
 Scenario: Delete File
 	Given the dataset "Dataset 1" has directory "directoryA"
@@ -51,5 +46,7 @@ Scenario: Delete File
 	When I open directory "directoryA"
 	Then I select file "testFile.txt"	
 	Then I follow "Delete File"	
+	Then I wait for lightbox to fully open
 	Then I press "confirm_submit"	
-	Then I should not be able to see file "testFile.txt"			
+	Then I should not be able to see file "testFile.txt"	
+	And I should not have file "testFile.txt" under dataset "Dataset 1" and path "/directoryA"		

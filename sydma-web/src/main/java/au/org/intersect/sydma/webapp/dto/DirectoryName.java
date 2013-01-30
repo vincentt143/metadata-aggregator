@@ -41,8 +41,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class DirectoryName
 {
-    @NotNull(message = "Directory Name is required")
-    @NotEmpty(message = "Directory Name is required")
+    @NotNull
+    @NotEmpty
     @Pattern(regexp = "[\\s\\w-]*", message = "Invalid character in path")
     private String directoryName;
     

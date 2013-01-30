@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" 
+	 xmlns:c="http://java.sun.com/jsp/jstl/core"
+	 xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	 xmlns:spring="http://www.springframework.org/tags" 
+	 xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+  <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+  <jsp:output omit-xml-declaration="yes"/>
+  <spring:message code="label_search_index" htmlEscape="false" var="title"/>
+
+    <spring:message code="application_name" htmlEscape="false" var="app_name"/>
+
+	<div id="w4">
+		
+		<c:if test="${empty error}">
+		<h1 class="first">Search results for "${userEntry}"</h1>
+		</c:if>
+		
+		<form id="simple-search" class="formbuilder" name="simpleSearch" method="get" action="">
+		
+			<fieldset>
+				<legend>Search for...</legend>
+				<ol>
+					<li>
+					<input type="text" id="search-query" class="field" size="50" title="Enter Search Terms" name="query" value="${fn:escapeXml(userEntry)}"/>
+					<input type="hidden" name="page" value="1"/>
+					<input type="submit" id="search-button" class="button submit-button" value="Search"/>
+					</li>
+				</ol>	
+			</fieldset>
+		</form> 
+		<c:if test="${empty error}">   
+		<p class="search-stats">Results <b>${startResult}</b> - <b>${endResult}</b> of <b>${totalNumOfResults}</b></p>
+		</c:if>
+		
+		<div>
+			<c:choose>
+			<c:when test="${not empty error}"><h3> ${error} </h3></c:when>
+			<c:otherwise>
+			<ul class="search-results">
+				<c:forEach items="${results}" var="result">
+					<li>
+						<c:url var="linkUrl" value="${result.url}"/>
+						<h2 class="search-title"> 
+							<c:choose>
+							<c:when test="${not empty linkUrl}"> 
+								<a href="${linkUrl}">${result.summary}</a> 
+							</c:when>
+							<c:otherwise> 
+								${result.summary}
+								<spring:url value="/resources/images/padlock.gif" var="padlock_icon"><!--stop bug--></spring:url> 
+								<img src="${padlock_icon}" alt="NO ACCESS" title="You Do Not Have Access To This Result." id="padlock_icon"> <!-- stop bug --></img> </c:otherwise>
+							</c:choose>
+						</h2>
+						<p class="summary"> ${result.description} </p> 
+						<em class="subtitle">${result.subjectCode}</em> <c:if test="${not empty result.subjectCode2}"><em class="subtitle">${result.subjectCode2}</em> </c:if> <c:if test="${not empty result.subjectCode3}"><em class="subtitle">${result.subjectCode3}</em> </c:if>
+						<span class="advertised-status">
+						<c:if test="${not empty result.advertisedStatus}"> - ${result.advertisedStatus} </c:if>
+						</span>
+					</li>
+				</c:forEach>
+			</ul>
+			</c:otherwise>
+			</c:choose>
+		</div>
+		<c:if test="${empty error}">
+		<div class="solrPagination">
+		<util:solrPagination maxPages="${maxPages}"/>
+		</div>
+		</c:if>
+    </div>
+</div>

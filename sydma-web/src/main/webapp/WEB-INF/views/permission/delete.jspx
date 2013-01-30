@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+    	<spring:message code="permissions.delete.permission.title" text="?Delete Permissions?" htmlEscape="true" />
+    </h1>
+	<c:url var="formAction" value="/permission/delete" />
+    <form class="formbuilder" modelAttribute="permissionEntry" action="${formAction}" autocomplete="off" method="post" >
+        <fieldset>
+        <input name="id" type="hidden" value="${id}" />
+       	<input name="group" type="hidden" value="${group}"/>
+            <legend>
+            	<spring:message code="permissions.delete.permission.title" text="?Delete Permissions?" htmlEscape="true" />
+            </legend>
+            <ol>
+            	<li>
+					<i class="icon icon-warn">
+						<spring:message code="permissions.delete.permission.message" text="?permissions.delete.permission.message?" htmlEscape="true" />
+					</i>
+				</li>
+            	<li>
+            		<span class="field_label">
+            			<spring:message code="permissions.delete.fullname.label" text="?permissions.delete.fullname.label?" htmlEscape="true" />:
+                    </span>
+                    <span id="full_name">
+                    	<c:out value="${permissionEntry.user.givenname} ${permissionEntry.user.surname}"/>
+                    </span>
+            	</li>
+            	<li>
+            		<span class="field_label">
+            			<spring:message code="permissions.delete.user.type.label" text="?permissions.delete.user.type.label?" htmlEscape="true" />:
+                    </span>
+                    <span id="user_type">
+                    	<c:out value="${permissionEntry.user.userType}"/>
+                    </span>
+            	</li>
+            	<li>
+            		<span class="field_label">
+						<spring:message code="permissions.delete.path.label" text="?permissions.delete.path.label?" htmlEscape="true" />:
+                    </span>
+                    <span id="path">
+                    	<c:out value="${displayPath}"/>
+                    </span>
+            	</li>
+            	<li>
+            		<span class="field_label">
+            			<spring:message code="permissions.delete.access.level.label" text="?permissions.delete.access.level.label?" htmlEscape="true"/>:
+                    </span>
+                    <span id="access_level">
+                    	<c:out value="${permissionEntry.accessLevel.name}"/>
+                    </span>
+            	</li>		
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input id="cancel_button" class="clear-button button" type="submit" name="_submit" value="Cancel"/> 
+            <input id="delete_button" class="submit-button button" type="submit" name="_submit" value="Delete"/>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,27 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+    <jsp:output omit-xml-declaration="yes" />
+    <table>   
+    <tr>
+        <td>
+            <a class="edit_publication" href="" onclick="return false;">  <spring:message code="publication.action.edit" text="?Edit?"/> </a>
+            |
+            <a class="remove_publication" href="" onclick="return false;">  <spring:message code="publication.action.delete" text="?Delete?"/> </a>            
+                                    
+            <input type="hidden" name="publications[0].id" value="${publication.id }"/>
+            <input type="hidden" name="publications[0].version" value="${publication.version}"/>
+            
+        </td>
+        <td>
+            <c:out value="${publication.citations}" escapeXml="false"/>
+            <input type="hidden" name="publications[0].citations" value="${publication.citations}"/>
+        </td>
+        <td>
+            <a href="${publication.url}" title="${publication.url}" target="_blank"><c:out value="${publication.url}"/></a>            
+            
+            <input type="hidden" name="publications[0].url" value="${publication.url}"/>
+        </td>
+    </tr>
+    </table>
+</jsp:root>

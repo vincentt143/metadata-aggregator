@@ -27,6 +27,8 @@
 package au.org.intersect.sydma.webapp.permission.path;
 
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
+import au.org.intersect.sydma.webapp.domain.ResearchGroup;
+import au.org.intersect.sydma.webapp.domain.ResearchProject;
 
 /**
  * Path to a dataset
@@ -39,7 +41,7 @@ public class ResearchDatasetPath extends AbstractPath
     private Long projectId;
     private Long groupId;
 
-    ResearchDatasetPath(final ResearchDataset dataset)
+    public ResearchDatasetPath(final ResearchDataset dataset)
     {
         datasetId = dataset.getId();
         if (datasetId == null)
@@ -51,7 +53,7 @@ public class ResearchDatasetPath extends AbstractPath
         groupId = dataset.getResearchProject().getResearchGroup().getId();
     }
 
-    ResearchDatasetPath(Long groupId, Long projectId, Long datasetId)
+    public ResearchDatasetPath(Long groupId, Long projectId, Long datasetId)
     {
         this.groupId = groupId;
         this.projectId = projectId;
@@ -81,12 +83,21 @@ public class ResearchDatasetPath extends AbstractPath
     {
         return datasetId;
     }
-    
+
     @Override
     public boolean isDatasetPath()
     {
         return true;
     }
 
+    @Override
+    public String getDisplayName()
+    {
+        ResearchGroup group = ResearchGroup.findResearchGroup(groupId);
+        ResearchProject project = ResearchProject.findResearchProject(projectId);
+        ResearchDataset dataset = ResearchDataset.findResearchDataset(datasetId);
+        return Path.SEPARATOR + group.getName() + Path.SEPARATOR + project.getName() + Path.SEPARATOR
+                + dataset.getName() + Path.SEPARATOR;
+    }
 
 }

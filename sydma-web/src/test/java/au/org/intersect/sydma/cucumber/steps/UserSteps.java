@@ -31,6 +31,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
 import cuke4duke.annotation.I18n.EN.Given;
@@ -49,32 +50,30 @@ public class UserSteps
     private static final String MOCK_GIVEN = "given";
     private static final String MOCK_INSTITUTION = "intersect";
 
-    private static final String ADMINISTRATOR = "administrator";
-    private static final String RESEARCHER = "researcher";
-    private static final String ICT_SUPPORT = "ict_support";
-    private static final String RESEARCH_MANAGER = "research_manager";
-
     @Autowired
     private WebDriver browser;
+
+    @Value("#{cucumber[cucumber_tomcat_port]}")
+    private Integer tomcatPort;
 
     @Given("^I have the usual users and roles$")
     public void iHaveTheUsualUsersAndRoles()
     {
-        createRole(RoleNames.ROLE_ADMINISTRATOR, "Administrator", ADMINISTRATOR);
-        createRole(RoleNames.ROLE_ICT_SUPPORT, "ICT Support", ICT_SUPPORT);
-        createRole(RoleNames.ROLE_RESEARCHER, "Researcher", RESEARCHER);
-        createRole(RoleNames.ROLE_RESEARCH_DATA_MANAGER, "Research Manager", RESEARCH_MANAGER);
-        createRole(RoleNames.ACCEPTED_TC, "Accepted Terms and Conditions", null);
-        createRole(RoleNames.ACTIVE, "Active", null);
-        addRole(RoleNames.ROLE_RESEARCHER, RESEARCH_MANAGER);
-        addRole(RoleNames.ACCEPTED_TC, ADMINISTRATOR);
-        addRole(RoleNames.ACCEPTED_TC, ICT_SUPPORT);
-        addRole(RoleNames.ACCEPTED_TC, RESEARCHER);
-        addRole(RoleNames.ACCEPTED_TC, RESEARCH_MANAGER);
-        addRole(RoleNames.ACTIVE, ADMINISTRATOR);
-        addRole(RoleNames.ACTIVE, ICT_SUPPORT);
-        addRole(RoleNames.ACTIVE, RESEARCHER);
-        addRole(RoleNames.ACTIVE, RESEARCH_MANAGER);
+        createRole(RoleNames.ROLE_ADMINISTRATOR, "Administrator");
+        createRole(RoleNames.ROLE_ICT_SUPPORT, "ICT Support");
+        createRole(RoleNames.ROLE_RESEARCHER, "Researcher");
+        createRole(RoleNames.ROLE_RESEARCH_DATA_MANAGER, "Research Manager");
+        createRole(RoleNames.ACCEPTED_TC, "Accepted Terms and Conditions");
+        createRole(RoleNames.ACTIVE, "Active");
+        unikeySetup();
+    }
+    
+    private void unikeySetup()
+    {
+        setupUnikeyUserWithRole("ictintersect2", RoleNames.ROLE_RESEARCHER);
+        setupUnikeyUserWithRole("ictintersect3", RoleNames.ROLE_ICT_SUPPORT);
+        setupUnikeyUserWithRole("ictintersect4", RoleNames.ROLE_ADMINISTRATOR);
+        setupUnikeyUserWithRole("ictintersect5", RoleNames.ROLE_RESEARCH_DATA_MANAGER);
     }
 
     private void addRole(RoleNames roleName, String username)
@@ -85,34 +84,35 @@ public class UserSteps
         user.merge();
     }
 
-    private void createRole(RoleNames roleName, String displayName, String username)
+    private void createRole(RoleNames roleName, String displayName)
     {
         String roleNameStr = roleName.toString();
-
         Role role = new Role();
         role.setName(roleNameStr);
         role.setDisplayName(displayName);
         role.persist();
-
-        if (username != null)
-        {
-            User user = new User();
-            user.setEnabled(true);
-            user.setUserType(UserType.INTERNAL);
-            user.setUsername(username);
-            Md5PasswordEncoder encoder = new Md5PasswordEncoder();
-            user.setPassword(encoder.encodePassword(username, null));
-            user.setGivenname(MOCK_GIVEN);
-            user.setSurname(MOCK_SURNAME);
-            user.setEmail(MOCK_EMAIL);
-            user.setInstitution(MOCK_INSTITUTION);
-            user.getRoles().add(role);
-            user.merge();
-        }
     }
 
-    @Given("^I have a UniKey user \"([^\"]*)\"$")
-    public void unikeyUser(String username)
+//    @Given("^I have a UniKey user \"([^\"]*)\"$")
+//    public void unikeyUser(String username)
+//    {
+//        User user = new User();
+//        user.setEnabled(true);
+//        user.setUsername(username);
+//        user.setUserType(UserType.UNIKEY);
+//        user.setGivenname(MOCK_GIVEN);
+//        user.setSurname(MOCK_SURNAME);
+//        user.setEmail(MOCK_EMAIL);
+//        user.setInstitution(MOCK_INSTITUTION);
+//        Md5PasswordEncoder encoder = new Md5PasswordEncoder();
+//        user.setPassword(encoder.encodePassword(username, null));
+//        user.persist();
+//        addRole(RoleNames.ROLE_RESEARCHER, username);
+//        addRole(RoleNames.ACCEPTED_TC, username);
+//        addRole(RoleNames.ACTIVE, username);
+//    }
+
+    private void setupUnikeyUserWithRole(String username, RoleNames roleName)
     {
         User user = new User();
         user.setEnabled(true);
@@ -122,41 +122,22 @@ public class UserSteps
         user.setSurname(MOCK_SURNAME);
         user.setEmail(MOCK_EMAIL);
         user.setInstitution(MOCK_INSTITUTION);
-        Md5PasswordEncoder encoder = new Md5PasswordEncoder();
-        user.setPassword(encoder.encodePassword(username, null));
         user.persist();
-        Role role = Role.findRolesByNameEquals(RoleNames.ROLE_RESEARCHER.toString()).getSingleResult();
-        user.getRoles().add(role);
-        user.merge();
+        
+        addRole(roleName, username);
+        addRole(RoleNames.ACCEPTED_TC, username);
+        addRole(RoleNames.ACTIVE, username);        
     }
 
-    @Given("^I have an internal user \"([^\"]*)\"$")
-    public void externalUser(String username)
+    @Given("I log in as \"([^\"]*)\"$")
+    public void iLogInAs(String user) throws InterruptedException
     {
-        User user = new User();
-        user.setEnabled(true);
-        user.setUsername(username);
-        user.setUserType(UserType.INTERNAL);
-        user.setGivenname(MOCK_GIVEN);
-        user.setSurname(MOCK_SURNAME);
-        user.setEmail(MOCK_EMAIL);
-        user.setInstitution(MOCK_INSTITUTION);
-        Md5PasswordEncoder encoder = new Md5PasswordEncoder();
-        user.setPassword(encoder.encodePassword(username, null));
-        user.persist();
-        Role role = Role.findRolesByNameEquals(RoleNames.ROLE_RESEARCHER.toString()).getSingleResult();
-        user.getRoles().add(role);
-        user.merge();
-    }
-
-    @Given("^I log in as \"([^\"]*)\"$")
-    public void iLogInAs(String username) throws InterruptedException
-    {
-        browser.get("http://localhost:7675/sydma-web/login");
-        WebElement userNameField = browser.findElement(By.id("j_username"));
-        WebElement passwordField = browser.findElement(By.id("j_password"));
-        userNameField.sendKeys(username);
-        passwordField.sendKeys(username);
-        browser.findElement(By.xpath("//input[@id='proceed']")).click();
+        String wasm = "http://ca1-dc2d-test.intersect.org.au:8888/login.cgi?appID=mda-intersect&appRealm=usyd&destURL=http://localhost:" + tomcatPort + "/sydma-web";
+        browser.get(wasm);
+        WebElement username = browser.findElement(By.name("credential_0"));
+        WebElement password = browser.findElement(By.name("credential_1"));
+        username.sendKeys(user);
+        password.sendKeys("password");
+        browser.findElement(By.xpath("//input[@name='Submit']")).click();
     }
 }

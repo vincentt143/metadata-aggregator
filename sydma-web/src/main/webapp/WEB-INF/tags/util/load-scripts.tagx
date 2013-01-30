@@ -15,6 +15,7 @@
     <spring:url value="/resources/styles/screen-local.css" var="screen_local" />
     <spring:url value="/resources/styles/screen.css" var="screen" />
     <spring:url value="/resources/styles/standard.css" var="standard" />
+    <spring:url value="/resources/styles/token-input.css" var="jquery_tokeninput" />
     
     <spring:url value="/resources/scripts/fancybox/jquery.fancybox-1.3.4.css" var="fancybox_css" />   
     
@@ -24,4 +25,5 @@
     <link rel="stylesheet" type="text/css" media="print" href="${print}" />
     <link rel="stylesheet" type="text/css" media="screen" href="${standard}" />
     <link rel="stylesheet" type="text/css" media="screen" href="${fancybox_css}" />
+    <link rel="stylesheet" type="text/css" media="screen" href="${jquery_tokeninput}" />
 </jsp:root>

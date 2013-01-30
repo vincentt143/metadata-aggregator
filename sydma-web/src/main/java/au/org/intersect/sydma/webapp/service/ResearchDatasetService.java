@@ -32,15 +32,15 @@ import au.org.intersect.sydma.webapp.exception.NoneUniqueNameException;
 
 /**
  * 
- *
+ * 
  * @version $Rev: 29 $
  */
 public interface ResearchDatasetService
 {
 
-    ResearchDataset createDataset(Long projectId, ResearchDataset researchDataset) 
+    ResearchDataset createDataset(Long projectId, ResearchDataset researchDataset, String keywords)
         throws NoneUniqueNameException;
 
-    ResearchDataset editDataset(ResearchDataset researchDataset) throws NoneUniqueNameException;
+    ResearchDataset editDataset(ResearchDataset researchDataset, String keywords) throws NoneUniqueNameException;
 
 }

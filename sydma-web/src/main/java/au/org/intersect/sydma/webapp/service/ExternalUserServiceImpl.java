@@ -58,6 +58,7 @@ public class ExternalUserServiceImpl implements ExternalUserService
         String password = generatePassword();
         user.setUsername(user.getEmail());
         user.setEnabled(true);
+        user.setHasRstudioAccount(false);
         user.setUserType(UserType.INTERNAL);
         Role researcher = Role.findRolesByNameEquals("ROLE_RESEARCHER").getSingleResult();
         user.getRoles().add(researcher);

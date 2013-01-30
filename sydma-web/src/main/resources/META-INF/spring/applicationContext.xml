@@ -1,38 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop 
-	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd         
-	http://www.springframework.org/schema/beans 
-	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd         
-	http://www.springframework.org/schema/context 
-	http://www.springframework.org/schema/context/spring-context-3.0.xsd         
-	http://www.springframework.org/schema/jee 
-	http://www.springframework.org/schema/jee/spring-jee-3.0.xsd         
-	http://www.springframework.org/schema/tx 
-	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-	http://www.springframework.org/schema/util
-	http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd           http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd  http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd     ">
 
-	<!-- This will automatically locate any and all property files you have 
+    <!-- *** ENVIRONMENT==${env} *** -->
+
+    <!-- This will automatically locate any and all property files you have 
 		within your classpath, provided they fall under the META-INF/spring directory. 
 		The located property files are parsed and their values can then be used within 
 		application context files in the form of ${propertyKey}. -->
-	<context:property-placeholder location="classpath*:META-INF/spring/*.properties"
-		ignore-unresolvable="true" />
-	<util:properties id="wasm"
-		location="classpath:META-INF/spring/wasm.properties"></util:properties>
-	<util:properties id="dmsProperties"
-		location="file://${dms.config.home}/dms.properties" />
-	<util:properties id="workerProperties"
-		location="file://${dms.config.home}/worker.properties" />
-	<util:properties id="sydmaFileProperties"
-		location="classpath:META-INF/spring/fileServer.properties" />
-    <util:properties id="dbSchemaProperties"
-        location="classpath:META-INF/spring/dbSchema.properties"></util:properties>
-	<!-- Turn on AspectJ @Configurable support. As a result, any time you instantiate 
+    <context:property-placeholder ignore-unresolvable="true" location="file://${dms.config.home}/*.properties"/>
+    <util:properties id="applicationTypeProperties" location="file://${dms.config.home}/applicationType.properties"/>
+    <util:properties id="database" location="file://${dms.config.home}/database.properties"/>
+    <util:properties id="email" location="file://${dms.config.home}/email.properties"/>
+    <util:properties id="rifcs" location="file://${dms.config.home}/rifcs.properties"/>
+    <util:properties id="wasm" location="file://${dms.config.home}/wasm.properties"/>
+    <util:properties id="dmsProperties" location="file://${dms.config.home}/dms.properties"/>
+    <util:properties id="workerProperties" location="file://${dms.config.home}/worker.properties"/>
+    <util:properties id="tunnelProperties" location="file://${dms.config.home}/tunnel.properties"/>
+    <util:properties id="sydmaFileProperties" location="file://${dms.config.home}/fileServer.properties"/>
+
+    <!-- ${filter.context.start}
+    <util:properties id="dbInstanceProperties" location="file://${dms.config.home}/dbInstance.properties"/>
+    <util:properties id="rstudio" location="file://${dms.config.home}/rstudio.properties"/>
+    ${filter.context.end} -->
+
+    <!-- Turn on AspectJ @Configurable support. As a result, any time you instantiate 
 		an object, Spring will attempt to perform dependency injection on that object. 
 		This occurs for instantiation via the "new" keyword, as well as via reflection. 
 		This is possible because AspectJ is used to "weave" Roo-based applications 
@@ -42,8 +33,8 @@
 		presented to a specific Spring dependency injection method). Roo applications 
 		use this useful feature in a number of areas, such as @PersistenceContext 
 		injection into entities. -->
-	<context:spring-configured />
-	<!-- This declaration will cause Spring to locate every @Component, @Repository 
+    <context:spring-configured/>
+    <!-- This declaration will cause Spring to locate every @Component, @Repository 
 		and @Service in your application. In practical terms this allows you to write 
 		a POJO and then simply annotate the new POJO as an @Service and Spring will 
 		automatically detect, instantiate and dependency inject your service at startup 
@@ -59,111 +50,174 @@
 		Edition annotations in your classes without needing to do any special configuration. 
 		The most commonly used annotation is @Autowired, which instructs Spring to 
 		dependency inject an object into your class. -->
-	<context:component-scan base-package="au.org.intersect">
-		<context:exclude-filter expression=".*_Roo_.*"
-			type="regex" />
-		<context:exclude-filter expression="org.springframework.stereotype.Controller"
-			type="annotation" />
-	</context:component-scan>
+    <context:component-scan base-package="au.org.intersect.sydma">
+        <context:exclude-filter expression=".*_Roo_.*" type="regex"/>
+        <context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
+    </context:component-scan>
+    <context:component-scan base-package="au.org.intersect.dms">
+        <context:include-filter expression="au.org.intersect.dms.webtunnel.TunnelController" type="assignable"/>
+    </context:component-scan>
     
-     
-    <bean class="org.apache.commons.dbcp.BasicDataSource"
-        destroy-method="close" id="schemaDataSource">
-        <property name="driverClassName" value="${database.driverClassName}" />
-        <property name="url" value="${database.url}" />
-        <property name="username" value="${database.username}" />
-        <property name="password" value="${database.password}" />
-        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
-        <property name="testOnBorrow" value="true" />
-        <property name="initialSize" value="${database.initialSize}" /> 
+    <!-- ${filter.context.start}
+    <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" id="dbQueryDataSource">
+        <property name="driverClassName" value="${dbinstance.database.driverClassName}"/>
+        <property name="url" value="${dbinstance.database.url}"/>
+        <property name="username" value="${dbinstance.database.username}"/>
+        <property name="password" value="${database.password}"/>
+        <property name="validationQuery" value="SELECT 1 FROM DUAL"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="initialSize" value="${dbinstance.database.initialSize}"/>
     </bean>
-     
+
+    <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" id="dbInstanceDataSource">
+        <property name="driverClassName" value="${dbinstance.database.driverClassName}"/>
+        <property name="url" value="${dbinstance.database.url}"/>
+        <property name="username" value="${dbinstance.database.username}"/>
+        <property name="password" value="${database.password}"/>
+        <property name="validationQuery" value="SELECT 1 FROM DUAL"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="initialSize" value="${dbinstance.database.initialSize}"/>
+    </bean>
+    ${filter.context.end} -->
+
+    <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" id="dataSource">
+        <property name="driverClassName" value="${database.driverClassName}"/>
+        <property name="url" value="${database.url}"/>
+        <property name="username" value="${database.username}"/>
+        <property name="password" value="${database.password}"/>
+        <property name="validationQuery" value="SELECT 1 FROM DUAL"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="initialSize" value="${database.initialSize}"/>
+    </bean>
+    <bean class="org.springframework.orm.jpa.JpaTransactionManager" id="transactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <qualifier value="sydmaPU"/>
+    </bean>
+    <tx:annotation-driven mode="aspectj" transaction-manager="transactionManager"/>
+    <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="persistenceXmlLocation" value="classpath*:META-INF/persistence.xml"/>
+        <property name="persistenceUnitName" value="sydmaPU"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+                <property name="showSql" value="false"/>
+                <property name="generateDdl" value="true"/>
+            </bean>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+                <prop key="hibernate.hbm2ddl.auto">${database.hibernate.hbm2ddl.auto}</prop>
+                <prop key="hibernate.connection.charSet">UTF-8</prop>
+            </props>
+        </property>
+    </bean>
+    <bean class="org.springframework.mail.javamail.JavaMailSenderImpl" id="mailSender">
+        <property name="host" value="${email.host}"/>
+        <property name="protocol" value="${email.protocol}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.util.MailHelperImpl"/>
+    <bean class="au.org.intersect.sydma.webapp.service.NewMailServiceImpl" id="newRdsRequestMailService">
+        <property name="mailFrom" value="${newRdsRequest.email.mailFrom}"/>
+        <property name="mailTo" value="${newRdsRequest.email.mailTo}"/>
+        <property name="subject" value="${newRdsRequest.email.subject}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.service.DatasetReadyToPublishMailServiceImpl" id="datasetReadyToPublishMailService">
+        <property name="mailFrom" value="${datasetReadyToPublish.email.mailFrom}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.service.ExternalUserMailServiceImpl" id="newExternalUserMailService">
+        <property name="mailFrom" value="${newExternalUser.email.mailFrom}"/>
+        <property name="createExternalUserSubject" value="${newExternalUser.email.subject}"/>
+        <property name="resetPasswordSubject" value="${resetPassword.email.subject}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.util.RifCsWriterImpl">
+        <property name="destinationDirectory" value="${sydma.rifCsDirectory}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.security.SecurityContextFacadeImpl" id="securityContextFacade"/>
+    <bean class="au.org.intersect.sydma.webapp.service.ApplicationTypeServiceImpl" id="applicationType">
+        <property name="applicationType" value="${application.type}"/>
+    </bean>
+
+    <!-- ${filter.context.start}
+    <bean class="au.org.intersect.sydma.webapp.service.RstudioSshServiceImpl" id="rstudioService">
+        <property name="rstudioHost" value="${rstudio_host}"/>
+        <property name="rstudioKey" value="${rstudio_key}"/>
+        <property name="rstudioRemoteUser" value="${rstudio_remote_user}"/>
+        <property name="rstudioCreateUserScript" value="${rstudio_create_user_script}" />
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.util.DBConnectionHelper" id="dbConnectionHelper">
+        <property name="driverClass" value="${dbinstance.database.driverClassName}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.util.DBHostnameHelper" id="dbHostnameHelper"/>
+    <bean class="au.org.intersect.sydma.webapp.util.DBPasswordHelper" id="dbPasswordHelper"/>
+    <bean class="au.org.intersect.sydma.webapp.validator.RstudioPasswordValidator" id="passwordValidator"/>
+    <bean class="au.org.intersect.sydma.webapp.service.ResearchDatasetDBServiceImpl" id="researchDatasetDBService" />
+    ${filter.context.end} -->
+
+    <bean class="au.org.intersect.sydma.webapp.util.CSVHelper" id="csvHelper"/>
+    <bean class="au.org.intersect.sydma.webapp.validator.TemporalDataValidator" id="temporalDataValidator"/>
+    <bean class="au.org.intersect.sydma.webapp.util.ModelAndViewRedirectHelper" id="modelAndViewRedirectHelper"/>
+    <bean class="au.org.intersect.sydma.webapp.service.PermissionServiceImpl" id="permissionServiceImpl"/>
+
+    <!-- ${filter.context.start}
+    <bean class="au.org.intersect.sydma.webapp.util.DBBackupHelperImpl" id="dbBackupHelper">
+        <property name="username" value="${database.username}"/>
+        <property name="password" value="${database.password}"/>
+        <property name="uploadRoot" value="${backup.path}"/>
+        <property name="mysqlDumpPath" value="${mysqldump.path}"/>
+    </bean>
+    ${filter.context.end} -->
+
+    <bean class="au.org.intersect.sydma.webapp.util.TokenInputHelperImpl" id="tokenInputHelper"/>
+    <bean class="au.org.intersect.dms.encrypt.impl.PublicEncryptAgent" id="publicAgent">
+        <constructor-arg value="${dms.webapp.key.filename}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.util.MailTemplateLoaderImpl" id="mailTemplateLoader">
+        <constructor-arg name="templateDir" value="${email.templateDir}"/>
+    </bean>
+    <bean class="au.org.intersect.sydma.webapp.service.WorkerListenersAttacher" id="workerListeners" init-method="init">
+        <property name="listeners">
+            <list>
+                <ref bean="fileAnnotationListener"/>
+            </list>
+        </property>
+        <property name="worker" ref="dmsWorkerNode"/>
+    </bean>
     
-	<bean class="org.apache.commons.dbcp.BasicDataSource"
-		destroy-method="close" id="dataSource">
-		<property name="driverClassName" value="${database.driverClassName}" />
-		<property name="url" value="${database.url}" />
-		<property name="username" value="${database.username}" />
-		<property name="password" value="${database.password}" />
-		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
-		<property name="testOnBorrow" value="true" />
-		<property name="initialSize" value="${database.initialSize}" />	
-	</bean>
-	<bean class="org.springframework.orm.jpa.JpaTransactionManager"
-		id="transactionManager">
-		<property name="entityManagerFactory" ref="entityManagerFactory" />
-		<qualifier value="sydmaPU" />
-	</bean>
-	<tx:annotation-driven mode="aspectj"
-		transaction-manager="transactionManager" />
-	<bean
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-		id="entityManagerFactory">
-		<property name="dataSource" ref="dataSource" />
-		<property name="persistenceXmlLocation" value="classpath*:META-INF/persistence.xml" />
-		<property name="persistenceUnitName" value="sydmaPU" />
-
-		<property name="jpaVendorAdapter">
-			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-				<property name="databasePlatform" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
-				<property name="showSql" value="false" />
-				<property name="generateDdl" value="true" />
-			</bean>
-		</property>
-		<property name="jpaProperties">
-			<props>
-				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
-				<prop key="hibernate.hbm2ddl.auto">${database.hibernate.hbm2ddl.auto}</prop>
-				<prop key="hibernate.connection.charSet">UTF-8</prop>
-			</props>
-		</property>
-	</bean>
-	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl"
-		id="mailSender">
-		<property name="host" value="${email.host}" />
-		<property name="protocol" value="${email.protocol}" />
-	</bean>
-	<bean class="au.org.intersect.sydma.webapp.util.MailHelperImpl"/>
-
-	<bean class="au.org.intersect.sydma.webapp.service.NewRdsRequestMailServiceImpl"
-		id="newRdsRequestMailService">
-		<property name="mailFrom" value="${newRdsRequest.email.mailFrom}" />
-		<property name="mailTo" value="${newRdsRequest.email.mailTo}" />
-		<property name="subject" value="${newRdsRequest.email.subject}" />
-	</bean>
-
-	<bean class="au.org.intersect.sydma.webapp.service.DatasetReadyToPublishMailServiceImpl"
-		id="datasetReadyToPublishMailService">
-		<property name="mailFrom" value="${datasetReadyToPublish.email.mailFrom}" />
+    <bean id="privAgent" class="au.org.intersect.dms.encrypt.impl.PrivateDecryptAgent">
+		<constructor-arg value="${dms.tunnel.key.filename}" />
 	</bean>
 	
-	<bean class="au.org.intersect.sydma.webapp.service.ExternalUserMailServiceImpl"
-		id="newExternalUserMailService">
-		<property name="mailFrom" value="${newExternalUser.email.mailFrom}" />
-		<property name="mailTo" value="${newExternalUser.email.mailTo}" />
-		<property name="createExternalUserSubject" value="${newExternalUser.email.subject}" />
-		<property name="resetPasswordSubject" value="${resetPassword.email.subject}" />
+	<bean id="privApplet" class="au.org.intersect.dms.encrypt.impl.PrivateDecryptAgent">
+		<constructor-arg value="${dms.tunnel.appletKey.filename}" />
 	</bean>
-
-    <bean class="au.org.intersect.sydma.webapp.util.RifCsWriterImpl">
-      <property name="destinationDirectory" value="${sydma.rifCsDirectory}"/>
-    </bean>
-
-	<bean
-		class="au.org.intersect.sydma.webapp.security.SecurityContextFacadeImpl"
-		id="securityContextFacade" />
-        
-    <bean id="dbConnectionHelper" class="au.org.intersect.sydma.webapp.util.DBConnectionHelper"/>
-            
     
-
-
-	<bean id="publicAgent" class="au.org.intersect.dms.encrypt.impl.PublicEncryptAgent">
-		<constructor-arg value="${dms.webapp.key.filename}" />
-	</bean>
-
-	<!-- worker impl expects this, so we provide empty -->
-	<util:map id="ingestorsMap">
-	</util:map>
-
+    <bean class="au.org.intersect.sydma.webapp.service.FileAnnotationListener" id="fileAnnotationListener"/>
+   <!-- worker impl expects this, so we provide empty -->
+    <util:map id="ingestorsMap"/>
+ 
+    <!-- Solr Beans -->
+    <bean class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer" id="solrServer">
+        <constructor-arg value="${solr.serverUrl}"/>
+    </bean>
+    
+    
+	<bean class="au.org.intersect.sydma.webapp.service.transfer.ProtocolPathResolver">
+            <property name="resolvers">
+            <map>
+                <entry key="local">
+	            <bean class="au.org.intersect.sydma.webapp.service.transfer.LocalProtocolPath" />
+                </entry>
+                <entry key="file">
+                    <bean class="au.org.intersect.sydma.webapp.service.transfer.HddProtocolPath" />
+                </entry>
+                <!-- ${filter.context.start}
+                <entry key="sftp">
+                    <bean class="au.org.intersect.sydma.webapp.service.transfer.SftpProtocolPath" />
+                </entry>
+                ${filter.context.end} -->
+            </map>
+            </property>
+        </bean>
 </beans>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<div>
+		<!-- load partials depending on application type -->
+		<c:choose>
+			<c:when test="${isAgr}">
+				<jsp:include page="agr_faq.jspx" flush="true"/>
+			</c:when>
+			<c:otherwise>
+				<jsp:include page="aggregator_faq.jspx" flush="true"/>
+			</c:otherwise>
+		</c:choose>
+	</div>
+</div>

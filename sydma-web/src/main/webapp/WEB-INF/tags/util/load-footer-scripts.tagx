@@ -3,7 +3,7 @@
 
   <spring:url value="/resources/scripts/jquery-1.4.2.js" var="jquery_js" />
   <spring:url value="/resources/scripts/jquery-ui-1.8.2.custom.min.js" var="ui_js" /> 
-  
+  <spring:url value="/resources/scripts/modernizr.custom.js" var="modernizr_js" />
   <spring:url value="/resources/scripts/sydma.js" var="sydma_js" />
   <spring:url value="/resources/scripts/fancybox/jquery.fancybox-1.3.4.js" var="lightbox_js" />
   <spring:url value="/resources/scripts/jquery.cookie.js" var="cookie_js" />
@@ -12,8 +12,11 @@
   <spring:url value="/resources/scripts/spin.min.js" var="spinner_js" />
   <spring:url value="/resources/scripts/jquery.form.js" var="form_js" />
   <spring:url value="/resources/scripts/jquery.ba-bbq.js" var="bbq_js" />        
+  <spring:url value="/resources/scripts/jquery.tokeninput.js" var="tokeninput_js" />     
+  <spring:url value="/resources/scripts/keywords/keywords.js" var="keywords_js" />    
   
     <script type="text/javascript" src="${jquery_js}"><jsp:text> </jsp:text></script>
+    <script type="text/javascript" src="${modernizr_js}"><jsp:text> </jsp:text></script>
     <script type="text/javascript" src="${bbq_js}"><jsp:text> </jsp:text></script>
     <script type="text/javascript" src="${form_js}"><jsp:text> </jsp:text></script>
     <script type="text/javascript" src="${spinner_js}"><jsp:text> </jsp:text></script>
@@ -23,5 +26,7 @@
     <script type="text/javascript" src="${cookie_js}"><jsp:text> </jsp:text></script>
     
     <script type="text/javascript" src="${sydma_js}"><jsp:text> </jsp:text></script>
-    <script type="text/javascript" src="${lightbox_js}"><jsp:text> </jsp:text></script>    
+    <script type="text/javascript" src="${lightbox_js}"><jsp:text> </jsp:text></script> 
+    <script type="text/javascript" src="${tokeninput_js}"><jsp:text> </jsp:text></script>
+    <script type="text/javascript" src="${keywords_js}"><jsp:text> </jsp:text></script>         
 </jsp:root>

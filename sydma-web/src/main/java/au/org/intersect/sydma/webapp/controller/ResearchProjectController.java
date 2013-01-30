@@ -33,9 +33,12 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.AutoPopulatingList;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -47,14 +50,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import au.org.intersect.sydma.webapp.controller.propertyeditor.ResearchSubjectCodePropertyEditor;
+import au.org.intersect.sydma.webapp.domain.Publication;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
 import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.exception.NoneUniqueNameException;
 import au.org.intersect.sydma.webapp.permission.PermissionType;
 import au.org.intersect.sydma.webapp.service.PermissionService;
+import au.org.intersect.sydma.webapp.service.ResearchProjectService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
 import au.org.intersect.sydma.webapp.util.RifCsWriter;
+import au.org.intersect.sydma.webapp.util.TokenInputHelper;
 
 /**
  * Research Project Controller.
@@ -63,7 +70,12 @@ import au.org.intersect.sydma.webapp.util.RifCsWriter;
 @Controller
 public class ResearchProjectController
 {
+    private static final String VOCABULARY = "vocabulary";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResearchProjectController.class);
+
     private static final String REDIRECT_TO_NEW = "researchproject/new";
+    private static final String REDIRECT_TO_VIEW = "researchproject/view";
     private static final String REDIRECT_TO_EDIT = "researchproject/edit";
     private static final String RESEARCH_PROJECT_REQUEST_MODEL = "researchProject";
     private static final String RESEARCH_GROUP_REQUEST_MODEL = "researchGroup";
@@ -71,26 +83,34 @@ public class ResearchProjectController
 
     private static List<Breadcrumb> breadcrumbs = new ArrayList<Breadcrumb>();
     private static List<Breadcrumb> breadcrumbsForEditing = new ArrayList<Breadcrumb>();
+    private static List<Breadcrumb> breadcrumbsForViewing = new ArrayList<Breadcrumb>();
 
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private TokenInputHelper tokenInputHelper;
+
+    @Autowired
+    private ResearchProjectService researchProjectService;
+
     static
     {
         breadcrumbs.add(Breadcrumb.getHome());
-        breadcrumbs.add(new Breadcrumb("Create Research Project"));
+        breadcrumbs.add(new Breadcrumb("sections.project.create.title"));
         breadcrumbsForEditing.add(Breadcrumb.getHome());
-        breadcrumbsForEditing.add(new Breadcrumb("Edit Research Project"));
+        breadcrumbsForEditing.add(new Breadcrumb("sections.project.edit.title"));
+        breadcrumbsForViewing.add(Breadcrumb.getHome());
+        breadcrumbsForViewing.add(new Breadcrumb("sections.project.view.title"));
     }
 
     @Autowired
     private RifCsWriter rifCsWriter;
-    
 
     @InitBinder
     public void initDataBinder(WebDataBinder binder)
     {
-        binder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());     
+        binder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());
     }
 
     /**
@@ -101,6 +121,7 @@ public class ResearchProjectController
     public ResearchProject initResearchProject()
     {
         ResearchProject emptyModel = new ResearchProject();
+        emptyModel.setPublications(new AutoPopulatingList(Publication.class));
         ResearchGroup researchGroup = new ResearchGroup();
         researchGroup.associateWithResearchProject(emptyModel);
         return emptyModel;
@@ -131,8 +152,8 @@ public class ResearchProjectController
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String createResearchProject(@RequestParam("groupId") final Long groupId,
-            @Valid final ResearchProject researchProject, final BindingResult result, final Model model,
-            Principal principal)
+            @RequestParam(VOCABULARY) final String keywords, @Valid final ResearchProject researchProject,
+            final BindingResult result, final Model model, Principal principal)
     {
         return permissionService.canGroup(PermissionType.CREATE_PROJECT, groupId, principal,
                 new PermissionService.ResearchGroupAction()
@@ -140,42 +161,58 @@ public class ResearchProjectController
                     @Override
                     public String act(ResearchGroup researchGroup, User user)
                     {
-                        if (result.hasErrors())
-                        {
-                            model.addAttribute(BREADCRUMBS, breadcrumbs);
-                            model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, researchGroup);
-                            return REDIRECT_TO_NEW;
-                        }
-
                         if (researchGroup == null)
                         {
                             throw new EntityNotFoundException("ResearchGroup with id [" + groupId
                                     + "] could not be found");
                         }
-                        researchGroup.associateWithResearchProject(researchProject);
 
-                        if (researchProject.isDuplicate())
+                        if (!result.hasErrors())
                         {
-                            String[] nameErrorCode = {""};
-                            String[] nameErrorArg = {""};
-                            FieldError nameError = new FieldError(RESEARCH_PROJECT_REQUEST_MODEL, "name",
-                                    researchProject.getName(), true, nameErrorCode, nameErrorArg,
-                                    "Project already exists under this group");
-                            result.addError(nameError);
-                            model.addAttribute(BREADCRUMBS, breadcrumbs);
-                            model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, researchGroup);
-                            return REDIRECT_TO_NEW;
+                            try
+                            {
+                                researchProjectService.create(researchProject, researchGroup, keywords);
+                                return "redirect:/";
+                            }
+                            catch (NoneUniqueNameException e)
+                            {
+                                String[] nameErrorCode = {""};
+                                String[] nameErrorArg = {""};
+                                FieldError nameError = new FieldError(RESEARCH_PROJECT_REQUEST_MODEL, "name",
+                                        researchProject.getName(), true, nameErrorCode, nameErrorArg,
+                                        "Project already exists under this group");
+                                result.addError(nameError);
+                            }
                         }
 
-                        researchProject.persist();
-                        return "redirect:/";
+                        model.addAttribute(VOCABULARY,
+                                tokenInputHelper.buildJsonOnValidationError(keywords, researchGroup));
+                        model.addAttribute(BREADCRUMBS, breadcrumbs);
+                        model.addAttribute(RESEARCH_GROUP_REQUEST_MODEL, researchGroup);
+                        return REDIRECT_TO_NEW;
                     }
                 });
 
     }
 
+    @RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
+    public String viewResearchProject(@PathVariable("id") Long id, final Model model, Principal principal)
+    {
+        return permissionService.canViewProject(id, principal, new PermissionService.ResearchProjectAction()
+        {
+            @Override
+            public String act(ResearchProject project, User user)
+            {
+                model.addAttribute(BREADCRUMBS, breadcrumbsForViewing);
+                model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, project);
+                LOGGER.info("Project publications: " + project.getPublications());
+                return REDIRECT_TO_VIEW;
+            }
+        });
+    }
+
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
-    public String editResearchProject(@PathVariable("id") Long id, final Model model, java.security.Principal principal)
+    public String editResearchProject(@PathVariable("id") Long id, final Model model, Principal principal)
     {
         return permissionService.canProject(PermissionType.EDIT_PROJECT, id, principal,
                 new PermissionService.ResearchProjectAction()
@@ -183,6 +220,7 @@ public class ResearchProjectController
                     @Override
                     public String act(ResearchProject project, User user)
                     {
+                        model.addAttribute(VOCABULARY, tokenInputHelper.appendJson(project.getKeywords()));
                         model.addAttribute(BREADCRUMBS, breadcrumbsForEditing);
                         model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, project);
                         return REDIRECT_TO_EDIT;
@@ -192,39 +230,45 @@ public class ResearchProjectController
 
     @RequestMapping(value = "/editResearchProject", method = RequestMethod.PUT)
     public String editResearchProject(@RequestParam(value = "id") final Long id,
-            @Valid final ResearchProject researchProject, final BindingResult result, final Model model,
-            final java.security.Principal principal)
+            @RequestParam(VOCABULARY) final String keywords, @Valid final ResearchProject researchProject,
+            final BindingResult result, final Model model, final java.security.Principal principal)
     {
         return permissionService.canProject(PermissionType.EDIT_PROJECT, id, principal,
                 new PermissionService.ResearchProjectAction()
                 {
                     @Override
-                    public String act(ResearchProject persisted, User user)
+                    public String act(ResearchProject project, User user)
                     {
-                        if (result.hasErrors())
+                        if (!project.getVersion().equals(researchProject.getVersion()))
                         {
+                            model.addAttribute(VOCABULARY,
+                                    tokenInputHelper.buildJsonOnValidationError(keywords, project.getResearchGroup()));
                             model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, researchProject);
+                            model.addAttribute("version_error", true);
                             return REDIRECT_TO_EDIT;
                         }
 
-                        ResearchGroup group = persisted.getResearchGroup();
-                        researchProject.setResearchGroup(group);
-
-                        if (researchProject.isDuplicate())
+                        if (!result.hasErrors())
                         {
-                            String[] nameErrorCode = {""};
-                            String[] nameErrorArg = {""};
-                            FieldError nameError = new FieldError("researchDataset", "name", researchProject.getName(),
-                                    true, nameErrorCode, nameErrorArg, "Project already exists under this group");
-                            result.addError(nameError);
-                            return REDIRECT_TO_EDIT;
+                            try
+                            {
+                                researchProjectService.editProject(researchProject, keywords);
+                                return "redirect:/";
+                            }
+                            catch (NoneUniqueNameException e)
+                            {
+                                String[] nameErrorCode = {""};
+                                String[] nameErrorArg = {""};
+                                FieldError nameError = new FieldError("researchDataset", "name", researchProject
+                                        .getName(), true, nameErrorCode, nameErrorArg,
+                                        "Project already exists under this group");
+                                result.addError(nameError);
+                            }
                         }
-
-                        researchProject.merge();
-
-                        persisted.updateRifCsIfNeeded(rifCsWriter);
-
-                        return "redirect:/";
+                        model.addAttribute(VOCABULARY,
+                                tokenInputHelper.buildJsonOnValidationError(keywords, project.getResearchGroup()));
+                        model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, researchProject);
+                        return REDIRECT_TO_EDIT;
                     }
                 });
 
@@ -235,5 +279,4 @@ public class ResearchProjectController
     {
         return "researchproject/index";
     }
-
 }

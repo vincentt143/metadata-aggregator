@@ -6,7 +6,7 @@
     <key>www.sydney.edu.au-metadata-aggregator-research-group-5</key>
     <originatingSource>www.sydney.edu.au</originatingSource>
     <party type="group">
-        <identifier type="local">15 211 513 464</identifier>
+        <identifier type="local">group-5</identifier>
 
         <name type="primary">
             <namePart>My group name</namePart>
@@ -15,7 +15,7 @@
 
         <!-- Sydney Uni -->
         <relatedObject>
-            <key>15211513464</key>
+            <key>sydney.edu.au/stc/PTY/0006</key>
             <relation type="isPartOf"/>
         </relatedObject>
 

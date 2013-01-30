@@ -20,9 +20,7 @@
     </h2>
     <ul id="home" class="news" >
 		<p>
-			Use of this service requires your agreement to abide by the University of Sydney’s Staff 
-			<a href="http://fmweb01.ucc.usyd.edu.au/pol/FMPro?-db=POL_Main.fp5&amp;-lay=www&amp;-format=/pol/pol_summary.html&amp;-error=pol_error.html&amp;DocID=13&amp;-find">
-			Code of Conduct</a>
+                        <spring:theme code="links.code.of.conduct" text="theme/links.code.of.conduct" htmlEscape="false" />
 		</p>
     </ul>
 

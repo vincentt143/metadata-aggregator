@@ -4,6 +4,7 @@
 	xmlns:spring="http://www.springframework.org/tags"
 	xmlns:form="http://www.springframework.org/tags/form"
 	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+    xmlns:publication="urn:jsptagdir:/WEB-INF/tags/publication"
 	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
 
 	<jsp:directive.page contentType="text/html;charset=UTF-8" />
@@ -24,49 +25,116 @@
 			text="?form.mandatory.fields?" htmlEscape="false" />
 	</p>
 	<c:url var="formAction" value="/researchproject/editResearchProject"/>
-	<form:form class="formbuilder" modelAttribute="researchProject"
-		method="put" action="${formAction }" autocomplete="off">
+	<form:form class="formbuilder" modelAttribute="researchProject" method="put" action="" autocomplete="off" id="projectForm">
 
-		<fieldset>
+		<fieldset id="project-tab">
 			<form:hidden path="id" />
 			<form:hidden path="version" />
 			<legend>
 				<spring:message code="researchProject.legend.edit"
 					text="researchProject.legend.edit?" />
 			</legend>
-
-			<ol>
+            <ul class="tabs">
+                <li><a href="#project-tab-basic"><spring:message code="researchProject.tab.basic" text="?Basic?"/></a></li>
+                <li><a href="#project-tab-publication"><spring:message code="researchProject.tab.publication" text="?Publication?"/></a></li>
+             	<li><a href="#project-tab-keywords"><spring:message code="vocabulary.keyword.tab" text="?vocabulary.keyword.tab?"/></a></li>
+            </ul>
+			<ol id="project-tab-basic">
+				<c:if test="${version_error}">
+					<ol class="errors">
+						<li class="error">
+							<p class="error-text">Error!</p> 
+							<span>
+								<spring:message code="researchProject.versioning.error" text="Version error" />
+							</span>
+						</li>
+					</ol>
+				</c:if>
 				<menu:form-entry characters="100" path="name"
 					code="researchProject.name" required="true" />
 				<menu:form-entry characters="100" path="subjectCode"
 					code="researchProject.field.of.research.code" required="true" cssClass="subject_code_auto"/>
-				<span>Unsure what your Field of Research Subject Code is? <a
-					target="_blank"
-					href="http://www.abs.gov.au/ausstats/abs@.nsf/0/6BB427AB9696C225CA2574180004463E?opendocument">
-						Click Here</a> to see a full list of the codes. </span>
+				<div>
+					<span>Unsure what your Field of Research Subject Code is? <a target="_blank"
+					href="http://www.abs.gov.au/ausstats/abs@.nsf/0/6BB427AB9696C225CA2574180004463E?opendocument">Click Here</a> to see a full list of the codes.
+					</span>
+				</div>
 				<menu:form-entry characters="100" path="subjectCode2" code="researchGroup.field.of.research.code" required="false" cssClass="subject_code_auto"/>
 				<menu:form-entry characters="100" path="subjectCode3" code="researchGroup.field.of.research.code" required="false" cssClass="subject_code_auto"/>
-				<menu:form-entry characters="400" path="url"
-					code="researchProject.URL" required="false" />
-				<span>Please include the protocol of the URL (for example:
-					http:// or https://)</span>
+				<menu:form-entry characters="400" path="url" code="researchProject.URL" required="false" />
+				<div>
+					<span>Please include the protocol of the URL (for example: http:// or https://)</span>
+            	</div>
 				<menu:form-text-area characters="1000" path="description" lines="10"
 					code="researchProject.description" required="true" />
 			</ol>
+            <ol id="project-tab-publication">
+                <li id="publication_section">                   
+                    <publication:publication modelAttribute="researchProject"/>
+                </li>                  
+            </ol>
+            <ol id="project-tab-keywords">
+				<input type="hidden" id="vocabulary" name="vocabulary"/>
+				<li>
+					<h3>
+						<c:choose>
+							<c:when test="${empty researchProject.name}">
+								<spring:message code="vocabulary.keyword.title.new" text="?Manage keywords?"/>
+							</c:when>
+							<c:otherwise>
+								<spring:message code="vocabulary.keyword.title.edit" text="?Manage keywords?" arguments="${researchProject.name}"/>
+							</c:otherwise>
+						</c:choose>
+					</h3>
+				</li>
+				<li>
+					<div class="inputs">
+						<label for="token-input-keywords" type="hidden" id="accessibility">Keyword(s)</label>
+	            		<spring:message code="vocabulary.keyword.message" text="?vocabulary.keyword.message?" arguments="Project"/>
+            		</div>
+            	</li>
+				<li>
+					<div class="inputs">
+						<ul type="text" name="keywords" id="keywords" class="token-input-list"/>
+					</div>
+				</li>
+            </ol>
 		</fieldset>
 		<div class="buttons">
-			<input class="clear-button button" type="reset" value="Reset"></input>
-			<input class="submit-button button" type="submit" value="Submit"></input>
+			<input class="clear-button button" type="reset" value="Reset" id="clear"></input>
+			<input class="submit-button button" type="button" value="Submit" id="submit-form"></input>
 		</div>
 	</form:form>
+	
+	<c:url var="searchProjectKeywords" value="/vocabulary/searchProjectKeywords">
+		<c:param name="id" value="${id}" />
+	</c:url>
+	<c:url var="searchKeywords" value="/vocabulary/searchKeywords">
+		<c:param name="id" value="${researchProject.researchGroup.id}" />
+	</c:url>
     <c:url var="subjectCodeUrl" value="/subjectcode/search"/>
     <script type="text/javascript">
-    
-    jQuery(document).ready(function()
-    {
+    $(document).ready(function(){
+        
         var subjectCodeUrl = "${subjectCodeUrl}";
-        Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);
-    });
-    
+        Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);        
+        jQuery("#project-tab").tabs();
+
+        var vocabulary = ${vocabulary};
+        var opt = 
+    	{
+            prePopulate : true,
+    		prePopulateKeywords : vocabulary,
+    		formAction : "${formAction}",
+    		formId : "#projectForm",
+            searchUrl : "${searchKeywords}"
+    	};
+        Sydma.keywords.init(opt);   	
+
+        $('#clear').click(function()
+        {
+            $("#keywords").tokenInput("clear");
+        });   
+    });  
     </script>
 </div>

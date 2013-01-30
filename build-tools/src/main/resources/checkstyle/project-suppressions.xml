@@ -29,6 +29,8 @@
   <suppress checks="UncommentedMain" files="[/\\]test[/\\]"/>
   <suppress checks="AvoidStarImport" files="[/\\]test[/\\]"/>
   <suppress checks="AvoidStaticImport" files="[/\\]test[/\\]"/>
+  <suppress checks="FileLengthCheck" files="[/\\]test[/\\]"/>
+  <suppress checks="MultipleStringLiteralsCheck" files="[/\\]test[/\\]"/>
 
   <!-- don't check generated code, this to work on Unix (/) and Windows (\) -->
   <suppress checks="." files="target[/\\]"/>

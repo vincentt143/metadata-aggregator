@@ -3,7 +3,6 @@
 
 package au.org.intersect.sydma.webapp.domain;
 
-import au.org.intersect.sydma.webapp.domain.DBUser;
 import au.org.intersect.sydma.webapp.domain.PermissionEntry;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.Role;
@@ -101,13 +100,9 @@ privileged aspect User_Roo_JavaBean {
     public void User.setResearchGroups(Set<ResearchGroup> researchGroups) {
         this.researchGroups = researchGroups;
     }
-    
-    public DBUser User.getDbUser() {
-        return this.dbUser;
-    }
-    
-    public void User.setDbUser(DBUser dbUser) {
-        this.dbUser = dbUser;
-    }
+
+   public void User.setHasRstudioAccount(Boolean hasRstudioAccount) {
+       this.hasRstudioAccount = hasRstudioAccount;
+   }
     
 }

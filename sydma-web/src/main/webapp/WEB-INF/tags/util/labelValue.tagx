@@ -1,0 +1,28 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:output omit-xml-declaration="yes" />
+
+    <jsp:directive.attribute name="code" type="java.lang.String" required="true" rtexprvalue="true"
+        description="The spring message code for the label" />
+    <jsp:directive.attribute name="value" type="java.lang.String" required="true" rtexprvalue="true"
+        description="The value to output" />
+    <jsp:directive.attribute name="length" type="java.lang.Integer" required="false" rtexprvalue="true"
+        description="Length to restrict the value to" />
+    <jsp:directive.attribute name="id" type="java.lang.String" required="false" rtexprvalue="true"
+        description="The id to give to the span around the output value" />
+    <jsp:directive.attribute name="cssClass" type="java.lang.String" required="false" rtexprvalue="true"
+        description="The class to give to the span around the output value" />
+
+    <spring:message var="valueName" code="${code }" text="?${code}?" />
+    <label> <c:out value="${valueName}" />: </label>
+
+    <c:set var="valueFragment" value="${value}" />
+     <c:if test="${not empty length }">
+        <c:if test="${fn:length(valueFragment) > length}">
+            <c:set var="valueFragment" value="${fn:substring(valueFragment, 0, length)}..." />
+            <c:set var="title" value="${value }"/>
+        </c:if>
+    </c:if> 
+    <span id="${id}" class="${cssClass}" title="${title}">
+        <c:out value="${valueFragment}" /> </span>
+</jsp:root>

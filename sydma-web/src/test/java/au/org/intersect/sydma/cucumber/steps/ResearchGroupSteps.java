@@ -32,10 +32,14 @@ package au.org.intersect.sydma.cucumber.steps;
 import java.io.IOException;
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 import cuke4duke.annotation.I18n.EN.Given;
 import cuke4duke.spring.StepDefinitions;
 
+import au.org.intersect.sydma.webapp.domain.AccessLevel;
 import au.org.intersect.sydma.webapp.domain.Building;
+import au.org.intersect.sydma.webapp.domain.PermissionEntry;
 import au.org.intersect.sydma.webapp.domain.PubliciseStatus;
 import au.org.intersect.sydma.webapp.domain.RdsRequest;
 import au.org.intersect.sydma.webapp.domain.RdsRequestStatus;
@@ -44,12 +48,13 @@ import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
 import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.permission.path.Path;
+import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 
 @StepDefinitions
 public class ResearchGroupSteps
 {
-    
-    
+
     @Given("I have a research group")
     public void iHaveAResearchGroup() throws IOException
     {
@@ -58,9 +63,10 @@ public class ResearchGroupSteps
         group.setSubjectCode(findOrCreateSubjectCode("10"));
         group.setPrincipalInvestigator(findOrCreateUser());
         group.setDescription("Some description");
+        group.setIsPhysical(false);
         group.merge();
     }
-    
+
     @Given("I have a physical collection research group called \"([^\"]*)\"$")
     public void iHaveAPhysicalResearchGroupCalled(String researchGroupName) throws IOException
     {
@@ -81,6 +87,7 @@ public class ResearchGroupSteps
         group.setSubjectCode(findOrCreateSubjectCode("10"));
         group.setDescription("Some description");
         group.setPrincipalInvestigator(findOrCreateUser());
+        group.setIsPhysical(false);
         group.merge();
     }
 
@@ -89,13 +96,14 @@ public class ResearchGroupSteps
     {
         ResearchGroup group = new ResearchGroup();
         group.setName(researchGroupName);
-        group.setSubjectCode(new ResearchSubjectCode("10", "10"));
+        group.setSubjectCode(findOrCreateSubjectCode("10"));
         group.setDescription("Some description");
         User user = User.findUsersByUsernameEquals(pi).getSingleResult();
         group.setPrincipalInvestigator(user);
+        group.setIsPhysical(false);
         group.merge();
     }
-    
+
     @Given("^the group \"([^\"]*)\" has a project called \"([^\"]*)\"$")
     public void theGroupResearchGroupTestHasAProjectCalled(String researchGroupName, String researchProjectName)
     {
@@ -121,6 +129,11 @@ public class ResearchGroupSteps
         dataset.setPhysicalLocation(findOrCreateBuilding());
         dataset.setSubjectCode(findOrCreateSubjectCode("909098"));
         dataset.setPubliciseStatus(PubliciseStatus.NOT_ADVERTISED);
+
+        DateTime timeNow = new DateTime();
+        dataset.setDateFrom(timeNow.minusMonths(2));
+        dataset.setDateTo(timeNow.minusMonths(1));
+
         dataset.setResearchProject(project);
         dataset.setIsPhysical(group.getIsPhysical());
         dataset.merge();
@@ -131,6 +144,7 @@ public class ResearchGroupSteps
     {
         ResearchProject project = ResearchProject.findResearchProjectsByNameEquals(researchProjectName)
                 .getSingleResult();
+        ResearchGroup group = project.getResearchGroup();
         ResearchDataset dataset = new ResearchDataset();
         dataset.setName(researchDatasetName);
         dataset.setDescription("Dataset Description");
@@ -138,14 +152,16 @@ public class ResearchGroupSteps
         dataset.setSubjectCode(findOrCreateSubjectCode("909090"));
         dataset.setPubliciseStatus(PubliciseStatus.ADVERTISED);
         dataset.setResearchProject(project);
+        dataset.setIsPhysical(group.getIsPhysical());
         dataset.merge();
     }
-    
+
     @Given("^the project \"([^\"]*)\" has a ready for advertising dataset \"([^\"]*)\"$")
     public void theProjectHasAReadyForAdvertisingDataset(String researchProjectName, String researchDatasetName)
     {
         ResearchProject project = ResearchProject.findResearchProjectsByNameEquals(researchProjectName)
                 .getSingleResult();
+        ResearchGroup group = project.getResearchGroup();
         ResearchDataset dataset = new ResearchDataset();
         dataset.setName(researchDatasetName);
         dataset.setDescription("Dataset Description");
@@ -153,11 +169,49 @@ public class ResearchGroupSteps
         dataset.setSubjectCode(findOrCreateSubjectCode("909090"));
         dataset.setPubliciseStatus(PubliciseStatus.MARKED_AS_READY_FOR_ADVERTISING);
         dataset.setResearchProject(project);
+        dataset.setIsPhysical(group.getIsPhysical());
         dataset.merge();
     }
-    
+
+    @Given("^I have an approved RDS request called \"([^\"]*)\" with PI \"([^\"]*)\"$")
+    public void iHaveAnApprovedRDSRequestCalledUnapprovedWithPI(String group, String pi)
+    {
+        RdsRequest request = new RdsRequest();
+        
+        request.setName(group);
+        User piUser = User.findUsersByUsernameEquals(pi).getSingleResult();
+        request.setPrincipalInvestigator(piUser);
+        request.setAmountOfStorage(100);
+        request.setSubjectCode(findOrCreateSubjectCode("99"));
+        request.setDescription("Some description");
+        request.setRequestStatus(RdsRequestStatus.APPROVED);
+        
+        ResearchGroup researchGroup = new ResearchGroup();
+        researchGroup.setName(request.getName());
+        researchGroup.setSubjectCode(request.getSubjectCode());
+        researchGroup.setSubjectCode2(request.getSubjectCode2());
+        researchGroup.setSubjectCode3(request.getSubjectCode3());
+        researchGroup.setPrincipalInvestigator(request.getPrincipalInvestigator());
+        researchGroup.setDataManagementContact(request.getDataManagementContact());
+        researchGroup.setDescription(request.getDescription());
+        researchGroup.setDirectoryPath("");
+        researchGroup.setIsPhysical(false);
+        researchGroup.persist();
+        request.setResearchGroup(researchGroup);
+        request.merge();
+        
+        Path pathToGroup = PathBuilder.groupPath(researchGroup);
+        
+        PermissionEntry entry = new PermissionEntry();
+        entry.setUser(piUser);
+        entry.setPath(pathToGroup.getPath());
+        entry.setAccessLevel(AccessLevel.FULL_ACCESS);
+        entry.merge();
+        
+    }
+     
     @Given("^I have an unapproved RDS request called \"([^\"]*)\" with PI \"([^\"]*)\"$")
-    public void iHaveAnUnapprovedRDSRequestCalledUnapprovedWithPI(String group, String pi) 
+    public void iHaveAnUnapprovedRDSRequestCalledUnapprovedWithPI(String group, String pi)
     {
         RdsRequest request = new RdsRequest();
         request.setRequestStatus(RdsRequestStatus.CREATED);
@@ -171,6 +225,24 @@ public class ResearchGroupSteps
     }
 
     
+    @Given("^I have an unapproved RDS request called \"([^\"]*)\" with PI \"([^\"]*)\" " 
+            + "and date \"([^\"]*)\" and requester \"([^\"]*)\"$")
+    public void iHaveAnUnapprovedRDSRequestCalledUnapprovedWithPIAndDateAndRequester(String group, String pi,
+            String date, String requester)
+    {
+        RdsRequest request = new RdsRequest();
+        request.setRequestStatus(RdsRequestStatus.CREATED);
+        request.setName(group);
+        User piUser = User.findUsersByUsernameEquals(pi).getSingleResult();
+        request.setPrincipalInvestigator(piUser);
+        request.setAmountOfStorage(100);
+        request.setSubjectCode(findOrCreateSubjectCode("99"));
+        request.setDescription("Some description");
+        request.setTimeAndDateOfRequest(date);
+        request.setRequester(requester);
+        request.merge();
+    }
+
     private Building findOrCreateBuilding()
     {
         List<Building> firstBuilding = Building.findBuildingEntries(0, 1);
@@ -204,7 +276,7 @@ public class ResearchGroupSteps
             return user;
         }
     }
-    
+
     private ResearchSubjectCode findOrCreateSubjectCode(String code)
     {
         ResearchSubjectCode subjectCode = ResearchSubjectCode.findResearchSubjectCode(code);
@@ -216,7 +288,5 @@ public class ResearchGroupSteps
         subjectCode.persist();
         return subjectCode;
     }
-
-
 
 }

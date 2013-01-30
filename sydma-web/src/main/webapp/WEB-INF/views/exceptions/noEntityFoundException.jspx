@@ -1,0 +1,13 @@
+<div id="criticalFailure" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+    <div class="sydma_exception">
+      <ol>
+        <li class="error">
+            <label>
+                <spring:message code="exceptions.noEntityFoundException" text="?exceptions.noEntityFoundException?"/>
+            </label>                       
+        </li>
+    </ol>   
+    </div>
+</div>

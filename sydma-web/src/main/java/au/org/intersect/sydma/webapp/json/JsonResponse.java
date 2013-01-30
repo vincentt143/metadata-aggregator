@@ -60,7 +60,7 @@ public class JsonResponse
     public String toJson()
     {
         JSONSerializer serializer = new JSONSerializer();
-        return serializer.exclude("*.class").serialize(this);
+        return serializer.exclude("*.class").deepSerialize(this);
     }
 
 }

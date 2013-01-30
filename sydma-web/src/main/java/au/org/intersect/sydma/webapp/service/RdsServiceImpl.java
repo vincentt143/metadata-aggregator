@@ -26,52 +26,36 @@
  */
 package au.org.intersect.sydma.webapp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import au.org.intersect.sydma.webapp.domain.AccessLevel;
 import au.org.intersect.sydma.webapp.domain.RdsRequest;
 import au.org.intersect.sydma.webapp.domain.RdsRequestStatus;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
-import au.org.intersect.sydma.webapp.permission.path.Path;
-import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 
 /**
  * 
- *
+ * 
  * @version $Rev: 29 $
  */
 @Service
 @Transactional("sydmaPU")
 public class RdsServiceImpl implements RdsService
 {
+    private static final Logger LOG = LoggerFactory.getLogger(RdsServiceImpl.class);
+
     @Autowired
-    private NewRdsRequestMailService mailService;
-    
-    @Autowired
-    private PermissionService permissionService;
+    private NewMailService mailService;
 
     @Override
-    public void approveRdsRequest(String directoryPath, RdsRequest rdsRequest)
+    public void approveRdsRequest(ResearchGroup researchGroup, RdsRequest rdsRequest)
     {
         rdsRequest.setRequestStatus(RdsRequestStatus.APPROVED);
-        ResearchGroup researchGroup = new ResearchGroup();
-        researchGroup.setName(rdsRequest.getName());
-        researchGroup.setSubjectCode(rdsRequest.getSubjectCode());
-        researchGroup.setSubjectCode2(rdsRequest.getSubjectCode2());
-        researchGroup.setSubjectCode3(rdsRequest.getSubjectCode3());
-        researchGroup.setPrincipalInvestigator(rdsRequest.getPrincipalInvestigator());
-        researchGroup.setDataManagementContact(rdsRequest.getDataManagementContact());
-        researchGroup.setDescription(rdsRequest.getDescription());
-        researchGroup.setDirectoryPath(directoryPath);
-        researchGroup.setIsPhysical(false);
-
+        rdsRequest.setResearchGroup(researchGroup);
         rdsRequest.merge();
-        researchGroup.persist();
-        
-        Path pathToGroup = PathBuilder.groupPath(researchGroup);
-        permissionService.addPermission(researchGroup.getPrincipalInvestigator(), pathToGroup, AccessLevel.FULL_ACCESS);
     }
 
     @Override
@@ -86,7 +70,14 @@ public class RdsServiceImpl implements RdsService
     {
         rdsRequest.setRequestStatus(RdsRequestStatus.CREATED);
         rdsRequest.persist();
-        mailService.sendNewRdsRequestEmail(rdsRequest);
+        try
+        {
+            mailService.sendNewRdsRequestEmail(rdsRequest);
+        }
+        catch (Exception e)
+        {
+            LOG.error("Cannot send email",e);
+        }
     }
 
 }

@@ -37,4 +37,14 @@ public class ResearchDatasetDBDoesNotExistException extends ResearchDatasetDBExc
 
     private static final long serialVersionUID = 1L;
     
+    public ResearchDatasetDBDoesNotExistException()
+    {
+        super();
+    }
+    
+    public ResearchDatasetDBDoesNotExistException(String message)
+    {
+        super(message);
+    }
+    
 }

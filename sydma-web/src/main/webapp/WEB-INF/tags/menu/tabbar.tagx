@@ -1,113 +1,82 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+<jsp:root 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
 	xmlns:sec="http://www.springframework.org/security/tags"
 	xmlns:tiles="http://tiles.apache.org/tags-tiles"
 	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
 	xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
 	<tiles:useAttribute name="activeTab" />
 	<jsp:output omit-xml-declaration="yes" />
 
 
 	<div id="tabbar">
-		<ul id="tabs" class="horizontal">				
-			<sec:authorize
-				access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
-				<c:set value="" var="activeClass" />
-				<c:if test="${activeTab eq 'browse.rds.tab' }">
-					<c:set value="active" var="activeClass" />
-				</c:if>
-				<li class="${activeClass}"><span> <c:url value='/home/index'
-							var="home" /> <a href="${home}"> <span><spring:message
-									code="browse.rds.tab" text="?browse.rds.tab?" /> </span> </a> </span>
-				</li>
+		<ul id="tabs" class="horizontal">
+			<!-- Every role can access the home page -->		
+			<sec:authorize access="hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+				<menu:tabbar-item linkUrl="/home/index" linkText="tabs.browse" currentTab="browse.rds.tab"  activeTab="${activeTab}"/>
 			</sec:authorize>
 
-			<sec:authorize access="hasRole('ROLE_RESEARCHER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
-				<c:set value="" var="activeClass" />
-				<c:if test="${activeTab eq 'upload.tab' }">
-					<c:set value="active" var="activeClass" />
-				</c:if>
-				<li class="${activeClass}"><span> <c:url
-							value='/upload/selectFiles' var="upload" /> <a href="${upload}"><spring:message
-								code="upload.tab" text="?upload.tab?" /><span></span> </a> </span></li>
+            <sec:authorize access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+				<menu:tabbar-item linkUrl="/transfer/transferwizard" linkText="tabs.transfer" currentTab="transfer.tab" activeTab="${activeTab}" />
+            </sec:authorize>
+            
+			<sec:authorize access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+				<menu:tabbar-item linkUrl="/rds/new" linkText="tabs.request" currentTab="request.rds.tab" activeTab="${activeTab}" />
 			</sec:authorize>
             
-            <sec:authorize access="hasRole('ROLE_RESEARCHER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
-                <c:set value="" var="activeClass" />
-                <c:if test="${activeTab eq 'download.tab' }">
-                    <c:set value="active" var="activeClass" />
-                </c:if>
-                <li class="${activeClass}"><span> <c:url
-                            value='/download/selectFiles' var="download" /> <a href="${download}"><spring:message
-                                code="download.tab" text="?download.tab?" /><span></span> </a> </span></li>
+            <sec:authorize access="hasAnyRole('ROLE_RESEARCH_DATA_MANAGER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+				<menu:tabbar-item linkUrl="/phycol/new" linkText="tabs.physical" currentTab="physicalCollection.tab" activeTab="${activeTab}" />
             </sec:authorize>
+            <c:if test="${isAgrEnv}">
+	            <sec:authorize access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+					<menu:tabbar-item linkUrl="/rstudio/index" linkText="tabs.rstudio" currentTab="rstudio.tab" activeTab="${activeTab}" />
+	            </sec:authorize>
+            </c:if>
 
-			<sec:authorize access="hasRole('ROLE_RESEARCHER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
-				<c:set value="" var="activeClass" />
-				<c:if test="${activeTab eq 'request.rds.tab' }">
-					<c:set value="active" var="activeClass" />
-				</c:if>
-				<li class="${activeClass}"><span> <c:url
-							value="/rds/new" var="rdsRequest" /><a href="${rdsRequest}"><span><b><spring:message
-										code="request.rds.tab" text="?request.rds.tab?" /> </b> </span> </a> </span></li>
-			</sec:authorize>
-            
-            <sec:authorize access="hasRole('ROLE_RESEARCH_DATA_MANAGER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
-                <c:set value="" var="activeClass" />
-                <c:if test="${activeTab eq 'physicalCollection.tab' }">
-                    <c:set value="active" var="activeClass" />
-                </c:if>
-                <li class="${activeClass}"><span> <c:url
-                            value="/phycol/new" var="phycol" /><a href="${phycol}"><span><b><spring:message
-                                        code="physicalCollection.tab" text="?physicalCollection.tab?" /> </b> </span> </a> </span></li>
-            </sec:authorize>
-
-			<sec:authorize access="hasRole('ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+			<sec:authorize access="hasAnyRole('ROLE_ADMINISTRATOR','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
 				<c:set value="" var="activeClass" />
 				<c:if test="${activeTab eq 'admin.tab'}">
 					<c:set value="active" var="activeClass" />
 				</c:if>
 				<li class="${activeClass}"><span><c:url
-							value="/admin/index" var="adminIndex" /><a href="${adminIndex}"><span><spring:message
-									code="admin.tab" text="?admin.tab?" />
+							value="/admin/index" var="adminIndex" /><a href="${adminIndex}"><span><spring:theme
+									code="tabs.admin" text="?tabs.admin?" />
 						</span>
 					</a>
 				</span>
 					<ul>
 						<li><c:url value='/admin/rds/list?created' var="rdsListCreated" />
-							<a href="${rdsListCreated}">Unapproved RDS requests</a></li>
+							<a href="${rdsListCreated}"><spring:theme code="tabs.admin.unapproved" text="?tabs.admin.unapproved?" /></a></li>
 						<li><c:url value='/admin/rds/list?approved' var="rdsListApproved" />
-							<a href="${rdsListApproved}">Approved RDS requests</a></li>
+							<a href="${rdsListApproved}"><spring:theme code="tabs.admin.approved" text="?tabs.admin.approved?" /></a></li>
 					</ul></li>
 			</sec:authorize>
-
-			<sec:authorize
-				access="hasAnyRole('ROLE_ADMINISTRATOR', 'ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+			
+			<sec:authorize access="hasRole('ROLE_ICT_SUPPORT')">
 				<c:set value="" var="activeClass" />
 				<c:if test="${activeTab eq 'user.management.tab'}">
 					<c:set value="active" var="activeClass" />
 				</c:if>
-				<li class="${activeClass}"><span> <c:url
-							value='/usermanagement/index' var="userManagementIndex" /> <a
-						href="${userManagementIndex}"><span><spring:message
-									code="user.management.tab" text="?user.management.tab?" />
-						</span>
-					</a>
+				<li class="${activeClass}"><span> <c:url value='/usermanagement/list' var="userManagementList" /> 
+					<a href="${userManagementList}"><span><spring:theme code="tabs.users" text="?tabs.users?" /></span></a>
 				</span>
-					<ul>
-						<li><c:url value='/usermanagement/new'
-								var="createExternalUser" /> <a href="${createExternalUser}">Create External User</a></li>
-						<li><c:url value='/usermanagement/list'
-								var="externalUserList" /> <a href="${externalUserList}">External User List</a></li>			
-						<sec:authorize access="hasRole('ROLE_ICT_SUPPORT')">
-						<li><c:url value='/usermanagement/assignroles'
-								var="unikeyUserList" /> <a href="${unikeyUserList}">Unikey User List</a></li>		
-						</sec:authorize>
-					</ul>
 				</li>
 			</sec:authorize>
 
+			<menu:tabbar-item linkUrl="/help/overview" linkText="tabs.help.overview" currentTab="help.overview.tab" activeTab="${activeTab}" />
+			<menu:tabbar-item linkUrlTheme="links.help.faq" linkText="tabs.help.faq" currentTab="help.faq.tab" activeTab="${activeTab}" />
+
 		</ul>
+		<sec:authorize
+				access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT','ROLE_ADMINISTRATOR','ROLE_RESEARCH_DATA_MANAGER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')">
+				<div id="loggedIn">
+					<sec:authentication property="principal.username" />
+                                        <c:url value="/logout" var="logoutAll" />
+					<a href="${logoutAll}"><spring:theme code="tabs.logout" text="?tabs.logout?" /></a>
+				</div>
+		</sec:authorize>
+
 	</div>
 
 </jsp:root>

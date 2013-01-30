@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<form xmlns:jsp="http://java.sun.com/JSP/Page" id="search" action="http://search.usyd.edu.au/search/search.cgi">
-	<jsp:directive.page contentType="text/html;charset=UTF-8" />
-	<jsp:output omit-xml-declaration="yes" />
-	<input type="hidden" name="collection" value="Usyd" /> <input
-		type="text" name="query" class="field" title="Enter search terms"
-		value="Enter search terms" /> <input type="submit" value="Go"
-		class="button" /> <input type="hidden" name="scope"
-		value="sydney.edu.au/unit" />
-</form>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<c:url var="formAction" value="/search/results" />
+	<form xmlns:jsp="http://java.sun.com/JSP/Page" id="search"
+		action="${formAction}">
+		<jsp:directive.page contentType="text/html;charset=UTF-8" />
+		<jsp:output omit-xml-declaration="yes" />
+		<input type="text" name="query" class="field"
+			title="Enter search terms" value="Enter search terms" /> <input
+			type="submit" value="Go" class="button" /> <input type="hidden"
+			name="page" value="1" /> <input type="hidden" name="size" value="10" />
+	</form>
+
+	<script type="text/javascript">
+		$(".field").each(function() {
+			var originalValue = this.value;
+
+			$(this).focus(function() {
+				this.value = "";
+			}).blur(function() {
+				if (this.value.length == 0) {
+					this.value = originalValue;
+				}
+			});
+		});
+	</script>
+</div>
