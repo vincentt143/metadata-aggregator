@@ -51,7 +51,7 @@ public class UrlHelperTest
         when(request.getLocalPort()).thenReturn(80);
         when(request.getContextPath()).thenReturn("/context-path");
         String baseUrl = UrlHelper.getCurrentBaseUrl(request);
-        assertEquals("http://server:80/context-path", baseUrl);
+        assertEquals("http://server/context-path", baseUrl);
     }
 
 }

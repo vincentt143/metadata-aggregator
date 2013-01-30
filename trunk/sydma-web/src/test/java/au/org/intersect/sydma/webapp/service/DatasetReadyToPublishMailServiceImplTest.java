@@ -29,17 +29,21 @@ package au.org.intersect.sydma.webapp.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.antlr.stringtemplate.StringTemplate;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.util.MailHelper;
+import au.org.intersect.sydma.webapp.util.MailTemplateLoader;
 
 /**
  * 
@@ -49,6 +53,32 @@ import au.org.intersect.sydma.webapp.util.MailHelper;
 // TODO CHECKSTYLE-OFF: ExecutableStatementCount
 public class DatasetReadyToPublishMailServiceImplTest
 {
+
+    private MailTemplateLoader templateLoader;
+    private DatasetReadyToPublishMailServiceImpl mailService;
+    private MailHelper mailHelper;
+
+    private String templateString = "Dear $firstName$ $surname$,"
+            + "One of your colleagues has indicated that a subset "
+            + "of your research data is ready for advertising in Research Data Australia "
+            + "(http://services.ands.org.au/home/orca/rda/)." + "Advertising your data raises your research profile, "
+            + "increases your Google ranking and promotes your research." + "Research Dataset: $datasetName$"
+            + "Research Project: $projectName$" + "Research Group: $groupName$"
+
+            + "Advertising Requested By: $requestedBy$"
+
+            + "You can approve or reject this request through $advertiseUrl$ in My Research Data Manager.";
+
+    @Before
+    public void setUp()
+    {
+        templateLoader = Mockito.mock(MailTemplateLoader.class);
+        mailHelper = Mockito.mock(MailHelper.class);
+        mailService = new DatasetReadyToPublishMailServiceImpl();
+        mailService.setMailTemplateLoader(templateLoader);
+        mailService.setMailFrom("from@intersect.org.au");
+        mailService.setMailHelper(mailHelper);
+    }
 
     @Test
     public void testSendReadyToPublishEmail()
@@ -71,22 +101,24 @@ public class DatasetReadyToPublishMailServiceImplTest
         dataset.setResearchProject(project);
         dataset.setId(20L);
 
-        MailHelper mailHelper = mock(MailHelper.class);
-        DatasetReadyToPublishMailServiceImpl mailService = new DatasetReadyToPublishMailServiceImpl();
-        mailService.setMailFrom("from@intersect.org.au");
-        mailService.setMailHelper(mailHelper);
+        // expectations
+        StringTemplate template = new StringTemplate(templateString);
+
+        when(templateLoader.loadTemplate("datasetReadyToPublishTemplate")).thenReturn(template);
+
         mailService.sendReadyToPublishEmail(dataset, "requestedby", "http://baseurl");
 
         ArgumentCaptor<String> from = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> subject = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> to = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String[]> to = ArgumentCaptor.forClass(String[].class);
         ArgumentCaptor<String> text = ArgumentCaptor.forClass(String.class);
 
         verify(mailHelper).sendMessage(from.capture(), subject.capture(), to.capture(), text.capture());
         assertEquals("from@intersect.org.au", from.getValue());
         assertEquals("Research dataset 'My dataset name' is ready for advertising", subject.getValue());
-        assertEquals("pi@intersect.org.au", to.getValue());
+        assertEquals("pi@intersect.org.au", to.getValue()[0]);
         String emailText = text.getValue();
+
         assertTrue(emailText.contains("Research Dataset: My dataset name"));
         assertTrue(emailText.contains("Research Group: My group name"));
         assertTrue(emailText.contains("Research Project: My project name"));

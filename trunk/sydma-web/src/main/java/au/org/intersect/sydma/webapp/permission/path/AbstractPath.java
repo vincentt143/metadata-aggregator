@@ -90,4 +90,10 @@ abstract class AbstractPath implements Path
     {
         return false;
     }
+    
+    public boolean isAffectedBy(Path path)
+    {
+        return getPath().startsWith(path.getPath()) || path.getPath().startsWith(getPath());
+    }
+
 }

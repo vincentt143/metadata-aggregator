@@ -1,0 +1,43 @@
+<div class="sydma_content" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util">
+
+    <h1>
+        <spring:message code="fileAnnotation.create.heading" text="?Create Annotation?" />
+    </h1>
+
+    <p class="required-warning">
+        <spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false" />
+    </p>
+    <c:url value="/fileannotation/create" var="submitUrl" />
+    <form:form id="create_annotation" modelAttribute="fileAnnotation" class="formbuilder ajaxForm" method="post"
+        action="${submitUrl}"> 
+               
+        <form:hidden path="path"/>
+        <fieldset>
+            <legend>
+                <spring:message code="fileAnnotation.legend" text="?Annotation?" />
+            </legend>
+            <ol>             
+                <c:set var="pathError">
+                    <form:errors path="path" />
+                </c:set>
+                <c:if test="${not empty pathError}">
+                    <c:set var="cssStyle" value="error" />                    
+                </c:if>          
+                <li class="${cssStyle}">
+                    <form:errors path="path"
+                        cssClass="error-text" element="p" />
+                    <util:fieldview code="fileAnnotation.path" value="${namedPath}" />
+                </li>      
+                
+                <menu:form-text-area characters="1000" code="fileAnnotation.annotation" path="annotation" required="true"/>                       
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input id="cancel_submit" class="cancel-button button" type="submit" value="Cancel" name="_submit"/>
+            <input id="confirm_submit" class="submit-button button" type="submit" value="Create" name="_submit"/>
+        </div>
+    </form:form>        
+
+</div>

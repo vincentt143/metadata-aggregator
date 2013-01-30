@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" version="2.0">
+
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+
+	<h1>
+		<spring:message code="permissions.grant.title" text="?Grant Permissions?" htmlEscape="true" />
+	</h1>
+    <c:url var="formAction" value="/permission/new" />
+    
+    <form:form method="post" action="" id="permissionsForm">
+        <fieldset>
+        	<legend><spring:message code="permissions.assign.title" text="?permissions.assign.title?" htmlEscape="true" /></legend>	
+		    <c:if test="${hasError}" >
+				<ol class="errors">
+					<li class="error">
+						<p class="error-text">
+						<c:out value="Following user(s) already have permissions at that level" />
+						</p> 
+						<c:choose>
+							<c:when test="${permError}">													
+								<span>
+									<c:out value="You do not have permission to assign this user that level of permission" />
+								</span>
+							</c:when>
+							<c:otherwise>
+								<span>
+									<c:forEach var="e" items="${usersInconsistent}">
+									${e.givenname} ${e.surname} <br/>
+									</c:forEach>
+								</span>
+							</c:otherwise>
+						</c:choose>
+					</li>
+				</ol>    	
+		    </c:if>
+            <ol>
+            	<li>
+	            	You are granting permission over ${type} ${name} for user(s):
+            	</li>
+
+				<li>
+					<div class="inputs">
+						<label for="token-input-users" type="hidden" id="accessibility">User(s)</label>
+						<ul type="text" name="users" id="users" class="token-input-list"/>
+					</div>
+				</li>
+				<br />
+				<div class="inputs">
+					<c:if test="${hasFullAccess}">
+	                	<input type="radio" name="permissionsLevel" id="fullAccess" value="FULL_ACCESS" /> 
+	                	<label for="fullAccess"><b>Full Access</b></label>
+
+	                	<c:url value="/help/faq#fullAccess" var="fullAccessFAQUrl" />
+	                	<a href="${fullAccessFAQUrl}">What can a user with Full Access permissions do?</a>
+	                	<br/>
+	                </c:if>
+	                <c:if test="${not isDirectoryPath}">
+	                	<input type="radio" name="permissionsLevel" id="editingAccess" value="EDITING_ACCESS" />
+	                	<label for="editingAccess"><b>Editing Access</b></label>
+						<c:url value="/help/faq#editingAccess" var="editingAccessFAQUrl" />
+	                	<a href="${editingAccessFAQUrl}">What can a user with Editing Access permissions do?</a>
+	                	<br/>
+	                </c:if>	                
+	                <input type="radio" name="permissionsLevel" id="viewingAccess" value="VIEWING_ACCESS" />
+					<label for="viewingAccess"><b>Viewing Access</b></label>
+					<c:url value="/help/faq#viewingAccess" var="viewAccessFAQUrl" />
+	                <a href="${viewAccessFAQUrl}">What can a user with Viewing Access permissions do?</a>
+				</div>
+				
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input class="clear-button button" type="reset" value="Clear" id="clear"></input> 
+            <input class="submit-button button" type="button" id="acceptPermission" value="Assign"/>
+        </div>		
+	</form:form>
+	
+	<c:url var="searchAllUrl" value="/usermanagement/searchAll" />
+	<c:url var="assignUrl" value="/permission/assigningPermissions"/>
+
+	<script type="text/javascript">
+		var listOfUsernames = new Array();	
+		//This is to resolve a duplication issue with tokeninput and fancybox view
+		$(document).ready(function(){
+	        if (!($(".token-input-list").length > 1))
+	        {  
+			    $("#users").tokenInput("${searchAllUrl}", {hintText: "Search users", crossDomain: false, preventDuplicates: true,
+			    resultsFormatter: function(item){return "<li><i>" + item.fullname + "</i><br/>" + item.name + "</li>"},
+				tokenFormatter: function(item){ return "<li><p>" + item.fullname + "</p></li>"} 
+			    });
+	        }
+	   	});
+		
+		$('#permissionsForm').keypress(function(e)
+		{
+		    if (e.which == 13)
+			{        	
+		        e.preventDefault();
+			}
+        });
+
+        jQuery('#clear').click(function()
+        {
+            $("#users").tokenInput("clear");
+        });
+
+        function createUserList(users)
+        {
+            listOfUsernames.splice(0, listOfUsernames.length); //ensure array is empty 
+            for ( var i in users)
+            {
+                var user = users[i];
+                listOfUsernames.push(user.name);
+                Sydma.log("User=" + user);
+            }
+            Sydma.log("List of users= " + listOfUsernames);
+        }
+
+        function assignPermission(accessLevel)
+        {
+            var usernameString = listOfUsernames.toString();
+            var assignPermissionsUrl = "${assignUrl}" + "?";
+            assignPermissionsUrl += "type=" + "${typeForUrl}" + "&amp;";
+            assignPermissionsUrl += "usernames=" + usernameString + "&amp;";
+            assignPermissionsUrl += "accessLevel=" + accessLevel + "&amp;";
+
+            if ("${isDirectoryPath}")
+            {
+                var filePath = "${path}";
+                assignPermissionsUrl += "path=" + filePath;
+            }
+            else
+            {
+                var objectId = "${object.id}";
+                assignPermissionsUrl += "path=" + objectId;
+            }
+
+            var $form = jQuery("#permissionsForm");
+            $form.attr("action", assignPermissionsUrl);
+            $form.submit();
+        }
+
+        jQuery('#acceptPermission').click(function()
+        {
+            var accessLevel = jQuery('input[type=radio][id$="Access"]:checked').val();
+            var users = $("#users").tokenInput("get");
+
+            if (users == "")
+            {
+                alert("Please enter at least one user to assign permissions to.");
+            }
+            else
+            {
+                if (accessLevel)
+                {
+                    createUserList(users);
+                    assignPermission(accessLevel);
+                }
+                else
+                {
+                    alert("Please select the level of access you wish to grant to the selected users.");
+                }
+            }
+        });
+    </script>
+</div>

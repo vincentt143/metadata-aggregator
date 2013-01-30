@@ -1,0 +1,74 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:display="urn:jsptld:http://displaytag.sf.net"
+    xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+    xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page"
+    xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    <jsp:output omit-xml-declaration="yes" />
+    <jsp:directive.attribute name="modelAttribute" type="java.lang.String" required="true" rtexprvalue="true"
+        description="The name of the model attribute for form binding" />
+        
+    <form:errors cssClass="errors" path="publications" />
+    <h3><spring:message code="publication.title" text="?Related Publication?"/></h3>
+    
+    <display:table uid="publication_list" name="${modelAttribute}.publications">
+        <display:setProperty name="basic.empty.showtable">true</display:setProperty>
+
+        <display:column titleKey="publication.action">
+            <c:set var="index" value="${publication_list_rowNum -1}"/>
+            <a class="edit_publication" href="" onclick="return false;"> <spring:message code="publication.action.edit" text="?Edit?"/> </a>
+            |
+            <a class="remove_publication" href="" onclick="return false;"> <spring:message code="publication.action.delete" text="?Delete?"/></a>            
+                                    
+            <form:hidden path="publications[${index}].version"/>
+            <form:hidden path="publications[${index}].version"/>    
+        </display:column>
+        
+        <display:column sortable="false" titleKey="publication.citations">
+				<c:out value="${publication_list.citations}"/>
+            	<c:set var="index" value="${publication_list_rowNum -1}"/>
+            	<form:hidden path="publications[${index}].citations"/>
+        </display:column>
+        
+        <display:column sortable="false" titleKey="publication.url">
+            <a href="${publication_list.url}" title="${publication_list.url}" target="_blank">
+            	<c:out value="${publication_list.url}"/>
+            </a>                        
+            <c:set var="index" value="${publication_list_rowNum -1}"/>
+            <form:hidden path="publications[${index}].url"/>
+        </display:column>   
+        
+    </display:table>
+
+    <input id="add_publication" class="left" type="button" value="Add New" />
+    
+    <c:url var="renderAddUrl" value="/publication/add"/>
+    <c:url var="renderEditUrl" value="/publication/edit"/>    
+    
+    <c:url var="publicationScriptUrl" value="/resources/scripts/publication/publication.js"/>    
+        
+    <script type="text/javascript">
+    $(document).ready(function()
+    {
+        var debug = Sydma.getDebug("Publication");
+        
+        var opt = 
+        {
+            "renderAddUrl" : "${renderAddUrl}",
+            "renderEditUrl" : "${renderEditUrl}"
+        };                        
+        
+        var prepareDialogHandler = function()
+        {
+            Sydma.publication.init(opt);
+        };
+        
+        if (!Sydma.publication)
+        {
+        	jQuery.getScript("${publicationScriptUrl}", prepareDialogHandler);
+        }
+     	else	
+        {
+         	prepareDialogHandler();
+        }
+    });
+	</script>
+</jsp:root>

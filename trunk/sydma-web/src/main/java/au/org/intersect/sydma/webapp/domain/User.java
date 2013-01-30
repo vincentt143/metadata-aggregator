@@ -32,18 +32,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.TypedQuery;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.json.RooJson;
@@ -64,11 +63,15 @@ import au.org.intersect.sydma.webapp.validator.Email;
 @RooJson
 @RooEntity(table = "users", finders = {"findUsersByEmailEqualsAndUserType", "findUsersByEmailEquals",
         "findUsersByUsernameEquals", "findUsersByUserTypeAndUsernameEquals", "findUsersByUserType",
-        "findUsersByGivennameEquals", "findUsersByUserTypeAndIdEquals"}, persistenceUnit = "sydmaPU")
+        "findUsersByGivennameEquals", "findUsersByUserTypeAndIdEquals", 
+        "findUsersByUsernameLikeOrGivennameLikeOrSurnameLike"}, persistenceUnit = "sydmaPU")
 // TODO CHECKSTYLE-OFF: MagicNumber
 // TODO CHECKSTYLE-OFF: MultipleStringLiteralsCheck
 public class User
 {
+    @Value("#{applicationTypeProperties['application.type']}")
+    private transient String applicationType;
+
     @Size(max = 100)
     private String username;
 
@@ -79,7 +82,7 @@ public class User
     @Size(min = 1, max = 100, message = "Surname is a required field")
     private String surname;
 
-    @Size(min = 1, max = 100, message = "Given name is required field")
+    @Size(min = 1, max = 100, message = "Given name is a required field")
     @DiacriticString(regexp = "[\\p{Alpha}][\\p{Alpha}\\s\\-]*")
     private String givenname;
 
@@ -92,22 +95,20 @@ public class User
     private String institution;
 
     private Boolean enabled;
-    
+
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles = new HashSet<Role>();
 
     @Enumerated(EnumType.STRING)
     private UserType userType;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<PermissionEntry> permissionEntries = new HashSet<PermissionEntry>();
-    
-    @OneToMany(mappedBy = "principalInvestigator")
-    private Set<ResearchGroup> researchGroups  = new HashSet<ResearchGroup>();
-    
-    @OneToOne(cascade = CascadeType.ALL)
-    private DBUser dbUser;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<PermissionEntry> permissionEntries = new HashSet<PermissionEntry>();
+
+    @OneToMany(mappedBy = "principalInvestigator")
+    private Set<ResearchGroup> researchGroups = new HashSet<ResearchGroup>();
+
+    private Boolean hasRstudioAccount;
 
     /**
      * Return the authorities for a given user
@@ -126,7 +127,14 @@ public class User
 
     public String getKeyForRifCs()
     {
-        return this.email;
+        if (applicationType != null)
+        {
+            return applicationType.toLowerCase() + "_" + this.email;
+        }
+        else
+        {
+            return this.email;
+        }
     }
 
     /**
@@ -146,6 +154,7 @@ public class User
         user.setSurname(surname);
         user.setEmail(email);
         user.setEnabled(true);
+        user.setHasRstudioAccount(false);
         user.setPassword("unikey_user");
         Role researcher = Role.findRolesByNameEquals("ROLE_RESEARCHER").getSingleResult();
         Role active = Role.findRolesByNameEquals("ACTIVE").getSingleResult();
@@ -154,16 +163,23 @@ public class User
         user.merge();
     }
 
-    public void modify(User user)
+    public boolean hasRole(Role.RoleNames roleName)
     {
-        this.setUsername(user.getEmail());
-        this.setEmail(user.getEmail());
-        this.setGivenname(user.getGivenname());
-        this.setSurname(user.getSurname());
-        this.setInstitution(user.getInstitution());
-        this.merge();
+        String str = roleName.toString();
+        for (Role role : this.getRoles())
+        {
+            if (role.getName().equals(str))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
+    public Boolean getHasRstudioAccount() {
+        return this.hasRole(Role.RoleNames.ROLE_RSTUDIO_USER);
+    }
+    
     public void activateUser(String password)
     {
         Md5PasswordEncoder encoder = new Md5PasswordEncoder();
@@ -176,7 +192,7 @@ public class User
     public void assignRole(Collection<Role> roles)
     {
         removeAllAssignableRoles();
-        this.getRoles().addAll(roles);  
+        this.getRoles().addAll(roles);
         this.merge();
     }
 
@@ -189,16 +205,16 @@ public class User
     public void removeAllAssignableRoles()
     {
         List<Role> assignableRoles = Role.findRolesByNameLike("ROLE_").getResultList();
-        this.getRoles().removeAll(assignableRoles); 
+        this.getRoles().removeAll(assignableRoles);
     }
-    
+
     public void acceptTermsAndConditions()
     {
         Role accept = Role.findRolesByNameEquals("ACCEPTED_TC").getSingleResult();
         this.getRoles().add(accept);
         this.merge();
     }
-  
+
     public boolean hasAcceptedTermsAndConditions()
     {
         Role acceptTC = Role.findRolesByNameEquals("ACCEPTED_TC").getSingleResult();
@@ -211,7 +227,7 @@ public class User
         }
         return false;
     }
-    
+
     public boolean hasAssignRolePermission()
     {
         Role support = Role.findRolesByNameEquals("ROLE_ICT_SUPPORT").getSingleResult();
@@ -224,7 +240,7 @@ public class User
         }
         return false;
     }
-    
+
     public boolean isActive()
     {
         Role active = Role.findRolesByNameEquals("ACTIVE").getSingleResult();
@@ -245,13 +261,20 @@ public class User
 
     public boolean isDuplicate()
     {
-        if (getId() == null)
+        try
         {
-            return !findUsersByEmailEquals(email).getResultList().isEmpty();
+            if (getId() == null)
+            {
+                return !findUsersByEmailEquals(email).getResultList().isEmpty();
+            }
+            else
+            {
+                return !findUsersWithEmailEqualsAndIdNotEquals(email, getId()).getResultList().isEmpty();
+            }
         }
-        else
+        catch (IllegalArgumentException e)
         {
-            return !findUsersWithEmailEqualsAndIdNotEquals(email, getId()).getResultList().isEmpty();
+            return false;
         }
     }
 
@@ -269,30 +292,40 @@ public class User
         q.setParameter("email", email);
         return q;
     }
-    
+
+    public boolean isPrincipalInvestigator()
+    {
+        return !getResearchGroups().isEmpty();
+    }
+
     public boolean isPrincipalInvestigatorForAnAdvertisedGroup()
     {
-        List<ResearchGroup> allResearchGroups = ResearchGroup.findAllResearchGroups();
-        boolean found = false;
-
-        for (int i = 0; i < allResearchGroups.size(); i++)
+        for (ResearchGroup group : researchGroups)
         {
-            if (!found && this.getId().equals(allResearchGroups.get(i).getPrincipalInvestigator()
-                    .getId()))
+            if (!group.getAdvertisedResearchProjects().isEmpty())
             {
-                found = !allResearchGroups.get(i).getAdvertisedResearchProjects().isEmpty();
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
-    
+
     public void updatePiRifCs(RifCsWriter rifCsWriter, ResearchGroup currentGroup)
     {
         if (isPrincipalInvestigatorForAnAdvertisedGroup())
         {
             rifCsWriter.writePrincipalInvestigatorRifCs(this, currentGroup);
-        }        
+        }
     }
-    
+
+    public String getRstudioUsername()
+    {
+        return username.replace("@", "_");
+    }
+
+    public String getFullname()
+    {
+        return givenname + " " + surname;
+    }
 }

@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jee="http://www.springframework.org/schema/jee"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
-                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/jee
+        http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
+    http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/util
+	    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
+	<util:properties id="cucumber"
+		location="classpath:cucumber.properties"></util:properties>
+		
 	<context:component-scan base-package="au.org.intersect.sydma.cucumber.steps">
 		<context:include-filter type="annotation"
 			expression="cuke4duke.spring.StepDefinitions" />
@@ -19,8 +30,10 @@
 
 	<!--  <bean id="chromeDriver" class="org.openqa.selenium.chrome.ChromeDriver">
 	</bean>  -->
-
+	<bean id="firefoxProfile" class="au.org.intersect.sydma.cucumber.steps.FirefoxProfileBuilder" factory-method="createProfile" />
+	
 	<bean id="firefoxDriver" class="org.openqa.selenium.firefox.FirefoxDriver">
+	<constructor-arg index="0" ref="firefoxProfile" />
 	</bean>
-
+	
 </beans>

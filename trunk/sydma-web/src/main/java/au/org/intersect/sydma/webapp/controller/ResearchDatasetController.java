@@ -35,9 +35,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.AutoPopulatingList;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -48,9 +52,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import au.org.intersect.sydma.webapp.controller.propertyeditor.DateTimePropertyEditor;
 import au.org.intersect.sydma.webapp.controller.propertyeditor.ResearchSubjectCodePropertyEditor;
 import au.org.intersect.sydma.webapp.domain.Building;
 import au.org.intersect.sydma.webapp.domain.PublicAccessRight;
+import au.org.intersect.sydma.webapp.domain.Publication;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
@@ -64,20 +70,25 @@ import au.org.intersect.sydma.webapp.service.PermissionService;
 import au.org.intersect.sydma.webapp.service.ResearchDatasetService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
 import au.org.intersect.sydma.webapp.util.RifCsWriter;
+import au.org.intersect.sydma.webapp.util.TokenInputHelper;
 import au.org.intersect.sydma.webapp.util.UrlHelper;
+import au.org.intersect.sydma.webapp.validator.TemporalDataValidator;
 
 /**
  * Research Dataset Controller.
  */
+// TODO CHECKSTYLE-OFF: ClassFanOutComplexityCheck
 @RequestMapping("/researchdataset/**")
 @Controller
 public class ResearchDatasetController
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ResearchDatasetController.class);
 
     private static final String BUILDINGS_MODEL_ATTRIBUTE = "buildings";
     private static final String PUBLIC_ACCESS_RIGHT_OPTIONS_ATTRIBUTE = "publicAccessRightOptions";
     private static final String REDIRECT_TO_HOME = "redirect:/";
     private static final String REDIRECT_TO_NEW = "researchdataset/new";
+    private static final String REDIRECT_TO_VIEW = "researchdataset/view";
     private static final String REDIRECT_TO_EDIT = "researchdataset/edit";
     private static final String CONFIRM_UNADVERTISE = "confirmUnadvertise";
     private static final String RESEARCH_GROUP_REQUEST_MODEL = "researchGroup";
@@ -88,15 +99,18 @@ public class ResearchDatasetController
     private static List<Breadcrumb> breadcrumbsForCreating = new ArrayList<Breadcrumb>();
     private static List<Breadcrumb> breadcrumbsForEditing = new ArrayList<Breadcrumb>();
     private static List<Breadcrumb> breadcrumbsForPublicizing = new ArrayList<Breadcrumb>();
+    private static List<Breadcrumb> breadcrumbsForViewing = new ArrayList<Breadcrumb>();
 
     static
     {
         breadcrumbsForCreating.add(Breadcrumb.getHome());
-        breadcrumbsForCreating.add(new Breadcrumb("Create Research Dataset"));
+        breadcrumbsForCreating.add(new Breadcrumb("sections.dataset.create.title"));
         breadcrumbsForEditing.add(Breadcrumb.getHome());
-        breadcrumbsForEditing.add(new Breadcrumb("Edit Research Dataset"));
+        breadcrumbsForEditing.add(new Breadcrumb("sections.dataset.edit.title"));
         breadcrumbsForPublicizing.add(Breadcrumb.getHome());
-        breadcrumbsForPublicizing.add(new Breadcrumb("Advertise Dataset"));
+        breadcrumbsForPublicizing.add(new Breadcrumb("sections.dataset.advertise.title"));
+        breadcrumbsForViewing.add(Breadcrumb.getHome());
+        breadcrumbsForViewing.add(new Breadcrumb("sections.dataset.view.title"));
     }
 
     @Autowired
@@ -114,16 +128,24 @@ public class ResearchDatasetController
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private TemporalDataValidator temporalDataValidator;
+
+    @Autowired
+    private TokenInputHelper tokenInputHelper;
+
     /**
-     * For ResearchProject we always initialize them with an empty ResearchProject first, workaround for the NotNull
+     * For ResearchDataset we always initialize them with an empty ResearchProject first, workaround for the NotNull
      * validation constraint when we only want to retrieve and set the real one later
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @ModelAttribute("researchDataset")
     public ResearchDataset initResearchProject()
     {
         ResearchDataset emptyModel = new ResearchDataset();
         ResearchProject researchProject = new ResearchProject();
         researchProject.associateWithResearchDataset(emptyModel);
+        emptyModel.setPublications(new AutoPopulatingList(Publication.class));
         return emptyModel;
     }
 
@@ -148,47 +170,72 @@ public class ResearchDatasetController
                         return REDIRECT_TO_NEW;
                     }
                 });
-
     }
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String createResearchDataset(@RequestParam("projectId") final Long projectId,
-            @Valid final ResearchDataset researchDataset, final BindingResult result, final Model model,
-            Principal principal)
+            @RequestParam("vocabulary") final String keywords, @Valid final ResearchDataset researchDataset,
+            final BindingResult result, final Model model, Principal principal)
     {
+
+        temporalDataValidator.validateResearchDatasetTemporalData(researchDataset, "researchDataset", result);
         return permissionService.canProject(PermissionType.CREATE_DATASET, projectId, principal,
                 new PermissionService.ResearchProjectAction()
                 {
                     @Override
                     public String act(ResearchProject project, User user)
                     {
-                        if (result.hasErrors())
+                        if (!result.hasErrors())
                         {
-                            model.addAttribute(BREADCRUMBS, breadcrumbsForCreating);
-                            model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, project);
-                            model.addAttribute(BUILDINGS_MODEL_ATTRIBUTE, Building.findAllBuildings());
-                            return REDIRECT_TO_NEW;
+                            try
+                            {
+                                researchDatasetService.createDataset(projectId, researchDataset, keywords);
+                                return REDIRECT_TO_HOME;
+                            }
+                            catch (NoneUniqueNameException noneUniqueException)
+                            {
+                                String[] nameErrorCode = {""};
+                                String[] nameErrorArg = {""};
+                                FieldError nameError = new FieldError(RESEARCH_DATASET_REQUEST_MODEL, "name",
+                                        researchDataset.getName(), true, nameErrorCode, nameErrorArg,
+                                        "Dataset already exists under this project");
+                                result.addError(nameError);
+                            }
                         }
-
-                        try
-                        {
-                            researchDatasetService.createDataset(projectId, researchDataset);
-                            return REDIRECT_TO_HOME;
-                        }
-                        catch (NoneUniqueNameException noneUniqueException)
-                        {
-                            String[] nameErrorCode = {""};
-                            String[] nameErrorArg = {""};
-                            FieldError nameError = new FieldError(RESEARCH_DATASET_REQUEST_MODEL, "name",
-                                    researchDataset.getName(), true, nameErrorCode, nameErrorArg,
-                                    "Dataset already exists under this project");
-                            result.addError(nameError);
-                            model.addAttribute(BREADCRUMBS, breadcrumbsForCreating);
-                            model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, project);
-                            return REDIRECT_TO_NEW;
-                        }
+                        // going back to view with errors, add model
+                        model.addAttribute("vocabulary",
+                                tokenInputHelper.buildJsonOnValidationError(keywords, project.getResearchGroup()));
+                        model.addAttribute(BREADCRUMBS, breadcrumbsForCreating);
+                        model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, project);
+                        model.addAttribute(BUILDINGS_MODEL_ATTRIBUTE, Building.findAllBuildings());
+                        return REDIRECT_TO_NEW;
                     }
                 });
+    }
+
+    @RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
+    public String viewResearchDataset(@PathVariable("id") Long datasetId, final Model model, Principal principal)
+    {
+        return permissionService.canViewDataset(datasetId, principal, new PermissionService.ResearchDatasetAction()
+        {
+            @Override
+            public String act(ResearchDataset dataset, User user)
+            {
+                model.addAttribute(BREADCRUMBS, breadcrumbsForViewing);
+                model.addAttribute(RESEARCH_DATASET_REQUEST_MODEL, dataset);
+                if (!(dataset.getDateFrom() == null))
+                {
+                    model.addAttribute("dateFrom", dataset.getDateFrom().toDate());
+                }
+                if (!(dataset.getDateTo() == null))
+                {
+                    model.addAttribute("dateTo", dataset.getDateTo().toDate());
+                }
+
+                return REDIRECT_TO_VIEW;
+            }
+        });
+
     }
 
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
@@ -201,6 +248,8 @@ public class ResearchDatasetController
                     @Override
                     public String act(ResearchDataset dataset, User user)
                     {
+                        model.addAttribute("vocabulary", tokenInputHelper.appendJson(dataset.getKeywords()));
+                        model.addAttribute("groupId", dataset.getResearchProject().getResearchGroup().getId());
                         model.addAttribute(BREADCRUMBS, breadcrumbsForEditing);
                         model.addAttribute(RESEARCH_DATASET_REQUEST_MODEL, dataset);
                         model.addAttribute(BUILDINGS_MODEL_ATTRIBUTE, Building.findAllBuildings());
@@ -212,54 +261,77 @@ public class ResearchDatasetController
 
     @RequestMapping(value = "/editResearchDataset", method = RequestMethod.PUT)
     public String editResearchDataset(@Valid final ResearchDataset researchDataset, final BindingResult result,
-            final Model model, java.security.Principal principal)
+            final Model model, Principal principal, @RequestParam("vocabulary") final String keywords)
     {
+        temporalDataValidator.validateResearchDatasetTemporalData(researchDataset, "researchDataset", result);
         return permissionService.canDataset(PermissionType.EDIT_DATASET, researchDataset.getId(), principal,
                 new PermissionService.ResearchDatasetAction()
                 {
                     @Override
                     public String act(ResearchDataset dataset, User user)
                     {
-                        if (result.hasErrors())
+                        if (!dataset.getVersion().equals(researchDataset.getVersion()))
                         {
+                            ResearchGroup group = dataset.getResearchProject().getResearchGroup();
+                            model.addAttribute("vocabulary",
+                                    tokenInputHelper.buildJsonOnValidationError(keywords, group));
+                            model.addAttribute("groupId", dataset.getResearchProject().getResearchGroup().getId());
                             model.addAttribute(BREADCRUMBS, breadcrumbsForEditing);
                             model.addAttribute(RESEARCH_DATASET_REQUEST_MODEL, researchDataset);
+                            model.addAttribute(BUILDINGS_MODEL_ATTRIBUTE, Building.findAllBuildings());
+                            model.addAttribute("version_error", true);
                             return REDIRECT_TO_EDIT;
                         }
 
-                        try
+                        if (!result.hasErrors())
                         {
-                            researchDatasetService.editDataset(researchDataset);
-                            return REDIRECT_TO_HOME;
+                            try
+                            {
+                                researchDatasetService.editDataset(researchDataset, keywords);
+                                return REDIRECT_TO_HOME;
+                            }
+                            catch (NoneUniqueNameException noneUniqueException)
+                            {
+                                // Find its own id, there should only be one
+                                String[] nameErrorCode = {""};
+                                String[] nameErrorArg = {""};
+                                FieldError nameError = new FieldError(RESEARCH_DATASET_REQUEST_MODEL, "name",
+                                        researchDataset.getName(), true, nameErrorCode, nameErrorArg,
+                                        "Dataset already exists under this project");
+                                result.addError(nameError);
+                            }
                         }
-                        catch (NoneUniqueNameException noneUniqueException)
-                        {
-                            // Find its own id, there should only be one
-                            String[] nameErrorCode = {""};
-                            String[] nameErrorArg = {""};
-                            FieldError nameError = new FieldError(RESEARCH_DATASET_REQUEST_MODEL, "name",
-                                    researchDataset.getName(), true, nameErrorCode, nameErrorArg,
-                                    "Dataset already exists under this project");
-                            result.addError(nameError);
-                            return REDIRECT_TO_EDIT;
-                        }
+                        // going back to view with errors, add model
+                        ResearchGroup group = dataset.getResearchProject().getResearchGroup();
+                        model.addAttribute("vocabulary", tokenInputHelper.buildJsonOnValidationError(keywords, group));
+                        model.addAttribute("groupId", dataset.getResearchProject().getResearchGroup().getId());
+                        model.addAttribute(BREADCRUMBS, breadcrumbsForEditing);
+                        model.addAttribute(RESEARCH_DATASET_REQUEST_MODEL, researchDataset);
+                        model.addAttribute(BUILDINGS_MODEL_ATTRIBUTE, Building.findAllBuildings());
+                        return REDIRECT_TO_EDIT;
                     }
                 });
-
     }
 
     @RequestMapping(value = "/publish/{id}", method = RequestMethod.GET)
-    public String confirmPublishResearchDataset(@PathVariable("id") Long datasetId, Model model)
+    public String confirmPublishResearchDataset(@PathVariable("id") Long datasetId, Model model, Principal principal)
     {
         ResearchDataset researchDataset = ResearchDataset.findResearchDataset(datasetId);
         ResearchProject researchProject = researchDataset.getResearchProject();
         ResearchGroup researchGroup = researchProject.getResearchGroup();
+        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
         if (researchDataset.isAdvertised())
         {
             return REDIRECT_TO_HOME;
         }
         else
         {
+            // Check permissions to each set and determine if editing is avaliable at the project/group level
+            model.addAttribute("canEditGroup",
+                    permissionService.hasEditingAccessPermissionForGroup(user, researchGroup));
+            model.addAttribute("canEditProject",
+                    permissionService.hasEditingAccessPermissionForProject(user, researchProject));
+
             model.addAttribute(BREADCRUMBS, breadcrumbsForPublicizing);
             model.addAttribute(RESEARCH_DATASET_REQUEST_MODEL, researchDataset);
             model.addAttribute(RESEARCH_PROJECT_REQUEST_MODEL, researchProject);
@@ -271,8 +343,8 @@ public class ResearchDatasetController
 
     @RequestMapping(value = "/publish", method = RequestMethod.POST)
     public String publishResearchDataset(@Valid ResearchDataset incomingResearchDataset, BindingResult result,
-            Model model, @RequestParam("id") Long datasetId, @RequestParam("submit") String submit,
-            HttpServletRequest request)
+            Model model, @RequestParam("id") Long datasetId,
+            @RequestParam(value = "submit", required = false) String submit, HttpServletRequest request)
     {
         if ("Advertise".equals(submit))
         {
@@ -343,6 +415,7 @@ public class ResearchDatasetController
     public void initDataBinder(WebDataBinder binder)
     {
         binder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());
+        binder.registerCustomEditor(DateTime.class, new DateTimePropertyEditor());
         binder.registerCustomEditor(PublicAccessRight.class, new PropertyEditorSupport()
         {
             public String getAsText()

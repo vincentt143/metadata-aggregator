@@ -28,12 +28,20 @@
 package au.org.intersect.sydma.webapp.util;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+
+import au.org.intersect.sydma.webapp.domain.DBUser;
+import au.org.intersect.sydma.webapp.domain.ResearchDatasetDB;
 
 /**
  * A wrapper object for handling how/where a connection is obtained for DB Instance creation
@@ -42,13 +50,52 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
  */
 public class DBConnectionHelper
 {
+    private static final Logger LOG = LoggerFactory.getLogger(DBConnectionHelper.class);
+
+    private String driverClass;
 
     @Autowired
-    @Qualifier("schemaDataSource")
+    @Qualifier("dbInstanceDataSource")
     private DataSource dataSource;
+
+    @Required
+    public void setDriverClass(String driverClass)
+    {
+        this.driverClass = driverClass;
+    }
 
     public Connection obtainConnection()
     {
-        return DataSourceUtils.getConnection(dataSource);        
+        return DataSourceUtils.getConnection(dataSource);
+    }
+
+    /**
+     * Obtain a connection for query
+     * 
+     * @param dbUser
+     *            Must pass a user with only viewing access
+     * @return
+     */
+    public Connection obtainConnectionFor(ResearchDatasetDB datasetDB, DBUser dbUser)
+    {
+        try
+        {
+            Class.forName(driverClass);
+        }
+        catch (ClassNotFoundException e)
+        {
+            LOG.error(e.toString());
+        }
+        String databaseUrl = "jdbc:mysql://" + datasetDB.getDbHostname() + ":3306/" + datasetDB.getDbName();
+        Connection connection = null;
+        try
+        {
+            connection = DriverManager.getConnection(databaseUrl, dbUser.getDbUsername(), dbUser.getDbPassword());
+        }
+        catch (SQLException e)
+        {
+            LOG.error("SQL connection error for url:" + databaseUrl, e);
+        }
+        return connection;
     }
 }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags"
+    xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+    xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:display="urn:jsptld:http://displaytag.sf.net"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" 
+    xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+        <spring:message code="dbinstance.change.password.title" text="?Change Database Password?" arguments="${dataset.name}" htmlEscape="true"/>
+    </h1>			                          
+          <c:choose>
+              <c:when test="${empty dbUser}">
+                  <!-- TEMP MEASURE -->
+                  You do not have access to this Database Instance
+              </c:when>
+              <c:otherwise>
+               <c:url var="formAction" value="/dbinstance/changePassword" />
+               <form:form class="formbuilder" method="put" action="${formAction}" autocomplete="off">
+				<fieldset>
+					<legend>Change Password</legend>
+					<input type="hidden" name="datasetId" value="${dataset.id}"/> 
+					<ol>
+                    	<li>
+                    		<spring:message code="dbinstance.change.password.instruction" text="?Select database access level?"/>
+                    	</li>
+                    	<li>
+							<i class="icon icon-warn">
+                    		<spring:message code="dbinstance.change.password.description" text="?Password will change for all users?"/>
+                   	 		</i>
+                    	</li>
+                    	
+                    	<label for="fullAccessCheckbox" id="accessibility">FA checkbox</label>
+                    	<input id="fullAccessCheckbox" type="checkbox" name="fullAccessLevel" value="fullAccess"/> Change Full Access Password<br/>
+                    	<label for="editingAccessCheckbox" id="accessibility">EA checkbox</label>
+                    	<input id="editingAccessCheckbox" type="checkbox" name="editingAccessLevel" value="editingAccess"/> Change Editing Access Password<br/>
+                    	<label for="viewingAccessCheckbox" id="accessibility">VA checkbox</label>
+                    	<input id="viewingAccessCheckbox" type="checkbox" name="viewingAccessLevel" value="viewingAccess"/> Change Viewing Access Password
+
+                    </ol>
+                    <c:url var="viewDatabaseInstanceUrl" value="/dbinstance/view">
+						<c:param name="datasetId" value="${dataset.id}" />
+					</c:url>
+				</fieldset>         
+				<div class="buttons">
+					<input class="clear-button button" type="submit" value="Cancel" name="_cancel"/>
+					<input class="submit-button button" type="submit" value="Change Password" id="submit"/>
+				</div>
+			</form:form>                    
+              </c:otherwise>
+          </c:choose>
+    <script type="text/javascript">
+    
+    	(function()
+    	{
+    	    //Used to notify Action Control to consider action as complete 
+			if (Sydma.ActionControl != null)
+		    {			    
+			    Sydma.ActionControl.markComplete = true;
+		    }
+    	})();
+    	
+    </script>
+</div>

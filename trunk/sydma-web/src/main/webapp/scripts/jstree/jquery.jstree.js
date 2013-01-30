@@ -1957,6 +1957,12 @@
 
                                                 }
                                         }, this))
+                                .bind("mouseup.jstree", $.proxy(function (e) {
+                                                    if($.vakata.dnd.is_drag && $.vakata.dnd.user_data.jstree) {
+                                                        if(this.data.dnd.i1) { clearInterval(this.data.dnd.i1); }
+                                                        if(this.data.dnd.i2) { clearInterval(this.data.dnd.i2); }
+                                                    }
+                                                }, this))
                                 .delegate("a", "mousedown.jstree", $.proxy(function (e) {
                                                 if(e.which === 1) {
                                                         this.start_drag(e.currentTarget, e);

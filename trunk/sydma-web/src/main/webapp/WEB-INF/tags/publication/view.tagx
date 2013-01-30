@@ -1,0 +1,28 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:display="urn:jsptld:http://displaytag.sf.net"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags" version="2.0">
+	<jsp:output omit-xml-declaration="yes" />
+	<jsp:directive.attribute name="modelAttribute" type="java.lang.String"
+		required="true" rtexprvalue="true"
+		description="The name of the model attribute for form binding" />
+	<h3><spring:message code="publication.title" text="?Related Publication?"/></h3>
+	
+	<c:set var="publicationList" value="${modelAttribute}.publications" />
+	<display:table name="${publicationList}"
+		uid="publication" defaultsort="1" pagesize="20">
+		<display:column title="Citations" property="citations" />
+		<display:column title="URL">
+			<a href="${publication.url}">${publication.url}</a>
+		</display:column>
+
+		<display:setProperty name="basic.empty.showtable" value="true" />
+		<display:setProperty name="paging.banner.group_size" value="25" />
+		<display:setProperty name="paging.banner.onepage" value=" " />
+		<display:setProperty name="paging.banner.placement" value="bottom" />
+	</display:table>
+
+</jsp:root>

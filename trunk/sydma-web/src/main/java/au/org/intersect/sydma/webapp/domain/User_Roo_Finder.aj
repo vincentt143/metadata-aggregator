@@ -74,4 +74,37 @@ privileged aspect User_Roo_Finder {
         return q;
     }
     
+    public static TypedQuery<User> User.findUsersByUsernameLikeOrGivennameLikeOrSurnameLike(String username, String givenname, String surname) {
+        if (username == null || username.length() == 0) throw new IllegalArgumentException("The username argument is required");
+        username = username.replace('*', '%');
+        if (username.charAt(0) != '%') {
+            username = "%" + username;
+        }
+        if (username.charAt(username.length() - 1) != '%') {
+            username = username + "%";
+        }
+        if (givenname == null || givenname.length() == 0) throw new IllegalArgumentException("The givenname argument is required");
+        givenname = givenname.replace('*', '%');
+        if (givenname.charAt(0) != '%') {
+            givenname = "%" + givenname;
+        }
+        if (givenname.charAt(givenname.length() - 1) != '%') {
+            givenname = givenname + "%";
+        }
+        if (surname == null || surname.length() == 0) throw new IllegalArgumentException("The surname argument is required");
+        surname = surname.replace('*', '%');
+        if (surname.charAt(0) != '%') {
+            surname = "%" + surname;
+        }
+        if (surname.charAt(surname.length() - 1) != '%') {
+            surname = surname + "%";
+        }
+        EntityManager em = User.entityManager();
+        TypedQuery<User> q = em.createQuery("SELECT o FROM User AS o WHERE LOWER(o.username) LIKE LOWER(:username)  OR LOWER(o.givenname) LIKE LOWER(:givenname)  OR LOWER(o.surname) LIKE LOWER(:surname)", User.class);
+        q.setParameter("username", username);
+        q.setParameter("givenname", givenname);
+        q.setParameter("surname", surname);
+        return q;
+    }
+    
 }

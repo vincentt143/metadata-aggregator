@@ -27,21 +27,34 @@
 
 package au.org.intersect.sydma.webapp.service;
 
+import java.util.List;
+
 import au.org.intersect.sydma.webapp.domain.DBSchema;
 import au.org.intersect.sydma.webapp.domain.DBUser;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchDatasetDB;
-import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.dto.DBInstanceDto;
+import au.org.intersect.sydma.webapp.exception.NoneUniqueNameException;
 
 /**
  * Service interface to manage individual DBSchemas on the database level
- *
+ * 
  * @version $Rev: 29 $
  */
 public interface ResearchDatasetDBService
 {
+    /**
+     * Changes the password for both the DB and the record for given user
+     * @param password
+     * @param dbUser
+     * @return
+     */
+    public boolean changeDBPassword(DBUser dbUser);
+    
+    ResearchDatasetDB createDBForDataset(ResearchDataset dataset, DBInstanceDto dbInstanceDTO);
 
-    DBUser grantUserAccessToDataset(User user, ResearchDataset dataset);    
+    void deleteDBForDataset(ResearchDataset dataset);
 
-    ResearchDatasetDB createDBForDatasetAndGrantUser(ResearchDataset dataset, DBSchema schema, User user);
+    void commitReverseEngineeredDatabase(List<String> ddlCommands, ResearchDatasetDB datasetDB, DBSchema schema)
+        throws NoneUniqueNameException;
 }

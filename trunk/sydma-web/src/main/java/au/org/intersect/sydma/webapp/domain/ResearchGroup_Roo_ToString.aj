@@ -16,6 +16,7 @@ privileged aspect ResearchGroup_Roo_ToString {
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("IsPhysical: ").append(getIsPhysical()).append(", ");
         sb.append("KeyForRifCs: ").append(getKeyForRifCs()).append(", ");
+        sb.append("Keywords: ").append(getKeywords() == null ? "null" : getKeywords().size()).append(", ");
         sb.append("Name: ").append(getName()).append(", ");
         sb.append("OriginatingSource: ").append(getOriginatingSource()).append(", ");
         sb.append("PrincipalInvestigator: ").append(getPrincipalInvestigator()).append(", ");

@@ -26,7 +26,9 @@
  */
 package au.org.intersect.sydma.webapp.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +50,7 @@ import au.org.intersect.sydma.webapp.domain.RdsRequest;
 import au.org.intersect.sydma.webapp.domain.RdsRequestStatus;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
+import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.service.RdsService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
 
@@ -70,16 +73,14 @@ public class RdsController
     static
     {
         breadcrumbs.add(Breadcrumb.getHome());
-        breadcrumbs.add(new Breadcrumb("RDS space"));
+        breadcrumbs.add(new Breadcrumb("sections.browse.title"));
     }
-    
 
     @InitBinder
-    public void setBinder(WebDataBinder dataBinder) 
+    public void setBinder(WebDataBinder dataBinder)
     {
-        dataBinder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());      
+        dataBinder.registerCustomEditor(ResearchSubjectCode.class, new ResearchSubjectCodePropertyEditor());
     }
-
 
     @RequestMapping(value = "/new", method = RequestMethod.GET)
     public String newRds(Model model)
@@ -91,7 +92,7 @@ public class RdsController
 
     @RequestMapping(value = "/createRdsRequest", method = RequestMethod.POST)
     public String createRdsRequest(@Valid RdsRequest rdsRequest, BindingResult result, Model model,
-            HttpServletRequest request)
+            HttpServletRequest request, Principal principal)
     {
         if (result.hasErrors())
         {
@@ -102,7 +103,18 @@ public class RdsController
         boolean groupIsUnique;
         boolean rdsIsUnique;
         groupIsUnique = ResearchGroup.findResearchGroupsByNameEquals(rdsRequest.getName()).getResultList().isEmpty();
-        rdsIsUnique = RdsRequest.findRdsRequestsByNameEquals(rdsRequest.getName()).getResultList().isEmpty();
+        // we don't need to check if request status is approved since by then the group check would cover it
+        rdsIsUnique = RdsRequest
+                .findRdsRequestsByNameEqualsAndRequestStatus(rdsRequest.getName(), RdsRequestStatus.CREATED)
+                .getResultList().isEmpty();
+
+        User currentUser = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
+        Calendar cal = Calendar.getInstance();
+        String timeAndDate = cal.getTime().toString();
+
+        rdsRequest.setTimeAndDateOfRequest(timeAndDate);
+        rdsRequest.setRequester(currentUser.getUsername());
+
         if (!groupIsUnique || !rdsIsUnique)
         {
             model.addAttribute(RDS_REQUEST_MODEL, rdsRequest);
@@ -114,12 +126,11 @@ public class RdsController
             result.addError(nameError);
             return REDIRECT_TO_NEW;
         }
-        
+
         rdsService.createRdsRequest(rdsRequest);
         return REDIRECT_TO_SHOW + rdsRequest.getId();
 
     }
-
 
     @RequestMapping(value = "/show/{id}", method = RequestMethod.GET)
     public String show(@PathVariable("id") Long id, Model model)

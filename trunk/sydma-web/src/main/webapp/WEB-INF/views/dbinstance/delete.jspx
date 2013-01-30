@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+        <spring:message code="dbinstance.delete.title" text="?Delete Instance?" arguments="${dataset.name}" htmlEscape="true"/>
+    </h1>
+
+    <c:url var="formAction" value="/dbinstance/delete" />
+    <form class="formbuilder" method="post" action="${formAction }" autocomplete="off">
+
+        <input type="hidden" name="datasetId" value="${dataset.id}"/>
+        <fieldset>
+            <legend>
+                <spring:message code="dbinstance.delete.legend" text="?Delete?" />
+            </legend>
+            <ol>
+                <li>
+                    <span class="field_label">
+                    	<spring:message code="dbinstance.dbName" text="?Schema Name?"/>:
+                    </span>
+                    <span id="dbName_value">
+                    	<c:out value="${datasetDB.dbName}"/>
+                    </span>
+                </li>
+                
+                <li>
+                    <spring:message code="dbinstance.delete.description" text="?Delete Description?"/>
+                </li>
+                
+                <li>
+                    <i class="icon icon-warn"><spring:message code="dbinstance.delete.warn" text="?Delete Warn?"/></i>
+                </li>
+                
+                <li>
+                    <spring:message code="dbinstance.delete.confirm.description" text="?Confirm Description?"/>
+                </li>
+                
+                <c:if test="${confirmFailure}">
+                    <c:set var="cssStyle" value="error" />
+                </c:if>                
+                <li class="${cssStyle}">
+                    <c:if test="${confirmFailure}">
+                        <p class="error-text">
+                            <spring:message code="dbinstance.delete.confirm.confirmFailure" text="?Unable to Confirm?"/>        
+                        </p>
+                    </c:if>
+                    <label for="confirmDbName">
+                        <spring:message code="dbinstance.delete.confirm.label" text="?Delete Confirm?"/>
+                    </label>
+                    <input id="confirmDbName" name="confirmDbName" value="" autocomplete="off"/>
+                </li>
+            </ol>
+            
+        </fieldset>
+        <div class="buttons">
+            <input id="cancel_button" class="clear-button button" type="submit" name="_submit" value="Cancel"/> 
+            <input id="delete_button" class="submit-button button" type="submit" name="_submit" value="Delete"/>
+        </div>
+    </form>
+    
+</div>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" 
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags"
+    xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+    xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:display="urn:jsptld:http://displaytag.sf.net"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" 
+    xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+    	<spring:message code="dbinstance.manage.database.backup.title" text="?Manage Database Backup?" arguments="${dataset.name}" htmlEscape="true"/>
+    </h1>
+
+    <c:url var="formAction" value="/dbinstance/manageBackup" />
+    <form:form class="formbuilder" modelAttribute="dBBackup" method="post" action="${formAction}" autocomplete="off" >   
+       <fieldset class="ajax_links">
+           <input type="hidden" name="datasetId" value="${datasetId}" />
+           <legend>
+               <spring:message code="dbinstance.manage.database.backup" text="?Schema?" />
+           </legend>
+           <ol>
+		    <display:table requestURI="/dbinstance/manageBackup?datasetId=${datasetId}" requestURIcontext="true" uid="backup" name="dBBackup" defaultsort="1" pagesize="25">
+		        
+		        <display:column sortable="false" title="Date" style="width: 25%">
+		        	<c:out value="${backup.date}" />
+		        </display:column>
+		        <display:column sortable="false" title="User" style="width: 25%">
+		        	<c:out value="${backup.user}" />
+		        </display:column>
+		        <display:column sortable="false" title="Done Before" style="width: 25%">
+		        	<c:out value="${backup.description}" />
+		        </display:column>
+		        <display:column sortable="false" title="Actions" class="ajax_links" style="width: 25%" >
+		        	<c:url value='/dbinstance/confirmRestore' var="restoreDatabaseUrl">
+		        		<c:param name="backupId" value="${backup.id}" />
+		            </c:url> 
+		            <a href="${restoreDatabaseUrl}">
+		            	<spring:message code="dbinstance.restore.link" text="?dbinstance.restore.link?" />
+		            </a>
+		        </display:column>
+		        <display:setProperty name="basic.empty.showtable" value="true" />  
+		        <display:setProperty name="paging.banner.group_size" value="20" />  
+		        <display:setProperty name="paging.banner.onepage" value=" " />  
+		        <display:setProperty name="paging.banner.placement" value="bottom" />
+		    </display:table>
+	    </ol>
+		</fieldset>
+		<c:if test="${canBackup}">	    
+		<div class="buttons">
+		    <c:url var="createBackupUrl" value="/dbinstance/createBackup">
+		        <c:param name="datasetId" value="${datasetId}"/>
+		    </c:url>
+		    <spring:message var="createInstanceMsg" code="dbinstance.create.backup" text="?Create Backup?"/>
+			
+			<input id="backup_button" class="submit-button button" type="submit" value="${createInstanceMsg}"/>  
+	    </div>  
+    </c:if>
+	</form:form>
+</div>    

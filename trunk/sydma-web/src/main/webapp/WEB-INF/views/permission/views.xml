@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
 <tiles-definitions>
-    <definition extends="contentUnlightboxable" name="permission/index">
-        <put-attribute name="body" value="/WEB-INF/views/permission/index.jspx" cascade="true"/>
-    </definition>
-    <definition extends="contentUnlightboxable" name="permission/view">
+    <definition extends="contentLightboxable" name="permission/view">
         <put-attribute name="body" value="/WEB-INF/views/permission/view.jspx" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="permission/delete">
+        <put-attribute name="body" value="/WEB-INF/views/permission/delete.jspx" cascade="true"/>
+    </definition>
+	<definition extends="contentLightboxable" name="permission/activityLog">
+        <put-attribute name="body" value="/WEB-INF/views/permission/activityLog.jspx" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="permission/new">
+        <put-attribute name="body" value="/WEB-INF/views/permission/new.jspx" cascade="true"/>
+        <put-list-attribute name="page_js_files">
+           	<add-attribute value="jquery.tokeninput.js" />
+        </put-list-attribute>
     </definition>
 </tiles-definitions>

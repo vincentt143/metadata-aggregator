@@ -4,11 +4,11 @@
 	<parent>
 		<artifactId>sydma</artifactId>
 		<groupId>au.org.intersect.sydma</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.10</version>
 	</parent>
 	<groupId>au.org.intersect.sydma</groupId>
 	<artifactId>build-tools</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.10</version>
 	<name>BUILD-TOOLS</name>
 	<properties>
 		<topLevelDir>${project.parent.basedir}</topLevelDir>

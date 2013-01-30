@@ -7,6 +7,9 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
 (function()
 {
 
+    var debug = Sydma.getDebug("ManageTree");
+    var info = Sydma.getInfo("ManageTree");
+    
     /* static private */
     var moveableClass = "moveable";
     var moveableSelector = "." + moveableClass;
@@ -69,7 +72,7 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
             "json_data" :
             {
                 data :
-                {
+                {                    
                     "state" : "closed",
                     "data" :
                     {
@@ -82,10 +85,11 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
                     },
                     "metadata" :
                     {
+                        "allowedActions" : inputOpt.rootPermission,
                         "name" : inputOpt.rootName,
                         "absolutePath" : inputOpt.rootPath,
                         "fileType" : "DATASET",
-                        "size" : "",
+                        "size" : null,
                         "creationDate" : ""                        
                     },
                     "attr" :
@@ -130,7 +134,7 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
         {            
             //check if the src's parent is the target destination, ie. prevent moving within the same folder
             var srcParent = data.op; //li -> ul (parent1) -> li (true node parent)
-            //Sydma.log("DEBUG::ManagetTree::checkMove::parent target", srcParent[0], target[0]);
+            //debug("checkMove::parent target", srcParent[0], target[0]);
             if (srcParent[0] == target[0])
             {
                 return false;
@@ -150,7 +154,7 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
         {
             dropAllow = true;
         }
-        Sydma.log("DEBUG::ManagetTree::dropCheck ", dropAllow);
+        //debug("dropCheck ", dropAllow);
         return dropAllow;
     };
 
@@ -167,7 +171,7 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
             "after" : false,
             "inside" : insideAllowed
         };
-        Sydma.log("DEBUG::ManagetTree::dragCheck ", allowed);
+        //debug("dragCheck ", allowed);
         return allowed;
     };
 
@@ -175,7 +179,7 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
     {
         var src = data.o;
         var target = data.r;
-        Sydma.log("DEBUG::ManagetTree::dropFinish ", src, target);
+        debug("dropFinish ", src, target);
     };
 
     /**
@@ -183,7 +187,7 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
      */
     Sydma.manageDataset.ManageTree.prototype.jsTreeNodeBinder = function(index, nodeData)
     {
-
+        nodeData.connectionId = this.connectionId;
         var treeNode = Sydma.fileTree.ServerTree.prototype.jsTreeNodeBinder.apply(this, [ index, nodeData ]);
 
         var fileType = nodeData.fileType;
@@ -201,6 +205,10 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
             addClass += " " + moveTargetClass;
             // addClass += " jstree-drop";
         }
+        
+        debug("jsTreeBinder::nodeData", nodeData);        
+        
+        treeNode["allowedActions"] = nodeData.allowedActions; 
 
         treeNode.attr["class"] = addClass;
 
@@ -216,7 +224,7 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
 
     Sydma.manageDataset.ManageTree.prototype.onNodeMove = function(event, data)
     {
-        Sydma.log("onNodeMove", data);
+        //debug("onNodeMove", data);
         var $movingNode = jQuery(data.rslt.o);
         var movingNodeOriginParentId = data.rslt.op.attr("id");
         var movingMetadata = $movingNode.data("jstree");
@@ -224,8 +232,8 @@ Sydma.manageDataset = Sydma.manageDataset ? Sydma.manageDataset : {};
         var movingNodeNewParentId = data.rslt.np.attr("id");
         var destinationMetadata = $destinationNode.data("jstree");
 
-        Sydma.log("$movingNodeOriginParent", movingNodeOriginParentId);
-        Sydma.log("$movingNodeNewParent", movingNodeNewParentId);
+        debug("onNodeMove::$movingNodeOriginParent", movingNodeOriginParentId);
+        debug("onNodeMove::$movingNodeNewParent", movingNodeNewParentId);
         
         var cancelMove = function()
         {

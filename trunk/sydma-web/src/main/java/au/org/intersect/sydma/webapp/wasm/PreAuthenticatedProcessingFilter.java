@@ -58,8 +58,11 @@ public class PreAuthenticatedProcessingFilter extends AbstractPreAuthenticatedPr
                 if (cookies[i].getName().equals(wasmService.getSKeyCookieName()))
                 {
                     String sKey = cookies[i].getValue();
-                    LOGGER.debug("UniKey sKey foud " + sKey);
-                    return sKey;
+                    if (sKey != null && sKey.trim().length() > 0) 
+                    {
+                        LOGGER.debug("UniKey sKey foud " + sKey);
+                        return sKey;
+                    }
                 }
             }
         }

@@ -41,7 +41,7 @@ public class MailHelperImpl implements MailHelper
     private transient MailSender mailTemplate;
 
     @Override
-    public void sendMessage(String mailFrom, String subject, String mailTo, String message)
+    public void sendMessage(String mailFrom, String subject, String[] mailTo, String message)
     {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(mailFrom);

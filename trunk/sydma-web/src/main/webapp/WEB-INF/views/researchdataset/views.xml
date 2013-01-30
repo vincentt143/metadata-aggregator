@@ -7,12 +7,22 @@
     
     <definition extends="contentLightboxable" name="researchdataset/new">
         <put-attribute name="body" value="/WEB-INF/views/researchdataset/new.jspx" cascade="true"/>
+        <put-list-attribute name="page_js_files">
+           	<add-attribute value="jquery.tokeninput.js" />
+        </put-list-attribute>           
     </definition>
     
     <definition extends="contentLightboxable" name="researchdataset/edit">
         <put-attribute name="body" value="/WEB-INF/views/researchdataset/edit.jspx" cascade="true"/>
+        <put-list-attribute name="page_js_files">
+           	<add-attribute value="jquery.tokeninput.js" />
+        </put-list-attribute>           
     </definition>
-    
+	
+	<definition extends="contentLightboxable" name="researchdataset/view">
+        <put-attribute name="body" value="/WEB-INF/views/researchdataset/view.jspx" cascade="true"/>
+    </definition>
+     
     <definition extends="contentUnlightboxable" name="researchdataset/publish">
         <put-attribute name="body" value="/WEB-INF/views/researchdataset/publish.jspx" cascade="true"/>
         <put-list-attribute name="page_js_files">

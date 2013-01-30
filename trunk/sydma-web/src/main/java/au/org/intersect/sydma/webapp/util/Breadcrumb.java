@@ -34,29 +34,42 @@ public class Breadcrumb
 {
     public static final String BREADCRUMBS = "breadcrumbs";
 
-    private static Breadcrumb home = new Breadcrumb("My Research Data Manager", "/");
-    private static Breadcrumb adminHome = new Breadcrumb("Administration", "/admin/index");
+    private static Breadcrumb home = new Breadcrumb("application.title", "/");
+    private static Breadcrumb adminHome = new Breadcrumb("sections.admin.title", "/admin/index");
 
     private String url;
 
     private String description;
 
-    public Breadcrumb(String description, String url)
+    private boolean code;
+
+    private Breadcrumb(String description, String url, boolean code)
     {
         this.description = description;
         this.url = url;
+        this.code = code;
+    }
+
+    public Breadcrumb(String description, String url)
+    {
+        this(description, url, true);
     }
 
     public Breadcrumb(String description)
     {
-        this.description = description;
+        this(description, null, true);
+    }
+
+    public Breadcrumb(String description, boolean code)
+    {
+        this(description, null, code);
     }
 
     public static Breadcrumb getHome()
     {
         return home;
     }
-    
+
     public static Breadcrumb getAdminHome()
     {
         return adminHome;
@@ -70,6 +83,11 @@ public class Breadcrumb
     public String getDescription()
     {
         return description;
+    }
+
+    public boolean getCode()
+    {
+        return code;
     }
 
 }

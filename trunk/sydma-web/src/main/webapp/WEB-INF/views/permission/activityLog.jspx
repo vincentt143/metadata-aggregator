@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0"
+	xmlns:display="urn:jsptld:http://displaytag.sf.net"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+
+	<h1>
+		<spring:message code="permissions.activity.log.title" text="?permissions.activity.log.title?" />
+	</h1>
+	<br />
+	<fieldset>
+		<legend><spring:message code="permissions.activity.log.legend" text="?permissions.activity.log.legend?"/></legend>
+		<display:table class="tabledata_blue" uid="log"
+			name="activityLog" pagesize="20" requestURI="/permission/activityLog?id=${id}">
+			<display:column title="User" property="principal" />
+			<display:column title="Activity">
+				<c:out value="${log.activity.name }" />
+			</display:column>
+  			<display:column title="Changes" property="changes"/>
+			<display:column title="Date" property="displayDate" />
+
+			<display:setProperty name="basic.empty.showtable" value="true" />
+			<display:setProperty name="paging.banner.group_size" value="25" />
+			<display:setProperty name="paging.banner.onepage" value=" " />
+			<display:setProperty name="paging.banner.placement" value="bottom" />
+		</display:table>
+	</fieldset>
+	
+	<script>
+        // inserting class to display:table pagelinks span. Adding to the whole table causes a problem with the download
+        $("span.pagelinks").addClass("ajax_links");
+    </script>
+</div>

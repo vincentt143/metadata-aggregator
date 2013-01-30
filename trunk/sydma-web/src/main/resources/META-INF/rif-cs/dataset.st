@@ -4,9 +4,9 @@
                  xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/home/orca/schemata/registryObjects.xsd">
 <registryObject group="$researchDataset.researchProject.researchGroup.name$">
     <key>$researchDataset.keyForRifCs$</key>
-    <originatingSource>?</originatingSource>
+    <originatingSource>www.sydney.edu.au</originatingSource>
     <collection type="dataset">
-        <identifier type="local">?</identifier>
+        <identifier type="local">dataset-$researchDataset.id$</identifier>
 
         <name type="primary">
             <namePart>$researchDataset.name$</namePart>

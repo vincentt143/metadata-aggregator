@@ -7,9 +7,19 @@
     
     <definition extends="contentLightboxable" name="researchproject/new">
         <put-attribute name="body" value="/WEB-INF/views/researchproject/new.jspx" cascade="true"/>
+        <put-list-attribute name="page_js_files">
+           	<add-attribute value="jquery.tokeninput.js" />
+        </put-list-attribute>
     </definition>
     
     <definition extends="contentLightboxable" name="researchproject/edit">
         <put-attribute name="body" value="/WEB-INF/views/researchproject/edit.jspx" cascade="true"/>
+		<put-list-attribute name="page_js_files">
+           	<add-attribute value="jquery.tokeninput.js" />
+        </put-list-attribute>
+    </definition>
+    
+	<definition extends="contentLightboxable" name="researchproject/view">
+        <put-attribute name="body" value="/WEB-INF/views/researchproject/view.jspx" cascade="true"/>
     </definition>
 </tiles-definitions>

@@ -26,11 +26,12 @@
  */
 package au.org.intersect.sydma.webapp.permission.path;
 
+import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 
 /**
  * Path to a project
- *
+ * 
  * @version $Rev: 29 $
  */
 public class ResearchProjectPath extends AbstractPath
@@ -57,9 +58,9 @@ public class ResearchProjectPath extends AbstractPath
     @Override
     public String getPath()
     {
-        return Path.SEPARATOR + groupId + Path.SEPARATOR + projectId + Path.SEPARATOR;            
+        return Path.SEPARATOR + groupId + Path.SEPARATOR + projectId + Path.SEPARATOR;
     }
-    
+
     @Override
     public Long getGroupId()
     {
@@ -71,12 +72,19 @@ public class ResearchProjectPath extends AbstractPath
     {
         return projectId;
     }
-    
+
     @Override
     public boolean isProjectPath()
     {
         return true;
     }
 
+    @Override
+    public String getDisplayName()
+    {
+        ResearchGroup group = ResearchGroup.findResearchGroup(groupId);
+        ResearchProject project = ResearchProject.findResearchProject(projectId);
+        return Path.SEPARATOR + group.getName() + Path.SEPARATOR + project.getName() + Path.SEPARATOR;
+    }
 
 }

@@ -6,7 +6,7 @@
     <key>www.sydney.edu.au-metadata-aggregator-research-project-101</key>
     <originatingSource>http://myprojecturl.com</originatingSource>
     <activity type="project">
-        <identifier type="local">15 211 513 464</identifier>
+        <identifier type="local">project-101</identifier>
 
         <name type="primary">
             <namePart>Proj1</namePart>
@@ -22,7 +22,7 @@
 
         <!-- Sydney Uni -->
         <relatedObject>
-            <key>15211513464</key>
+            <key>sydney.edu.au/stc/PTY/0006</key>
             <relation type="isPartOf"/>
         </relatedObject>
 

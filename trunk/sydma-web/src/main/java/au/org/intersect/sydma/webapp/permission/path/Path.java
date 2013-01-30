@@ -88,4 +88,16 @@ public interface Path
      * @return
      */
     boolean isFilePath();
+
+    /**
+     * Returns true is permissions on this path are affected by the argument path
+     * @param parentPath
+     * @return
+     */
+    public boolean isAffectedBy(Path parentPath);
+    
+    /**
+     * Returns the path name as presented to end user
+     */
+    public String getDisplayName();
 }

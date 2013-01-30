@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="contentLightboxable" name="dbinstance/create">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/create.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/view">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/view.jspx" cascade="true"/>
+    </definition>    
+    
+    <definition extends="contentLightboxable" name="dbinstance/edit">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/edit.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/reverse">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/reverse.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/query">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/query.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/change">
+    	<put-attribute name="body" value="/WEB-INF/views/dbinstance/change.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/editQuery">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/editQuery.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/deleteQuery">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/deleteQuery.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/show">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/show.jspx" cascade="true"/>
+    </definition>
+        
+    <definition extends="contentLightboxable" name="dbinstance/delete">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/delete.jspx" cascade="true"/>
+    </definition>
+        
+    <definition extends="contentLightboxable" name="dbinstance/confirmDelete">
+        <put-attribute name="body" value="/WEB-INF/views/dbinstance/deleteConfirm.jspx" cascade="true"/>
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/manageBackup">
+    	<put-attribute name="body" value="/WEB-INF/views/dbinstance/manageBackup.jspx" cascade="true" />
+    </definition>
+    
+    <definition extends="contentLightboxable" name="dbinstance/createBackup">
+    	<put-attribute name="body" value="/WEB-INF/views/dbinstance/createBackup.jspx" cascade="true" />
+    </definition>
+    
+	<definition extends="contentLightboxable" name="dbinstance/confirmRestore">
+    	<put-attribute name="body" value="/WEB-INF/views/dbinstance/confirmRestore.jspx" cascade="true" />
+    </definition>
+</tiles-definitions>

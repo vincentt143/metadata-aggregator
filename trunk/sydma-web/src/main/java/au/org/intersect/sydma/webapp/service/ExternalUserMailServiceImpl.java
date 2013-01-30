@@ -28,12 +28,12 @@
 package au.org.intersect.sydma.webapp.service;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.util.MailHelper;
+import au.org.intersect.sydma.webapp.util.MailTemplateLoader;
 
 /**
  * Service implementation to send email
@@ -43,18 +43,14 @@ import au.org.intersect.sydma.webapp.util.MailHelper;
 public class ExternalUserMailServiceImpl implements ExternalUserMailService
 {
     private static final String EXTERNAL_USER_MODEL = "externalUser";
-    
-    /**
-     * Template engine
-     */
-    private static final StringTemplateGroup ST_GROUP = new StringTemplateGroup("externalUserEmail");
+
+    @Autowired
+    private MailTemplateLoader mailTemplateLoader;
     
     @Autowired
     private transient MailHelper mailHelper;
     
-    private String mailFrom;
-    
-    private String mailTo;
+    private String mailFrom;    
     
     private String createExternalUserSubject;
     
@@ -66,11 +62,6 @@ public class ExternalUserMailServiceImpl implements ExternalUserMailService
         this.mailFrom = mailFrom;
     }
     
-    @Required
-    public void setMailTo(String mailTo)
-    {
-        this.mailTo = mailTo;
-    }
 
     @Required
     public void setCreateExternalUserSubject(String createExternalUserSubject)
@@ -88,11 +79,11 @@ public class ExternalUserMailServiceImpl implements ExternalUserMailService
     public void sendNewExternalUserEmail(User user, String password, String baseUrl)
     {
         String loginUrl = baseUrl + "/login";
-        StringTemplate template = ST_GROUP.getInstanceOf("META-INF/email/externalUserTemplate");
+        StringTemplate template = mailTemplateLoader.loadTemplate("externalUserTemplate");
         template.setAttribute(EXTERNAL_USER_MODEL, user);
         template.setAttribute("password", password);
         template.setAttribute("loginUrl", loginUrl);
-        mailTo = user.getEmail();    
+        String[] mailTo = new String[]{user.getEmail()};    
         mailHelper.sendMessage(mailFrom, createExternalUserSubject, mailTo, template.toString());
     }
     
@@ -100,11 +91,11 @@ public class ExternalUserMailServiceImpl implements ExternalUserMailService
     public void sendResetPasswordEmail(User user, String password, String baseUrl)
     {
         String loginUrl = baseUrl + "/login";
-        StringTemplate template = ST_GROUP.getInstanceOf("META-INF/email/resetPasswordTemplate");
+        StringTemplate template = mailTemplateLoader.loadTemplate("resetPasswordTemplate");
         template.setAttribute(EXTERNAL_USER_MODEL, user);
         template.setAttribute("password", password);
         template.setAttribute("loginUrl", loginUrl);
-        mailTo = user.getEmail();    
+        String[] mailTo = new String[]{user.getEmail()};
         mailHelper.sendMessage(mailFrom, resetPasswordSubject, mailTo, template.toString());
     }
 }

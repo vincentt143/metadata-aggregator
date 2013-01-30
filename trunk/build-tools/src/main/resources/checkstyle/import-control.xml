@@ -15,7 +15,7 @@
 		<allow pkg="org.joda.time" />
 		<allow pkg="au.org.intersect.dms.util" />
 		<allow pkg="org.antlr.stringtemplate" />
-
+		
 		<subpackage name="webapp">
 			<allow pkg="javax.servlet" />
 			<allow pkg="java.text" />
@@ -45,18 +45,30 @@
 				<allow pkg="javax.persistence" />
 			</subpackage>
 			<subpackage name="domain">
+                <allow pkg="org.hibernate.annotations" />
 				<allow pkg="javax.validation.constraints" />
 				<allow pkg="javax.persistence" />
 				<allow pkg="org.hibernate.validator.constraints" />
+				<allow pkg="javax.validation" />
 				<allow pkg="au.org.intersect.sydma.webapp.util" />
 				<allow pkg="au.org.intersect.sydma.webapp.validator" />
 				<allow pkg="au.org.intersect.sydma.webapp.service" />
 				<allow pkg="au.org.intersect.sydma.webapp.permission" />
                 <allow pkg="org.apache.commons"/>
+                <allow pkg="java.sql" />
+                <allow pkg="javax.sql" />
+                <allow pkg="au.org.intersect.sydma.webapp.exception" />
+                <allow class="org.apache.solr.client.solrj.SolrServer" />
+                <allow class="org.apache.solr.client.solrj.SolrServerException" />
+                <allow class="org.apache.solr.common.SolrInputDocument" />
+                <allow class="org.springframework.scheduling.annotation.Async" />
+                <allow class="org.apache.solr.client.solrj.SolrQuery" />
+                <allow class="org.apache.solr.client.solrj.response.QueryResponse" />
 			</subpackage>
 			<subpackage name="controller">
 				<allow pkg="au.org.intersect.dms" />
 				<allow pkg="au.org.intersect.sydma.webapp.controller" />
+                <allow pkg="au.org.intersect.sydma.webapp.validator" />
 				<allow pkg="au.org.intersect.sydma.webapp.domain" />
 				<allow pkg="au.org.intersect.sydma.webapp.util" />
 				<allow pkg="au.org.intersect.sydma.webapp.wasm" />
@@ -66,13 +78,17 @@
 				<allow pkg="au.org.intersect.sydma.webapp.exception" />
 				<allow pkg="au.org.intersect.sydma.webapp.dto" />
 				<allow pkg="au.org.intersect.sydma.webapp.controller.propertyeditor" />
+				<allow pkg="au.org.intersect.sydma.webapp.validator.TemporalDataValidator" />
 				<allow pkg="javax.validation" />
 				<allow pkg="javax.persistence" />
 				<allow pkg="org.springframework.validation" />
 				<allow pkg="org.springframework.transaction" />
 				<allow pkg="flexjson" />
 				<allow pkg="java.beans" />
+				<allow pkg="java.sql"/>
 				<allow pkg="au.org.intersect.sydma.webapp.permission" />
+				<allow class="au.org.intersect.sydma.webapp.service.SolrIndexFacade" />
+				<allow pkg="org.apache.solr.client.solrj" />
 			</subpackage>
 			<subpackage name="dto">
 				<allow pkg="org.hibernate.validator.constraints" />
@@ -82,7 +98,9 @@
 			<subpackage name="util">
 				<allow pkg="org.apache.commons.io" />
 				<allow pkg="org.springframework.mail" />
+				<allow pkg="au.com.bytecode.opencsv"/>
 				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+				<allow pkg="au.org.intersect.sydma.webapp.service" />
                 <allow pkg="java.sql" />
                 <allow pkg="javax.sql" />
                 <allow pkg="org.springframework.jdbc" />
@@ -93,15 +111,23 @@
 				<allow pkg="au.org.intersect.sydma.webapp.exception" />
 				<allow pkg="au.org.intersect.sydma.webapp.dto" />
 				<allow pkg="au.org.intersect.sydma.webapp.permission" />
+                <allow pkg="au.org.intersect.dms.core.domain" />
+                <allow pkg="au.org.intersect.dms.core.service" />
+                <allow pkg="au.org.intersect.dms.core.errors" />
 				<allow pkg="org.springframework.mail" />
 				<allow pkg="org.springframework.transaction.annotation" />
 				<allow pkg="javax.persistence" />
                 <allow pkg="java.sql" />
                 <allow pkg="javax.sql" />
                 <allow pkg="org.springframework.jdbc.datasource" />
-			</subpackage>
-			<subpackage name="permission">
-				<allow pkg="au.org.intersect.sydma.webapp.domain" />
+                <allow pkg="net.schmizz.sshj" />
+				<allow pkg="org.apache.solr.client.solrj" />
+                <allow pkg="org.apache.solr.common" />
+                <allow pkg="org.apache.lucene.queryParser"/>
+                <allow pkg="au.org.intersect.sydma.webapp.service.transfer" />
+               	<subpackage name="transfer">
+	                <allow pkg="au.org.intersect.sydma.webapp.service" />
+               	</subpackage>
 			</subpackage>
 			<subpackage name="json">
 				<allow pkg="flexjson" />
@@ -111,6 +137,11 @@
 			</subpackage>
 			<subpackage name="validator">
 				<allow pkg="javax.validation" />
+                <allow pkg="au.org.intersect.sydma.webapp.domain" />
+			</subpackage>
+			<subpackage name="filter">
+                <allow pkg="au.org.intersect.sydma.webapp.domain" />
+				<allow pkg="au.org.intersect.sydma.webapp.service" />
 			</subpackage>
 		</subpackage>
 	</subpackage>

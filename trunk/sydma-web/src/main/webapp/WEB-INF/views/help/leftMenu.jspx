@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div id="menu" class="withtabs" xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+
+	<dl>
+		<dt><spring:message code="help.left.menu.title" text="?help.left.menu.title?"/></dt>
+		<dd>
+			<ul>
+				<li><c:url value='/help/index' var="helpIndex" />
+				<a href="${helpIndex}"><spring:message code="help.left.menu.overview" text="?help.left.menu.overview?"/></a>
+				</li>
+				<li><c:url value='/help/login' var="helpLogin" />
+				<a href="${helpLogin}"><spring:message code="help.login.title" text="?help.login.title?"/></a>
+				</li>
+				<li><c:url value='help/viewDataset' var="helpViewDataset" />
+				<a href="${helpViewDataset}"><spring:message code="help.view.dataset.title" text="?help.view.dataset.title?"/></a>
+				</li>
+				<li><c:url value='help/uploadDownload' var="helpUploadDownload" />
+				<a href="${helpUploadDownload}"><spring:message code="help.upload.download.title" text="?help.upload.download.title?"/></a>
+				</li>
+				<li><c:url value='help/advertiseData' var="helpAdvertiseData" />
+				<a href="${helpAdvertiseData}"><spring:message code="help.advertise.dataset.title" text="?help.advertise.dataset.title?"/></a>
+				</li>
+				<li><c:url value='help/requestRdsSpace' var="helpRequestRdsSpace" />
+				<a href="${helpRequestRdsSpace}"><spring:message code="help.request.rds.space.title" text="?help.request.rds.space.title?"/></a>
+				</li>
+				<li><c:url value='help/managingUsers' var="helpManagingUsers" />
+				<a href="${helpManagingUsers}"><spring:message code="help.managing.users.title" text="?help.managing.users.title?"/></a>
+				</li>
+			</ul>
+		</dd>	
+	</dl>
+</div>

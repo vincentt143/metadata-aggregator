@@ -9,15 +9,5 @@
             </label>                       
         </li>
     </ol>   
-    <p>
-        <spring:message code="exceptions.reload.description" text="?Refresh Page?"/>            
-    </p>         
-     <div class="buttons">
-        <input id="confirmRefresh" class="sydmaReload button" type="button" value="Okay" name="Okay"
-            title="Okay" />
     </div>
-    </div>
-    <script type="text/javascript">
-        Sydma.activateReloadButton();
-    </script>
 </div>

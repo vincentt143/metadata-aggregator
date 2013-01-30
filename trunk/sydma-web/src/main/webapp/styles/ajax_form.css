@@ -1,17 +1,16 @@
 @CHARSET "UTF-8";
 
 /***/
+.sydma_content h1,.sydma_content h2,.sydma_content h3,.sydma_content h4,.sydma_content h5,.sydma_content h6
+	{
+	color: #CE1126;
+}
 
-.sydma_content h1, .sydma_content h2, .sydma_content h3, .sydma_content h4, .sydma_content h5, .sydma_content h6
-	{
-		color: #CE1126;
-	}
-.sydma_content h1
-	{
-		text-transform:uppercase;
-		font-size:1.7em;
-	}	
-	
+.sydma_content h1 {
+	text-transform: uppercase;
+	font-size: 1.7em;
+}
+
 .sydma_content form.boxed {
 	padding: .909em;
 	width: 45em;
@@ -39,9 +38,7 @@
 	position: relative;
 }
 
-
-
-.sydma_content form.formbuilder legend {
+.sydma_content fieldset legend {
 	font-style: normal;
 	text-transform: none;
 	font-weight: bold;
@@ -55,35 +52,58 @@
 	background: #fdfcde;
 }
 
-.sydma_content form.formbuilder label {
-	margin-top: .4em;
+.sydma_content fieldset label {
+	margin-top: .6em;
 	width: 11em;
-	margin-top: .2em;
+	/**margin-top: .2em;*/
 	display: inline-block;
+	*display: inline;
+	zoom: 1;
 	vertical-align: top;
 	text-align: right;
 	font-weight: bold;
+	margin-right: 1em;
 }
 
-.sydma_content form.formbuilder fieldset {
+.sydma_content .field_label {
+	margin-top: .6em;
+	width: 11em;
+	/**margin-top: .2em;*/
+	display: inline-block;
+	*display: inline;
+	zoom: 1;
+	vertical-align: top;
+	text-align: right;
+	font-weight: bold;
+	margin-right: 1em;
+}
+	
+.sydma_content fieldset span {
+	margin-right: 2em;
+	vertical-align:bottom;
+}
+
+.sydma_content  fieldset {
+	background-image:none;
 	background-color: #fdfcde;
 	position: relative;
 	padding: 0 1em 1em 1em;
 	margin: 1em 0;
 }
 
-.sydma_content form.formbuilder fieldset ol {
+.sydma_content  fieldset ol {
 	margin: 1em 0 0 0;
 	padding: 0;
 }
 
-.sydma_content form.formbuilder fieldset li {
+.sydma_content  fieldset li,
+.sydma_content ol li {
 	list-style: none;
 	padding: .5em .5em 1em .5em;
 	margin: 0;
 }
 
-.sydma_content form.formbuilder fieldset li.error {
+.sydma_content  fieldset li.error {
 	border-color: #ce1126;
 	border-width: 2px 0 1px 0;
 	color: #ce1126;
@@ -91,7 +111,7 @@
 	width: auto;
 }
 
-.sydma_content form.formbuilder fieldset fieldset {
+.sydma_content  fieldset fieldset {
 	border: none;
 	margin: .3em 0 0;
 	padding-left: 0;
@@ -99,7 +119,7 @@
 	margin: 0;
 }
 
-.sydma_content form.formbuilder fieldset fieldset legend {
+.sydma_content  fieldset fieldset legend {
 	background: none;
 	padding: 0 0 .5em;
 	margin: 0;
@@ -108,7 +128,7 @@
 	font-weight: bold;
 }
 
-.sydma_content form.formbuilder fieldset fieldset label {
+.sydma_content  fieldset fieldset label {
 	display: block;
 	width: auto;
 	font-weight: normal;
@@ -118,32 +138,32 @@
 	margin-top: 0;
 }
 
-.sydma_content form.formbuilder fieldset legend span {
+.sydma_content  fieldset legend span {
 	display: block;
 	max-width: 25em;
 	white-space: normal;
 }
 
-.sydma_content form.formbuilder fieldset fieldset legend span {
+.sydma_content  fieldset fieldset legend span {
 	max-width: 42em;
 }
 
-.sydma_content form.formbuilder select {
+.sydma_content  select {
 	max-width: 25em;
 }
 
-.sydma_content form.formbuilder fieldset li.error {
+.sydma_content  fieldset li.error {
 	margin-bottom: .5em;
 	background-color: #FFF5EE;
 }
 
-.sydma_content form.formbuilder em,.sydma_content .required-warning em {
+.sydma_content  em,.sydma_content .required-warning em {
 	font-weight: bold;
 	font-style: normal;
 	color: #f00;
 }
 
-.sydma_content form.formbuilder .user-agreement label {
+.sydma_content  .user-agreement label {
 	width: auto;
 	font-weight: normal;
 	margin: -1.6em 0 0 3em;
@@ -151,31 +171,31 @@
 	text-align: left;
 }
 
-.sydma_content form.formbuilder textarea {
+.sydma_content  textarea {
 	width: 25em;
 	font-size: 1em;
 }
 
-.sydma_content form.formbuilder .buttons {
+.sydma_content  .buttons {
 	text-align: right;
 	margin-top: 1em;
 }
 
-.sydma_content form.formbuilder .buttons input {
+.sydma_content  .buttons input {
 	margin-left: 2em;
 }
 
-.sydma_content form.formbuilder h2 {
+.sydma_content  h2 {
 	color: #384856;
 	margin: .8em 0;
 	font-size: 1.6em;
 }
 
-.sydma_content form.formbuilder p {
+.sydma_content  p {
 	margin: 1em 0;
 }
 
-.sydma_content form.formbuilder p.error-text {
+.sydma_content  p.error-text {
 	margin-bottom: .8em;
 	color: #ce1126;
 	background: transparent url(../images/common/icon_error.gif) no-repeat
@@ -185,22 +205,22 @@
 	padding-left: 1.7em;
 }
 
-.sydma_content form.formbuilder p.leader-text {
+.sydma_content  p.leader-text {
 	padding-top: 1em;
 	margin-top: 0;
 }
 
-.sydma_content form.formbuilder li p {
+.sydma_content  li p {
 	font-size: 1em;
 	margin: 0;
 }
 
-.sydma_content form.formbuilder li input.button {
+.sydma_content  li input.button {
 	padding: .25em .75em;
 	margin-bottom: .2em;
 }
 
-.sydma_content form.formbuilder .hidden {
+.sydma_content  .hidden {
 	height: 1px;
 	left: -9999em;
 	overflow: hidden;
@@ -209,15 +229,19 @@
 	width: 1px;
 }
 
-.sydma_content form.formbuilder input[type=text] {
+.sydma_content  input[type=text] {
 	width: 18em;
 }
 
-.sydma_content form.formbuilder .buttons input.button {
+.sydma_content table input[type=text] {
+	width: 100%;
+}
+
+.sydma_content  .buttons input.button {
 	margin: 0 0 0 1em;
 }
 
-.sydma_content form.formbuilder input.button {
+.sydma_content  input.button {
 	height: auto;
 	border: 0;
 	color: #fff;
@@ -226,19 +250,19 @@
 	margin: 0;
 }
 
-.sydma_content form.formbuilder input.button.clear-button {
+.sydma_content  input.button.clear-button {
 	background: #ce1126;
 }
 
-.sydma_content form.formbuilder input.button.submit-button {
+.sydma_content  input.button.submit-button {
 	background: #12416c;
 }
 
-.sydma_content form.formbuilder input.button:hover {
+.sydma_content  input.button:hover {
 	background: #355d82;
 	text-decoration: underline;
 }
 
-.sydma_content form.formbuilder input.button.clear-button:hover {
+.sydma_content  input.button.clear-button:hover {
 	background-color: #d53447;
 }

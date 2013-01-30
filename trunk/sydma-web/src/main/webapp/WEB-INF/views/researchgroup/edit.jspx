@@ -21,41 +21,115 @@
 		<spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false"/>
 	</p>
 	<c:url var="formAction" value="/researchgroup/editResearchGroup" />
-	<form:form class="formbuilder" modelAttribute="researchGroup" method="put" action="${formAction }" autocomplete="off">
-		<fieldset>
-		<form:hidden path="id"/>
-		<form:hidden path="version"/>
+	<form:form class="formbuilder" modelAttribute="researchGroup" method="put" action="" autocomplete="off" id="groupForm">
+		<fieldset id="group-tab">
+			<form:hidden path="id"/>
+			<form:hidden path="version"/>
+			<form:hidden path="principalInvestigator"/>
 			<legend>
 				<spring:message code="researchGroup.legend.edit" text="?researchGroup.legend.edit?"/>
 			</legend>
-			<ol>
+			<ul class="tabs">
+                <li><a href="#group-tab-basic"><spring:message code="researchProject.tab.basic" text="?Basic?"/></a></li>
+                <li><a href="#group-tab-keywords"><spring:message code="vocabulary.keyword.tab" text="?vocabulary.keyword.tab?"/></a></li>
+            </ul>
+			<ol id="group-tab-basic">
+				<c:if test="${version_error}">
+					<ol class="errors">
+						<li class="error">
+							<p class="error-text">Error!</p> 
+							<span>
+								<spring:message code="researchGroup.versioning.error" text="Version error" />
+							</span>
+						</li>
+					</ol>
+				</c:if>
 				<menu:form-entry characters="100" path="name" code="researchGroup.name" required="true"/>
 				<menu:form-entry characters="100" path="subjectCode" code="researchGroup.field.of.research.code" required="true" cssClass="subject_code_auto"/>
-				<span>Unsure what your Field of Research Subject Code is? 
-					<a target="_blank" href="http://www.abs.gov.au/ausstats/abs@.nsf/0/6BB427AB9696C225CA2574180004463E?opendocument"> Click Here</a>
-				to see a full list of the codes.
-				</span>
+				<div>
+					<span>Unsure what your Field of Research Subject Code is? 
+						<a target="_blank" href="http://www.abs.gov.au/ausstats/abs@.nsf/0/6BB427AB9696C225CA2574180004463E?opendocument"> Click Here</a>
+					to see a full list of the codes.
+					</span>
+				</div>
 				<menu:form-entry characters="100" path="subjectCode2" code="researchGroup.field.of.research.code" required="false"  cssClass="subject_code_auto"/>
 				<menu:form-entry characters="100" path="subjectCode3" code="researchGroup.field.of.research.code" required="false"  cssClass="subject_code_auto"/>
-				<menu:form-entry characters="20" path="principalInvestigator" code="researchGroup.principal.investigator" required="true"/>
-				<menu:form-entry characters="20" path="dataManagementContact" code="researchGroup.data.management.contact" required="false"/>
+                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchGroup.principal.investigator" text="?Principal Investigator?"/>:
+	                </span>
+                	<span class="field_value">
+                    	<c:out value="${researchGroup.principalInvestigator }" escapeXml="true"/>
+                	</span>
+                </li>
+
+				<menu:form-entry characters="20" path="dataManagementContact" code="researchGroup.data.management.contact" required="false" cssClass="data_management_contact_auto"/>
 				<menu:form-entry characters="400" path="url" code="researchGroup.URL" required="false" />
 				<menu:form-text-area characters="1000" path="description" lines="10" code="researchGroup.description" required="true"/>				
 			</ol>
+            <ol id="group-tab-keywords">
+				<input type="hidden" id="vocabulary" name="vocabulary" value=""/>
+				<li>
+					<h3>
+						<c:choose>
+							<c:when test="${empty researchGroup.name}">
+								<spring:message code="vocabulary.keyword.title.new" text="?Manage keywords?"/>
+							</c:when>
+							<c:otherwise>
+								<spring:message code="vocabulary.keyword.title.edit" text="?Manage keywords?" arguments="${researchGroup.name}"/>
+							</c:otherwise>
+						</c:choose>
+					</h3>
+				</li>
+				<li>
+					<div class="inputs">
+	            		<spring:message code="vocabulary.keyword.message" text="?vocabulary.keyword.message?" arguments="Group"/>
+            		</div>
+            	</li>
+				<li>
+					<div class="inputs">
+						<label for="token-input-keywords" type="hidden" id="accessibility">Keyword(s)</label>
+						<ul type="text" name="keywords" id="keywords" class="token-input-list"/>
+					</div>
+				</li>
+            </ol>
 		</fieldset>
 		<div class="buttons">
-			<input class="clear-button button" type="reset" value="Reset"/>
-			<input class="submit-button button" type="submit" value="Update" id="submit"/>
+			<input class="clear-button button" type="reset" value="Reset" id="clear"/>
+			<input class="submit-button button" type="button" value="Update" id="submit-form"/>
 		</div>
 	</form:form>
+	
+	<c:url var="searchKeywords" value="/vocabulary/searchKeywords">
+		<c:param name="id" value="${researchGroup.id}" />
+	</c:url>
     <c:url var="subjectCodeUrl" value="/subjectcode/search"/>
+    <c:url var="dataManagementContactUrl" value="/usermanagement/searchUnikey" />
     <script type="text/javascript">
-    
-    jQuery(document).ready(function()
-    {
-        var subjectCodeUrl = "${subjectCodeUrl}";
-        Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);
-    });
-    
+	$(document).ready(function(){
+	    var subjectCodeUrl = "${subjectCodeUrl}";
+		var dataManagementContactUrl = "${dataManagementContactUrl}";
+		
+		Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);
+	   	Sydma.autocompleteUser(".data_management_contact_auto", dataManagementContactUrl);
+	    jQuery("#group-tab").tabs();
+	    
+	    var vocabulary = ${vocabulary};
+	    var opt = 
+		{
+			prePopulate : true,
+			prePopulateKeywords : vocabulary,
+			formAction : "${formAction}",
+			formId : "#groupForm",
+			searchUrl : "${searchKeywords}"
+		};
+	    Sydma.keywords.init(opt);   	
+
+	    $('#clear').click(function()
+	    {
+	        $("#keywords").tokenInput("clear");
+	    }); 
+	});
     </script>
 </div>

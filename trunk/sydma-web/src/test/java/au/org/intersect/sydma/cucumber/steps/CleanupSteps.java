@@ -27,9 +27,12 @@
 package au.org.intersect.sydma.cucumber.steps;
 
 //TODO CHECKSTYLE-OFF: ImportOrderCheck
-
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +44,16 @@ import cuke4duke.annotation.After;
 import cuke4duke.annotation.Before;
 import cuke4duke.spring.StepDefinitions;
 
+import au.org.intersect.sydma.webapp.domain.ActivityLog;
+import au.org.intersect.sydma.webapp.domain.MasterVocabularyTerm;
+import au.org.intersect.sydma.webapp.domain.PermissionEntry;
 import au.org.intersect.sydma.webapp.domain.PublicAccessRight;
 import au.org.intersect.sydma.webapp.domain.RdsRequest;
+import au.org.intersect.sydma.webapp.domain.ResearchDatabaseQuery;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.Role;
 import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.domain.Vocabulary;
 
 /**
  * Start and End steps
@@ -63,23 +71,82 @@ public class CleanupSteps
     @Autowired
     private PooledDataSource dataSource;
     
+    @Autowired
+    private CommonsHttpSolrServer solrServer;
+
+
     @Before
-    public void before()
+    public void before() throws SQLException
     {
         cleanup();
     }
 
     @After
-    public void after() throws SQLException
+    public void after()
     {
-        cleanup();
+//        try
+//        {
+//            solrServer.deleteByQuery("*:*");
+//        }
+//        catch (Exception e)
+//        {
+//            LOGGER.error("Error deleting solr entries");
+//        }
+        
         browser.close();
-        dataSource.close();
+        try
+        {
+            cleanup();
+        }
+        catch (SQLException e)
+        {
+            LOGGER.error("Error deleting database entries");
+        }
+        try
+        {
+            dataSource.close();
+        }
+        catch (SQLException e)
+        {
+            LOGGER.error("Error closing database connection");
+        }
     }
-     
-    private void cleanup()
+    
+    //TODO CHECKSTYLE-OFF: CyclomaticComplexityCheck
+    //TODO CHECKSTYLE-OFF: NPathComplexityCheck
+    private void cleanup() throws SQLException
     {
         LOGGER.debug(" *** Starting Database Cleanup ***");
+        Connection connection = dataSource.getConnection();
+        for (MasterVocabularyTerm terms : MasterVocabularyTerm.findAllMasterVocabularyTerms())
+        {
+            terms.remove();
+        }
+        
+        for (Vocabulary vocabulary : Vocabulary.findAllVocabularys())
+        {
+            vocabulary.remove();
+        }
+        
+        for (PermissionEntry entry : PermissionEntry.findAllPermissionEntrys())
+        {
+            entry.remove();
+        }
+        
+        for (ResearchDatabaseQuery query : ResearchDatabaseQuery.findAllResearchDatabaseQuerys())
+        {
+            query.remove();
+        }
+        
+        for (ActivityLog logEntry : ActivityLog.findAllActivityLogs())
+        {
+            logEntry.remove();
+        }
+
+        dropSydmaDbInstance(connection);
+        dropSydmaUser(connection); 
+        connection.close();
+
         for (RdsRequest rdsRequest : RdsRequest.findAllRdsRequests())
         {
             rdsRequest.remove();
@@ -105,5 +172,38 @@ public class CleanupSteps
             role.remove();
         }
         LOGGER.debug(" *** Done with Database Cleanup ***");
+    }
+
+    private void dropSydmaUser(Connection connection) throws SQLException
+    {
+        Statement statement = connection.createStatement();
+        ResultSet results = statement.executeQuery("SELECT User from mysql.user");
+        while (results.next())
+        {
+            String username = results.getString("User");
+            if (username.startsWith("sydma_user_"))
+            {
+                Statement dropStatement = connection.createStatement();
+                dropStatement.executeUpdate("DROP USER " + username);
+                dropStatement.close();
+            }
+        }
+    }
+
+    private void dropSydmaDbInstance(Connection connection) throws SQLException
+    {
+        Statement statement = connection.createStatement();
+        ResultSet results = statement.executeQuery("SHOW databases");
+        while (results.next())
+        {
+            String database = results.getString("Database");
+            if (database.startsWith("dataset_"))
+            {
+                Statement dropStatement = connection.createStatement();
+                dropStatement.executeUpdate("DROP DATABASE " + database);
+                dropStatement.close();
+
+            }
+        }
     }
 }

@@ -28,95 +28,75 @@
             
             <ol>
                 <li>
-                <label>
-                <spring:message code="researchGroup.name" text="?name?"/>:
-                </label>
-                <span class="field_value">
-                    <c:out value="${researchGroup.name }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchGroup.name" value="${researchGroup.name}" />
                 </li>
                 
                 <li>
-                <label>
-                <spring:message code="researchGroup.field.of.research.code" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchGroup.subjectCode}">
-                        <c:out value="${researchGroup.subjectCode.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchGroup.field.of.research.code" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchGroup.subjectCode}">
+	                        <c:out value="${researchGroup.subjectCode.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
                 </li>
 
                 <li>
-                <label>
-                <spring:message code="researchGroup.field.of.research.code.optional" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchGroup.subjectCode2}">
-                        <c:out value="${researchGroup.subjectCode2.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchGroup.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchGroup.subjectCode2}">
+	                        <c:out value="${researchGroup.subjectCode2.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
                 </li>
   
                 <li>
-                <label>
-                <spring:message code="researchGroup.field.of.research.code.optional" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchGroup.subjectCode3}">
-                        <c:out value="${researchGroup.subjectCode3.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchGroup.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchGroup.subjectCode3}">
+	                        <c:out value="${researchGroup.subjectCode3.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
                 </li>
             
                 <li>
-                <label>
-                <spring:message code="researchGroup.principal.investigator" text="?Principal Investigator?"/>:
-                </label>
-                <span class="field_value">
-                    <c:out value="${researchGroup.principalInvestigator }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchGroup.principal.investigator" value="${researchGroup.principalInvestigator}" />
                 </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchGroup.principal.investigator.full.name" text="?Principal Investigator Full Name?"/>:
-                </label>
-                <span class="field_value">
-                    <c:out value="${researchGroup.principalInvestigator.givenname }" escapeXml="true"/>
-                    <c:out value=" " escapeXml="true"/>
-                    <c:out value="${researchGroup.principalInvestigator.surname }" escapeXml="true"/>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchGroup.principal.investigator.full.name" text="?Principal Investigator Full Name?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:out value="${researchGroup.principalInvestigator.givenname }" escapeXml="true"/>
+	                    <c:out value=" " escapeXml="true"/>
+	                    <c:out value="${researchGroup.principalInvestigator.surname }" escapeXml="true"/>
+	                </span>
                 </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchGroup.data.management.contact" text="?Data Management Contact?"/>:
-                </label>
-                <span class="field_value">
-                    <c:out value="${researchGroup.dataManagementContact }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchGroup.data.management.contact" value="${researchGroup.dataManagementContact}" />
                 </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchGroup.URL" text="?URL?"/>:
-                </label>
-                <span class="field_value">
-                <c:out value="${researchGroup.url }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchGroup.URL" value="${researchGroup.url}" />
                 </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchGroup.description" text="?description?"/>:
-                </label>
-                <span class="field_value">
-                <c:out value="${researchGroup.description }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchGroup.description" value="${researchGroup.description}" />
                 </li>
             </ol>
-            <c:url var="editGroupUrl" value="../../researchgroup/edit/${researchGroup.id}" />
-            <a href="${editGroupUrl}" class="edit_link"> <spring:message code="researchGroup.legend.edit" text="?Edit Group Info?" /> </a>
+            <c:if test="${canEditGroup}" >
+            	<c:url var="editGroupUrl" value="../../researchgroup/edit/${researchGroup.id}" />
+            	<a href="${editGroupUrl}" class="edit_link"> <spring:message code="researchGroup.legend.edit" text="?Edit Group Info?" /> </a>
+        	</c:if>
         </fieldset>
     </form:form>
-    
     
     <form:form class="formbuilder" modelAttribute="researchProject" method="post" action="publish" autocomplete="off">
         <form:hidden path="id" />
@@ -129,64 +109,54 @@
             
             <ol>
                 <li>
-                <label>
-                <spring:message code="researchProject.name" text="?name?"/>:
-                </label>
-                <span class="field_value">
-                    <c:out value="${researchProject.name }" escapeXml="true"/>
-                </span>
-                </li>
-                <li>
-                <label>
-                <spring:message code="researchProject.field.of.research.code" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchProject.subjectCode}">
-                        <c:out value="${researchProject.subjectCode.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
-                </li>
-                
-				<li>
-                <label>
-                <spring:message code="researchProject.field.of.research.code.optional" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchProject.subjectCode2}">
-                        <c:out value="${researchProject.subjectCode2.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
-                </li>
-				<li>
-                <label>
-                <spring:message code="researchProject.field.of.research.code.optional" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchProject.subjectCode3}">
-                        <c:out value="${researchProject.subjectCode3.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
+                	<util:fieldview code="researchProject.name" value="${researchProject.name }" />
                 </li>
                 
                 <li>
-                <label>
-                <spring:message code="researchProject.URL" text="?URL?"/>:
-                </label>
-                <span class="field_value">
-                <c:out value="${researchProject.url }" escapeXml="true"/>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchProject.field.of.research.code" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchProject.subjectCode}">
+	                        <c:out value="${researchProject.subjectCode.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
                 </li>
+                
+				<li>
+	                <span class="field_label">
+	                	<spring:message code="researchProject.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchProject.subjectCode2}">
+	                        <c:out value="${researchProject.subjectCode2.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
+                </li>
+                
+				<li>
+	                <span class="field_label">
+	                	<spring:message code="researchProject.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchProject.subjectCode3}">
+	                        <c:out value="${researchProject.subjectCode3.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
+                </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchProject.description" text="?description?"/>:
-                </label>
-                <span class="field_value">
-                <c:out value="${researchProject.description }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchProject.URL" value="${researchProject.url}" />
+                </li>
+                
+                <li>
+                	<util:fieldview code="researchProject.description" value="${researchProject.description}" />
                 </li>
             </ol>
-            <c:url var="editProjectUrl" value="../../researchproject/edit/${researchProject.id}" />
-            <a href="${editProjectUrl}" class="edit_link"> <spring:message code="researchProject.legend.edit" text="?Edit Project Info?" /> </a>
+            <c:if test="${canEditProject}" >
+            	<c:url var="editProjectUrl" value="../../researchproject/edit/${researchProject.id}" />
+            	<a href="${editProjectUrl}" class="edit_link"> <spring:message code="researchProject.legend.edit" text="?Edit Project Info?" /> </a>
+        	</c:if>
         </fieldset>
     </form:form>
     
@@ -203,69 +173,59 @@
             <ol>
                 <menu:form-select path="publicAccessRight" code="researchDataset.publicAccessRight" required="true" items="${publicAccessRightOptions}" label="shortName" value="id" includeBlank="false"/>
                 <li>
-                <label>
-                <spring:message code="researchDataset.name" text="?name?"/>:
-                </label>
-                <span class="field_value">
-                    <c:out value="${researchDataset.name }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchDataset.name" value="${researchDataset.name}" />
                 </li>
-                <li>
-                <label>
-                <spring:message code="researchDataset.field.of.research.code" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchDataset.subjectCode}">
-                        <c:out value="${researchDataset.subjectCode.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
+                
+                <li> 
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.field.of.research.code" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchDataset.subjectCode}">
+	                        <c:out value="${researchDataset.subjectCode.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
                 </li>
                 
                 <li>
-                <label>
-                <spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchDataset.subjectCode2}">
-                        <c:out value="${researchDataset.subjectCode2.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchDataset.subjectCode2}">
+	                        <c:out value="${researchDataset.subjectCode2.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
                 </li>
+                
                	<li>
-                <label>
-                <spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
-                </label>
-                <span class="field_value">
-                    <c:if test="${not empty researchDataset.subjectCode3}">
-                        <c:out value="${researchDataset.subjectCode3.displayName }" escapeXml="true"/>
-                    </c:if>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchDataset.subjectCode3}">
+	                        <c:out value="${researchDataset.subjectCode3.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
                 </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchDataset.physicalLocation" text="?location?"/>:
-                </label>
-                <span class="field_value">
-                <c:if test="${not empty researchDataset.physicalLocation}">
-                <c:out value="${researchDataset.physicalLocation.label}" escapeXml="true"/>
-                </c:if>
-                </span>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.physicalLocation" text="?location?"/>:
+	                </span>
+	                <span class="field_value">
+	                	<c:if test="${not empty researchDataset.physicalLocation}">
+	                		<c:out value="${researchDataset.physicalLocation.label}" escapeXml="true"/>
+	                	</c:if>
+	                </span>
                 </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchDataset.additionalLocationInformation" text="?location?"/>:
-                </label>
-                <span class="field_value">
-                <c:out value="${researchDataset.additionalLocationInformation}" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchDataset.additionalLocationInformation" value="${researchDataset.additionalLocationInformation}" />
                 </li>
+                
                 <li>
-                <label>
-                <spring:message code="researchDataset.description" text="?description?"/>:
-                </label>
-                <span class="field_value">
-                <c:out value="${researchDataset.description }" escapeXml="true"/>
-                </span>
+                	<util:fieldview code="researchDataset.description" value="${researchDataset.description}" />
                 </li>
             </ol>
             <c:url var="editDatasetUrl" value="../edit/${researchDataset.id}" />

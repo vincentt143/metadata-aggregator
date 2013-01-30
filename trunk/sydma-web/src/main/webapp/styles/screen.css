@@ -448,6 +448,18 @@ div#tabbar {
 	margin: 0;
 }
 
+div#tabbar #loggedIn {
+	float:right;
+	padding-top: 1.5em;
+	padding-right: 2em;
+	font-weight: bold;
+}
+
+div#tabbar #loggedIn a {
+	padding-left: 2em;
+	font-weight: normal;
+}
+
 #tabs {
 	list-style: none;
 	list-style-image: none;
@@ -457,6 +469,7 @@ div#tabbar {
 	display: block;
 	height: 2.7em;
 	background: #f5af00;
+	float: left;
 }
 
 #tabs li {

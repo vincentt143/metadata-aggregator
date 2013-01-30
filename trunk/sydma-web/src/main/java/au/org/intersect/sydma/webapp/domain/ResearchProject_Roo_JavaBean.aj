@@ -3,10 +3,13 @@
 
 package au.org.intersect.sydma.webapp.domain;
 
+import au.org.intersect.sydma.webapp.domain.Publication;
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
+import au.org.intersect.sydma.webapp.domain.Vocabulary;
 import java.lang.String;
+import java.util.List;
 import java.util.Set;
 
 privileged aspect ResearchProject_Roo_JavaBean {
@@ -69,6 +72,22 @@ privileged aspect ResearchProject_Roo_JavaBean {
     
     public void ResearchProject.setResearchDatasets(Set<ResearchDataset> researchDatasets) {
         this.researchDatasets = researchDatasets;
+    }
+    
+    public List<Publication> ResearchProject.getPublications() {
+        return this.publications;
+    }
+    
+    public void ResearchProject.setPublications(List<Publication> publications) {
+        this.publications = publications;
+    }
+    
+    public List<Vocabulary> ResearchProject.getKeywords() {
+        return this.keywords;
+    }
+    
+    public void ResearchProject.setKeywords(List<Vocabulary> keywords) {
+        this.keywords = keywords;
     }
     
 }

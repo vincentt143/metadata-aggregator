@@ -1,0 +1,264 @@
+.sydma_content #applet-container {
+ position:absolute;
+ top:2.5em;
+ right:1em;
+ width:20px;
+ height:16px;
+}
+
+#transfer-wizard
+{
+	text-align:center;	
+}
+
+#transfer-wizard .transfer-pane
+{		
+	border:solid 1px #000;
+	margin:10px 0px;
+}
+
+#transfer-wizard .tree-pane
+{
+	width:44%;
+	min-height:300px;
+	overflow:hidden;
+	text-align:left;
+}
+
+#transfer-wizard .transfer-pane-title
+{
+	text-align:center;
+	font-size:1.5em;	
+	margin:0;
+}
+
+#transfer-wizard .transfer-pane-header
+{
+	background:#DDD;	
+	text-align:center;
+	padding-bottom:0.5em;
+}
+
+
+#transfer-wizard .transfer-pane-header h1,
+#transfer-wizard .transfer-pane-header h2,
+#transfer-wizard .transfer-pane-header h3
+{
+	display:inline;
+}
+
+#transfer-wizard .transfer-pane-info
+{
+	
+}
+
+#transfer-wizard #transfer-button-pane
+{
+	width:10%;
+	overflow:hidden;
+	display:inline-block;	
+	*display: inline;
+	zoom: 1;
+	vertical-align:middle;
+	
+}
+
+#transfer-wizard .transfer-select
+{
+	margin-left:1em;
+}
+
+#transfer-wizard #from-pane
+{
+	display:inline-block;
+	*display: inline;
+	zoom: 1;
+	vertical-align:middle;
+}
+
+#transfer-wizard #to-pane
+{
+	display:inline-block;
+	vertical-align:middle;
+	*display: inline;
+	zoom: 1;
+}
+
+#transfer-wizard #status-pane
+{
+	clear:both;
+	min-height:100px;
+}
+/**toolbar*/
+
+#transfer-wizard .transfer-toolbar
+{
+	margin-left:1em;
+}
+	
+#transfer-wizard .transfer-pane-refresh
+{
+	text-decoration:none;
+	height:20px;
+	width:20px;
+	display:inline-block;
+	*display: inline;
+	zoom: 1;
+	vertical-align:-40%;
+	background:url('images/icon_20_action-refresh.png') no-repeat;
+}
+
+/**toolbar end**/
+
+#transfer-wizard .transfer-canvas
+{
+	position:relative;	
+}
+
+#transfer-wizard .pane-slide
+{
+	width:100%;	
+	position:absolute;	
+	height:23.5em;
+	left:100%;
+}	
+
+#transfer-wizard .transfer-tree-container
+{
+	overflow-y:auto;
+	height:96%;	
+}
+
+#transfer-wizard .transfer-type-select-container
+{
+	text-align:center;	
+}
+
+
+#transfer-wizard .transfer-list-scroll
+{
+	overflow-y:auto;
+	
+}
+
+#transfer-wizard ul.transfer-list,
+#transfer-wizard ul.transfer-list li
+{
+	margin:0;
+	padding:0;
+	list-style-type:none;
+}
+
+#transfer-wizard .pane-slide ul.transfer-list
+{
+	height:90%;
+	overflow-y:auto;
+}
+
+#transfer-wizard ul.transfer-list li
+{
+	display:block;	
+	margin:10px 20px;
+	position:relative;
+	height:1.8em;
+}
+
+#transfer-wizard .server-slide ul.transfer-list li
+{
+	display:inline-block;
+	*display: inline;
+	zoom: 1;
+}
+
+#transfer-wizard ul.transfer-list li a
+{
+	text-decoration: none;
+	cursor:pointer;
+	font-size:2em;
+	color:#B0B0B0;
+	text-transform:uppercase;
+	transition: color 1s, font 1s;
+	-moz-transition: color 1s, font 1s; /* Firefox 4 */
+	-webkit-transition: color 1s, font 1s; /* Safari and Chrome */
+	-o-transition: color 1s, font 1s; /* Opera */
+}
+
+#transfer-wizard ul.transfer-list li a.transfer-list-item-fake
+{
+	visibility:hidden;
+}
+
+
+#transfer-wizard ul.transfer-list li a.transfer-list-item
+{
+	position:absolute;
+	left:0;
+}
+
+#transfer-wizard .server-slide ul.transfer-list li a
+{
+	font-size:1.5em;	
+	text-align:center;
+}
+
+
+#transfer-wizard ul.transfer-list li a:hover
+{
+	color:#505050;	
+	font-size:2.2em;		
+}
+
+
+#transfer-wizard .transfer-notice
+{
+	margin:auto;
+	display:block;	
+	width:90%;
+	text-align:center;
+	height:10%;
+}
+
+/** progress bar **/
+#transfer-wizard .transfer-progress
+{	
+	margin:1em 5%;
+}
+
+#transfer-wizard .transfer-progress-applet
+{
+	/* unfortunately IE won't initiate applet if it's not visible :(
+	so we just set it way out of the screen
+	visibility: hidden;*/	
+	margin-left:-9999px;
+	float:left;
+}
+
+
+#transfer-wizard .transfer-progress-status-info
+{
+	display:inline-block;
+	*display: inline;
+	zoom: 1;
+}
+
+#transfer-wizard .transfer-progress-cancel
+{
+	float:right;
+}
+
+/**pane slide animation**/
+
+#transfer-wizard .pane-slide
+{
+	/*transition:left 0.5s linear;	
+	-moz-transition: left 0.5s linear; 
+	-webkit-transition: left 0.5s linear; 
+	-o-transition: left 0.5s linear; 
+	*/
+}
+
+#transfer-wizard .pane-slide.transfer-slide-in-view
+{
+	left:0;	
+}
+

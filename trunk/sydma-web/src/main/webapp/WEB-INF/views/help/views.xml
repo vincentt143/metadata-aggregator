@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="contentUnlightboxable" name="help/overview">
+        <put-attribute name="body" value="/WEB-INF/views/help/overview.jspx" cascade="true"/>
+        <put-attribute name="activeTab" value="help.overview.tab" cascade="true"/>
+    </definition>
+    <definition extends="contentUnlightboxable" name="help/faq">
+        <put-attribute name="body" value="/WEB-INF/views/help/faq.jspx" cascade="true"/>
+        <put-attribute name="activeTab" value="help.faq.tab" cascade="true"/>
+    </definition>
+</tiles-definitions>

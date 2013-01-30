@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" 
+	 xmlns:c="http://java.sun.com/jsp/jstl/core"
+     xmlns:spring="http://www.springframework.org/tags" 
+     xmlns:form="http://www.springframework.org/tags/form"
+     xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+     xmlns:tiles="http://tiles.apache.org/tags-tiles"
+     xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+
+  <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+  <jsp:output omit-xml-declaration="yes"/>
+
+   <spring:message code="label_researchgroup_new" htmlEscape="false" var="title"/>
+    <spring:message code="application_name" htmlEscape="false" var="app_name"/>
+    <h1>
+    	<spring:message code="researchGroup.edit.vocabulary.title" text="?researchGroup.edit.vocabulary.title?" />
+    </h1>
+    <p>
+    	<spring:message code="form.provide.information" text="?form.provide.information?"/>
+    </p>
+    
+    <p class="required-warning">
+		<spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false"/>
+	</p>
+	<c:url var="formAction" value="/researchgroup/editword" />
+	<form:form class="formbuilder" modelAttribute="vocabulary" method="post" action="${formAction}" autocomplete="off">
+		<input type="hidden" name="groupId" value="${groupId}"/>
+		<fieldset>
+			<form:hidden path="id" />
+			<form:hidden path="version" />
+			<legend>
+				<spring:message code="researchGroup.manage.vocabulary.legend" text="?researchGroup.manage.vocabulary.legend?" />
+			</legend>
+			<ol>
+				<menu:form-entry characters="255" path="keyword" code="manage.vocabulary.edit.keyword" required="true"/>			
+			</ol>
+		</fieldset>
+		<div class="buttons">
+			<input id="cancel" class="clear-button button" type="submit" value="Cancel" name="_submit"></input>
+			<input id="submit" class="submit-button button" type="submit" value="Submit" name="_submit"></input>
+		</div>
+	</form:form>
+</div>

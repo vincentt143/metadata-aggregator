@@ -15,20 +15,32 @@
     </div>
     
 
-    <c:url var="listDestinationUrl" value="../../../filetree/listDownload" />    
-    <c:url var="connectUrl" value="../../../filetree/connect" />
+    <c:url var="listDestinationUrl" value="/filetree/listDownload" />    
+    <c:url var="connectUrl" value="/filetree/connect" />
     
-    <c:url var="createDirectoryUrl" value="../../directory/create" />
-    <c:url var="deleteDirectoryUrl" value="../../directory/delete" />      
-    <c:url var="deleteFileUrl" value="../../file/delete" />
+    <c:url var="createDirectoryUrl" value="/managedataset/directory/create" />
+    <c:url var="deleteDirectoryUrl" value="/managedataset/directory/delete" />      
+    <c:url var="deleteFileUrl" value="/managedataset/file/delete" />
+    <c:url var="createAnnotationUrl" value="/fileannotation/create" />
+    <c:url var="editAnnotationUrl" value="/fileannotation/edit" />
+    <c:url var="deleteAnnotationUrl" value="/fileannotation/delete" />
     
-    <c:url var="moveNodeUrl" value="../../file/move" />                                
+    <c:url var="assignPermissionsUrl" value="../../../permission/new" />
+    
+    <spring:message var="permissionsLinkText" code="permissions.directory.linktext" text="?Assign permissions?"/>               
+    
+    <spring:message var="createAnnotationLinkText" code="fileAnnotation.create.link" text="?Create Annotation?"/>
+    <spring:message var="deleteAnnotationLinkText" code="fileAnnotation.delete.link" text="?Delete Annotation?"/>
+
+    
+    <c:url var="moveNodeUrl" value="/managedataset/file/move" />                                
     
 <script type="text/javascript">
 jQuery(function(){
     
     var rootPath = "${nodeRootPath}";
     var rootName = "${nodeRootName}";
+    var rootPermission = ${nodeRootPermission};
     var listDestinationUrl = "${listDestinationUrl}";
     var connectUrl = "${connectUrl}";
     var destinationTreeTabIndex = 10;
@@ -40,30 +52,42 @@ jQuery(function(){
     var createDirUrlCreator = Sydma.manageDataset.getUrlCreator("${createDirectoryUrl}");
     var deleteDirUrlCreator = Sydma.manageDataset.getUrlCreator("${deleteDirectoryUrl}");
     var deleteFileUrlCreator = Sydma.manageDataset.getUrlCreator("${deleteFileUrl}");
+    var createAnnotationUrlCreator = Sydma.manageDataset.getUrlCreator("${createAnnotationUrl}", null, null, true);
+    var editAnnotationUrlCreator = Sydma.manageDataset.getUrlCreator("${editAnnotationUrl}", null, null, true);
+    var deleteAnnotationUrlCreator = Sydma.manageDataset.getUrlCreator("${deleteAnnotationUrl}", null, null, true);
+    
+    var fileTypeParam = 
+    {
+      	"type" : "directory"      
+    };    
+    var assignPermissionsUrlCreator = Sydma.manageDataset.getUrlCreator("${assignPermissionsUrl}", "path", fileTypeParam);
     
     var onDeleteActionComplete = controlManager.onDeleteActionLinkComplete;
     var onCreateActionComplete = controlManager.onCreateActionLinkComplete;
+    
     
     var linkOpt = 
     {
         "actionMenuContainerSelector" : "#actionMenu",
         "links" : 
             {
-            	"createDir" :
+            	"createDirectory" :
         	    {
         	    	"title" : "Create Directory",
         	    	"url" : createDirUrlCreator,
         	    	"forTypes" : ["DIRECTORY","DATASET"],
         	    	"linkClass" : "createDir",
-        	    	"onComplete" : onCreateActionComplete
+        	    	"onComplete" : onCreateActionComplete,
+					"useAjax" : true
         	    },
-        	    "deleteDir" :
+        	    "deleteDirectory" :
                 {
                 	"title" : "Delete Directory",
                 	"url" : deleteDirUrlCreator,
                 	"forTypes" : ["DIRECTORY"],
                 	"linkClass" : "deleteDir",
-                	"onComplete" : onDeleteActionComplete
+                	"onComplete" : onDeleteActionComplete,
+					"useAjax" : true
                 },   
                 "deleteFile" :
                 {
@@ -71,13 +95,49 @@ jQuery(function(){
                 	"url" : deleteFileUrlCreator,
                 	"forTypes" : ["FILE"],
                 	"linkClass" : "deleteFile",
-                	"onComplete" : onDeleteActionComplete
-                }            	
+                	"onComplete" : onDeleteActionComplete,
+					"useAjax" : true
+                },   
+                "assignDirectoryPermissions" :
+                {
+                	"title" : "${permissionsLinkText}",
+                	"url" : assignPermissionsUrlCreator,
+                	"forTypes" : ["DIRECTORY","FILE"],
+					"useAjax" : true
+                },
+                "createAnnotation" :
+                {
+                	"title" : "${createAnnotationLinkText}",
+                	"url" : createAnnotationUrlCreator,
+                	"forTypes" : ["DIRECTORY","FILE"],
+                	"onComplete" : onDeleteActionComplete,
+					"useAjax" : true,
+					"beforeInsert" : Sydma.manageDataset.checkNoAnnotation
+                },
+                "editAnnotation" :
+                {
+                    "title" : "Edit Annotation",
+                	"url" : editAnnotationUrlCreator,
+                	"forTypes" : ["DIRECTORY","FILE"],
+                	"onComplete" : onDeleteActionComplete,
+					"useAjax" : true,
+					"beforeInsert" : Sydma.manageDataset.checkAnnotation
+                },
+                "deleteAnnotation" :
+                {
+                	"title" : "${deleteAnnotationLinkText}",
+                	"url" : deleteAnnotationUrlCreator,
+                	"forTypes" : ["DIRECTORY","FILE"],
+                	"onComplete" : onDeleteActionComplete,
+					"useAjax" : true,
+					"beforeInsert" : Sydma.manageDataset.checkAnnotation
+                }            
             }
     };
     
     var browseTreeOpt =
     {
+        "rootPermission" : rootPermission,
         "treeSelector" : "#browse_tree",
         "treeId" : "browse_tree",
         "url" : listDestinationUrl,
@@ -86,6 +146,7 @@ jQuery(function(){
         "rootName" : rootName,
         "rootPath" : rootPath,
         "allowFileSelect" : true,
+        "allowDirectorySelect" : true,
         "limitSelection" : 1
     };
     
@@ -94,8 +155,10 @@ jQuery(function(){
 		"moveNodeUrl" : moveNodeUrl  
     };
     
+
+    var infoMenu = Sydma.manageDataset.createInfoMenu("#fileInfoMenu");
     
-    controlManager.createBrowseTree(browseTreeOpt, linkOpt, moveNodeOpt);
+    controlManager.createBrowseTree(browseTreeOpt, linkOpt, moveNodeOpt, infoMenu);
     
     Sydma.activateReloadButton();
     

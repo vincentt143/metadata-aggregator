@@ -4,18 +4,11 @@
 # Config stuff
 #
 
-REMOTE_USER="devel"
-REMOTE_HOST="gsw1-sydma01-vm"
-
 BUILD_DIR="sydma-web/target"
 STAGING_DIR="staging"
 WAR_FILE_LOCAL="sydma-web-*.war"
 WAR_FILE_REMOTE="sydma-web.war"
 WEBAPP_DIR="sydma-web"
-
-TUNNEL_BUILD_DIR="sydma-httptunnel/target"
-TUNNEL_WAR_FILE_LOCAL="sydma-httptunnel-*.war"
-TUNNEL_WAR_FILE_REMOTE="sydma-httptunnel.war"
 
 INSTALLER_DIR="sydma-install"
 
@@ -27,33 +20,40 @@ echo "\nCurrent directory = $PWD"
 # Command line args
 #
 
-USAGE="\n$0: [-u <remote user>] [-h <remote host>]\n"
+USAGE="\n$0: [-u <remote user>] [-h <remote host>] [-s] [-b]\n"
 
-while getopts "h:u:" options; do
+while getopts "h:u:ksb" options; do
   case $options in
     u) REMOTE_USER=$OPTARG;;
-    h) REMOTE_HOST=$OPTARG;;
+    h) REMOTE_CONFIG=$OPTARG;;
+    s) SKIP_TEST=skip;;
+    b) BUILD=build;;
     *) echo $USAGE
        exit 1;;
   esac
 done
 
-if [ "${REMOTE-HOST:0:4}" = "ca1-" ]; then
-  echo "USING SPECIFIC WAR NAME FOR DC2D (sydae-web.war)"
-  WAR_FILE_REMOTE="sydae-web.war"
-  WEBAPP_DIR="sydae-web"
+
+ENV_FILE="../../${INSTALLER_DIR}/config/${REMOTE_CONFIG}/env.sh"
+if [ -e $ENV_FILE ]; then
+  . $ENV_FILE
+else
+  echo "Please define a env.sh file for remote host in $ENV_FILE"
+  exit 1
 fi
+if [ -z "$PROFILE" ]; then
+  echo "Please configure PROFILE in env.sh (either dc2d or dc2f)"
+  exit 1
+fi
+if [ -z "$REMOTE_HOST" ]; then
+  echo "Please configure REMOTE_HOST in env.sh
+fi
+if [ -z "$REMOTE_USER" ]; then
+  echo "Please configure REMOTE_USER in env.sh
+fi
+
 
 echo "\nDeploying to $REMOTE_USER@$REMOTE_HOST"
-
-# Check dms config home exists
-if [ -d "../../${INSTALLER_DIR}/config/${REMOTE_HOST}" ]
-then
-	echo "DMS home taken from ${INSTALLER_DIR}/config/${REMOTE_HOST}"
-else
-	echo "Cannot find DMS home configuration at ${INSTALLER_DIR}/config/${REMOTE_HOST}"
-	exit 1
-fi
 
 # Parse research subject code csv into sql
 #echo "\nParsing research subject code csv"
@@ -66,111 +66,102 @@ fi
 
 cd ../../
 
-echo "\nBuilding war file"
-OUT=`mvn clean`
-
-OUT=`mvn package -P ${REMOTE_HOST}`
-
-if [ $? -ne 0 ]
-then
-  echo $OUT
-  echo "\nError building war file."
-  exit 1
+MUST_BUILD=
+if [ ! -f "`ls sydma-web/target/sydma-web-*.war`" -o -n "$BUILD" ]; then
+  MUST_BUILD=yes
+else 
+  if [ -f "`ls sydma-web/target/sydma-web-*.war`" ]; then
+    CHECK_BUILD=`grep "ENVIRONMENT==${PROFILE}" sydma-web/target/sydma-web-*/WEB-INF/classes/META-INF/spring/applicationContext.xml`
+    if [ -z "$CHECK_BUILD" ]; then
+      echo "WARNING: >> Found build with wrong profile >> MUST REBUILD"
+      MUST_BUILD=yes
+    fi
+  fi
 fi
+
+if [ -n "$MUST_BUILD" ]; then
+
+  echo "\nBuilding sydma-web.war file"
+
+  OUT=`mvn clean`
+  
+  if [ -z "$SKIP_TEST" ]; then
+    echo mvn package -P ${PROFILE}
+    OUT=`mvn package -P ${PROFILE}`
+  else
+    echo "WARNING - BUILDING WAR BUT SKIPPING TESTS PHASE"
+    echo mvn package -DskipTests -P ${PROFILE}
+    OUT=`mvn package -DskipTests -P ${PROFILE}`
+  fi
+  
+  if [ $? -ne 0 ]
+  then
+    echo $OUT
+    echo "\nError building war file."
+    exit 1
+  fi
+
+fi
+
+echo "Zipping all files"
+
+rm -rf /tmp/staging
+rm -f /tmp/staging.zip
+mkdir /tmp/staging
+
+TMP_STAGING_DIR=/tmp/staging
+
 
 #
 # Copy war & script to QA server
 #
-echo "\nCopying war file to remote server"
-scp ${BUILD_DIR}/${WAR_FILE_LOCAL} ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/${WAR_FILE_REMOTE}
+echo "\nPreparing war file `ls $BUILD_DIR/${WAR_FILE_LOCAL}` to remote server as ${WAR_FILE_REMOTE}"
+echo cp `ls $BUILD_DIR/${WAR_FILE_LOCAL}` ${TMP_STAGING_DIR}/${WAR_FILE_REMOTE}
+cp `ls $BUILD_DIR/${WAR_FILE_LOCAL}` ${TMP_STAGING_DIR}/${WAR_FILE_REMOTE}
+
+echo "\nPreparing solr configuration files to remote server"
+mkdir -p ${TMP_STAGING_DIR}/solr_conf
+cp ${INSTALLER_DIR}/resource/solr_conf/*.xml ${TMP_STAGING_DIR}/solr_conf
+
+
+echo "\nPreparing script file to remote server"
+cp ${INSTALLER_DIR}/bin/qa-installer-remote.sh ${TMP_STAGING_DIR}/qa-installer-remote.sh
+chmod u+x ${TMP_STAGING_DIR}/qa-installer-remote.sh
+
+
+echo "\nPreparing dms.home to remote server"
+mkdir ${TMP_STAGING_DIR}/dms.home
+cp -rp ${INSTALLER_DIR}/config/${REMOTE_CONFIG}/  ${TMP_STAGING_DIR}/dms.home
+
+echo "\nPreparing sql files to remote server"
+for sql_file in create_users.sql create_access_rights.sql create_buildings.sql create_research_subject_code.sql create_dataset_schema.sql create_vocabulary.sql; do
+  sed "s/SQL_D/$SQL_D/g
+s/SQL_F/$SQL_F/g" ${INSTALLER_DIR}/sql/${sql_file} > /tmp/temp.sql
+  cp /tmp/temp.sql ${TMP_STAGING_DIR}/${sql_file}
+done
+
+echo "\nPreparing sql schemas to remote server"
+cp -r ${INSTALLER_DIR}/resource/schemas ${TMP_STAGING_DIR}/dms.home/
+
+# Zip and Copy all
+cd /tmp && zip -r staging staging && cd -
+echo scp /tmp/staging.zip ${REMOTE_USER}@${REMOTE_HOST}:~
+scp /tmp/staging.zip ${REMOTE_USER}@${REMOTE_HOST}:~
 if [ $? -ne 0 ]
 then
-  echo "\nError copying war file."
-  exit 1
-fi
-
-echo "\nCopying tunnel war file to remote server"
-scp ${TUNNEL_BUILD_DIR}/${TUNNEL_WAR_FILE_LOCAL} ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/${TUNNEL_WAR_FILE_REMOTE}
-if [ $? -ne 0 ]
-then
-  echo "\nError copying war file."
-  exit 1
-fi
-
-
-echo "\nCopying script file to remote server"
-sed "s/__WAR_FILE__/$WAR_FILE_REMOTE/g
-s/__WEBAPP_DIR__/$WEBAPP_DIR/g" ${INSTALLER_DIR}/bin/qa-installer-remote.sh | ssh ${REMOTE_USER}@${REMOTE_HOST} "cat > ${STAGING_DIR}/qa-installer-remote.sh"
-if [ $? -ne 0 ]
-then
-  echo "\nError copying script file."
-  exit 1
-fi
-ssh ${REMOTE_USER}@${REMOTE_HOST} "chmod u+x ${STAGING_DIR}/qa-installer-remote.sh"
-
-echo "\nCopying dms home directory to remote server"
-ssh ${REMOTE_USER}@${REMOTE_HOST}  rm -rf ${STAGING_DIR}/dms.home
-scp -rp ${INSTALLER_DIR}/config/${REMOTE_HOST}/  ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/dms.home
-if [ $? -ne 0 ]
-then
-  echo "\nError copying dms config file."
-  exit 1
-fi
-
-echo "\nCopying sql file to remote server"
-scp ${INSTALLER_DIR}/sql/create_users.sql ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/
-if [ $? -ne 0 ]
-then
-  echo "\nError copying sql file."
-  exit 1
-fi
-
-scp ${INSTALLER_DIR}/sql/create_access_rights.sql ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/
-if [ $? -ne 0 ]
-then
-  echo "\nError copying sql file."
-  exit 1
-fi
-
-scp ${INSTALLER_DIR}/sql/create_buildings.sql ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/
-if [ $? -ne 0 ]
-then
-  echo "\nError copying sql file."
-  exit 1
-fi
-
-
-scp ${INSTALLER_DIR}/sql/create_research_subject_code.sql ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/
-if [ $? -ne 0 ]
-then
-  echo "\nError copying sql file."
-  exit 1
-fi
-
-scp ${INSTALLER_DIR}/sql/create_dataset_schema.sql ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/
-if [ $? -ne 0 ]
-then
-  echo "\nError copying sql file."
-  exit 1
-fi
-
-# Copy the schemas
-scp -r ${INSTALLER_DIR}/resource/schemas ${REMOTE_USER}@${REMOTE_HOST}:${STAGING_DIR}/dms.home/
-if [ $? -ne 0 ]
-then
-  echo "\nError copying db instance schema directory."
+  echo "\nError copying ZIP file."
   exit 1
 fi
 
 #
 # Run remote script
 #
-echo "\nRunning installer"
-ssh ${REMOTE_USER}@${REMOTE_HOST} 'staging/qa-installer-remote.sh'
-if [ $? -ne 0 ]
-then
-  echo "\nThere were errors running the installer."
-  exit 1
-fi
+echo "\nRunning installer (PENDING: JUST PRINTING COMMAND)"
+echo ssh ${REMOTE_USER}@${REMOTE_HOST} "unzip staging.zip && staging/qa-installer-remote.sh '$WAR_FILE_REMOTE' '$WEBAPP_DIR' "
+## if [ $? -ne 0 ]
+## then
+  ## echo "\nThere were errors running the installer."
+  ## exit 1
+## fi
 
 exit 0

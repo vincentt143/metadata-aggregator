@@ -8,6 +8,9 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
 
 (function()
 {
+    var debug = Sydma.getDebug("FileTree");
+    var info = Sydma.getInfo("FileTree");
+    
     /** 
      * FileTree abstract class, you must create a subclass that implements the abstract functions
      * 
@@ -23,6 +26,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
     Sydma.fileTree.FileTree.prototype.generateDefaultTreeOpt = function(treeNodeId)
     {
         var saveOpenedCookieName = "jstree_open_" + treeNodeId;
+        debug("generateDefaultTreeOpt::Using cookie" + saveOpenedCookieName);
         // delete tree state cookie
         $.cookie(saveOpenedCookieName, null);
                        
@@ -54,12 +58,32 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
         return defaultTreeOpt;
     };
     
+    Sydma.fileTree.FileTree.prototype.assignDnDSetting = function(metadata, data)
+    {
+        if (metadata.fileType == "FILE" && metadata.canUpload && this.opt.allowFileSelect)
+        {
+             data.attr["class"] = "jstree-drop";
+        }
+        else if (metadata.fileType == "DATASET" && metadata.canUpload && this.opt.allowDatasetSelect)
+        {
+             data.attr["class"] = "jstree-drop";
+        }
+        else if (metadata.fileType == "DIRECTORY" && metadata.canUpload && this.opt.allowDirectorySelect)
+        {
+             data.attr["class"] = "jstree-drop";
+        }
+        else if (metadata.connectionId == -1)
+        {
+            data.attr["class"] = "jstree-drop";
+        }
+    };
+    
     /**
      * Abstract function
      */
     Sydma.fileTree.FileTree.prototype.extractDataName = function(dataNode)
     {
-        Sydma.log("Sydma.fileTree.FileTree.extractDataName is an abstract function, please implement it");
+        info("Sydma.fileTree.FileTree.extractDataName is an abstract function, please implement it");
     };
     
     /**
@@ -67,7 +91,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
      */
     Sydma.fileTree.FileTree.prototype.extractDataType = function(dataNode)
     {
-        Sydma.log("Sydma.fileTree.FileTree.extractDataType is an abstract function, please implement it");
+        info("Sydma.fileTree.FileTree.extractDataType is an abstract function, please implement it");
     };
     
     Sydma.fileTree.FileTree.prototype.nodeSort = function(obj1, obj2)
@@ -113,7 +137,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
         //closure
         var getAjaxDataFunc = function(node)        
         {
-            Sydma.log("DEBUG::FileTree::getAjaxData::node", node);
+            debug("getAjaxData::node", node);
             var nodeData = jQuery(node).data();
             var v =
             {
@@ -131,7 +155,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
         var fileTree = this;
         return function(request, textStatus, errorThrown)    
         {
-            //Sydma.log("DEBUG::Tree Ajax Errors ", textStatus, errorThrown);
+            //debug("Tree Ajax Errors ", textStatus, errorThrown);
             Sydma.defaultAjaxErrorHandler(request, textStatus, errorThrown);
         };
     };
@@ -142,7 +166,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
      */
     Sydma.fileTree.FileTree.prototype.jsTreeNodeBinder = function()
     {
-        Sydma.log("Sydma.fileTree.FileTree.jsTreeNodeBinder is an abstract function, please implement it");
+        info("Sydma.fileTree.FileTree.jsTreeNodeBinder is an abstract function, please implement it");
     };
     
     /**
@@ -152,10 +176,10 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
     {
         var treeData = [];
         for(var i in data)
-        {            
+        {
             var treeNode = this.jsTreeNodeBinder(i, data[i]);
             treeData.push(treeNode);
-        }        
+        }
         return treeData; 
     };
     /**
@@ -184,7 +208,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
             }
             else
             {
-                Sydma.log("ERROR::Connection failed", response);
+                info("ERROR::Connection failed", response);
                 jQuery("#messageDialog").showMessage(response.error,
                 {
                     title : 'Connection Failed'
@@ -198,7 +222,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
      */
     Sydma.fileTree.FileTree.prototype.getXhrFactory = function()
     {
-        Sydma.log("Sydma.fileTree.FileTree.getXhrFactory is an abstract function, please implement it");
+        info("Sydma.fileTree.FileTree.getXhrFactory is an abstract function, please implement it");
     };
     
     /**
@@ -208,13 +232,21 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
     {
         return {};
     };
+    
+    var jTreeId = 0;
+    var createTreeId = function()
+    {
+        jTreeId++;
+        return "jstree-" + jTreeId;
+    };
 
     Sydma.fileTree.FileTree.prototype.getTreeOpt = function()
     {
-        
+        this.opt.treeId = this.opt.treeId ? this.opt.treeId : createTreeId();
         var treeOpt = this.generateDefaultTreeOpt(this.opt.treeId);
         var limitSelection = (this.opt.limitSelection != null) ? this.opt.limitSelection : -1; //the default is not to limit them
         
+        var entityIcon = "../scripts/filetree/resource/entity_dir_icon.png";
 
         var disallowSelect = function()
         {
@@ -224,7 +256,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
         {
             return true;
         };
-        
+
         var fileSelect;
         if (this.opt.allowFileSelect)
         {
@@ -235,17 +267,30 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
             fileSelect = disallowSelect;
         }
         
-
+        var directorySelect;
+        var directoryIcon;
+        if (this.opt.allowDirectorySelect)
+        {
+            directorySelect = allowSelect;
+        }
+        else
+        {
+            directorySelect = disallowSelect;
+            directoryIcon = entityIcon;
+        }
+        
         var datasetSelect;
+        var datasetIcon;
         if (this.opt.allowDatasetSelect)
         {
-            datasetSelect = allowSelect;
+            datasetSelect = allowSelect;            
         }
         else
         {
             datasetSelect = disallowSelect;
+            datasetIcon = entityIcon;
         }       
-        
+
         var entitySelect;
         if (this.opt.allowEntitySelect)
         {
@@ -256,6 +301,8 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
             entitySelect = disallowSelect;
         }       
         
+                
+                
         var treeOptExtra = 
         {
             //initial load data
@@ -283,13 +330,17 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
                         "select_node" : entitySelect,
                         "icon" : 
                         {
-                            "image" : "../scripts/filetree/resource/entity_dir_icon.png"
+                            "image" : entityIcon
                         }
                     },
 
                     "DATASET" :
                     {
-                        "select_node" : datasetSelect
+                        "select_node" : datasetSelect,
+                        "icon" : 
+                        {
+                            "image" : datasetIcon
+                        }
                     },
                     "FILE" :
                     {
@@ -297,7 +348,11 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
                     },
                     "DIRECTORY" :
                     {
-                        "select_node" : true
+                        "select_node" : directorySelect,
+                        "icon" :
+                        {
+                            "image" : directoryIcon
+                        }
                     },
                     "default" :
                     {
@@ -308,15 +363,24 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
         };        
         jQuery.extend(true, treeOpt, treeOptExtra); // deep extend
         
+        
         return treeOpt;
     };
     
 
     Sydma.fileTree.FileTree.prototype.refresh = function($node)
     {
+        debug("REFRESH", this);
         this.jstreeApi.refresh($node);
     };
-    
+
+
+    Sydma.fileTree.FileTree.prototype.setFocus = function()
+    {
+        debug("SET FOCUS", this);
+        this.jstreeApi.set_focus();
+    };
+
     
     /**
      * Util function called after tree initialization is complete 
@@ -325,6 +389,49 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
     Sydma.fileTree.FileTree.prototype.treeInitialized = function()
     {
         
+    };
+    
+    Sydma.fileTree.FileTree.prototype.configureDnD = function()
+    {
+        if (this.opt.enableDnD)
+        {
+            this.treeOpt["plugins"].push("dnd");
+            this.treeOpt["plugins"].push("crrm");
+        }
+        
+    };
+    
+    /**
+     * @internal
+     * 
+     */
+    Sydma.fileTree.FileTree.prototype.onNodeSelect = function(event, data)
+    {        
+        var node = data.rslt.obj;
+//        debug("TREE NODE SELECT", node);
+        
+        this.opt.onSelect(node.data("jstree"));
+    };
+    
+
+    /**
+     * @internal
+     * 
+     */
+    Sydma.fileTree.FileTree.prototype.onNodeDeselect = function(event, data)
+    {
+        var node = data.rslt.obj;
+//        debug("TREE NODE DESELECT", node);
+        this.opt.onDeselect(node.data("jstree"));
+    };
+    
+    /**
+     * @public
+     * 
+     */
+    Sydma.fileTree.FileTree.prototype.getSelectedNodes = function()
+    {        
+        return this.jstreeApi.get_selected();
     };
     
     /**
@@ -337,17 +444,25 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
         "connectionId" : //defaults to -1. ie, local file browsing
         "limitSelection" : 1|-1 for limiting multi select or not
         "allowFileSelect" : true|false //defaults to allow
+        "allowDirectorySelect" : true|false //defaults to allow
         "allowDatasetSelect" : true|false  //defaults to allow
         "allowEntitySelect" : true|false  //defaults to allow
         "enableDoubleClick" : true|false //defaults to true
+        "onTreeInit"
      */
     Sydma.fileTree.FileTree.prototype.loadTree = function(inputOpt)
     {
         //saves opt, making it publicly accessible        
-        this.opt = inputOpt;
-        //Sydma.log("DEBUG::FileTree.loadTree::input", inputOpt);
+        
+        this.opt = 
+            {
+                "onSelect" : jQuery.noop,
+                "onDeselect" : jQuery.noop                
+            };
+        jQuery.extend(true, this.opt, inputOpt);
+        //debug("loadTree::input", inputOpt);
         this.connectionId = inputOpt.connectionId ? inputOpt.connectionId : -1;
-        //Sydma.log("DEBUG::FileTree.loadTree::connectionId " + this.connectionId + " " + inputOpt.connectionId);
+        //debug("loadTree::connectionId " + this.connectionId + " " + inputOpt.connectionId);
         var treeNodeSelector = inputOpt.treeSelector;
         var tabIndex = inputOpt.tabIndex;
         
@@ -355,15 +470,21 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
         
         var treeOpt = this.getTreeOpt();
         
-        //Sydma.log("DEBUG::FileTree.loadTree::initial", treeOpt);
+        //debug("loadTree::initial", treeOpt);
         
         var extraTreeOpt = this.getExtendTreeOpt(inputOpt);
 
-        //Sydma.log("DEBUG::FileTree.loadTree::extra", extraTreeOpt);
+        debug("loadTree::extra", extraTreeOpt);
         
         jQuery.extend(true, treeOpt, extraTreeOpt); // deep extend
         
-        Sydma.log("DEBUG::FileTree.loadTree::final", treeOpt);
+        var inputTreeOpt = inputOpt.treeOpt;
+        jQuery.extend(true, treeOpt, inputTreeOpt); // deep extend
+        
+        this.treeOpt = treeOpt;
+        this.configureDnD();
+        
+        debug("loadTree::final", treeOpt);
         
         this.jstree = $treeNode.jstree(treeOpt);
         this.jstreeApi = jQuery.jstree._reference($treeNode);       
@@ -378,14 +499,23 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
             $treeNode.find("ul").delegate("li", "dblclick", openNode); 
         }
         
+        this.jstree.bind("select_node.jstree", jQuery.proxy(this.onNodeSelect,this ));
+        this.jstree.bind("deselect_node.jstree", jQuery.proxy(this.onNodeDeselect,this ));
+        
         this.treeInitialized();
+        
+        if (jQuery.isFunction(inputOpt.onTreeInit))
+        {           
+            inputOpt.onTreeInit();
+        }
     };
     
 })();        
 
 (function()
 {
-
+    var debug = Sydma.getDebug("LocalTree");
+    var info = Sydma.getInfo("LocalTree");
     /**
      * initialize
      */
@@ -405,8 +535,9 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
      */
     Sydma.fileTree.LocalTree.prototype.jsTreeNodeBinder = function(index, nodeData)
     {
-        //Sydma.log("DEBUG::jsTreeNodeBinder::Data", nodeData);
+        //debug("jsTreeNodeBinder::Data", nodeData);
         var metadata = nodeData.metadata;        
+                
         
         var data = 
         {
@@ -415,9 +546,15 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
             "attr" :
                 {
                     "title" : nodeData.data.title //shows up as <a title="X">...</a>
-                    
                 }                
         };
+        
+        metadata["connectionId"] = this.connectionId;
+        if (this.opt.DnDTarget)
+        {
+            this.assignDnDSetting(metadata, data);    
+        }
+        
         var attr = 
         {
             "id" : this.opt.treeId + "-" + nodeData.attr.id,
@@ -431,7 +568,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
             "metadata" : metadata,
             "state" : nodeData.state            
         };        
-        //Sydma.log("DEBUG::LocalTree::jsTreeNodeBinder::Node", treeNode);
+        //debug("jsTreeNodeBinder::Node", treeNode);
         return treeNode;
     };
     
@@ -599,27 +736,26 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
     
     /**
      * Extended method to allow time for applet to load
-     * 
-     * 
-     * Expects the following additional property in opt
-            appletId : //id for the applet
      */
     Sydma.fileTree.LocalTree.prototype.loadTree = function(inputOpt)
     {
-        var applet = Sydma.applet.findApplet(inputOpt.appletId);
+        var applet = Sydma.applet.findApplet();
         if (applet == null)
         {
-            Sydma.log("DEBUG::Applet appears to be null???", jQuery("object#sydma-applet, embed#sydma-applet").length);
+            info("Applet appears to be null???");
+            alert("Plugin (applet) to access your computer not found");
+            return alert.blah.yak;
         }        
         this.applet = applet;
         
         var treeFile = this;
-        
+        //debug("Loading Tree");
         var initialize = function()
         {            
+            debug("Initialize LocalTree");
             Sydma.fileTree.FileTree.prototype.loadTree.call(treeFile, inputOpt);           
         };
-        Sydma.applet.appletReady(applet, initialize);
+        Sydma.applet.appletReady(initialize);
     };
     
     /**
@@ -649,7 +785,10 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
  */
 (function()
 {
-
+    
+    var debug = Sydma.getDebug("ServerTree");
+    var info = Sydma.getInfo("ServerTree");
+    
     /**
      * initialize
      */
@@ -711,7 +850,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
      */
     Sydma.fileTree.ServerTree.prototype.jsTreeNodeBinder = function(index, nodeData)
     {
-        //Sydma.log("DEBUG::jsTreeNodeBinder::Data", nodeData);
+        //debug("jsTreeNodeBinder::Data", nodeData);
         
         
         var state = determineState(nodeData);
@@ -728,11 +867,17 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
                     "title" : nodeData.name //shows up as <a title="X">..</a>
                 }
         };
+        metadata["connectionId"] = this.connectionId;
+        if (this.opt.DnDTarget)
+        {
+            this.assignDnDSetting(metadata, data);    
+        }
+        
         var attr = 
         {
             "id" : this.opt.treeId + "-" + nodeData.nodeId,
             "rel" : metadata.fileType, //enable types plugin
-            "tabindex" : this.opt.tabIndex //shows up as <li tabindex="X">..</li>            
+            "tabindex" : this.opt.tabIndex //shows up as <li tabindex="X">..</li>
         };                
         
         var treeNode = 
@@ -742,7 +887,7 @@ Sydma.fileTree = Sydma.fileTree ? Sydma.fileTree : {};
             "metadata" : metadata,
             "state" : state
         };        
-        //Sydma.log("DEBUG::ServerTree::jsTreeNodeBinder::Node", treeNode);
+        //debug("jsTreeNodeBinder::Node", treeNode);
         return treeNode;
     };
     

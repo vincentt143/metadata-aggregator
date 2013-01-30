@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+    xmlns:spring="http://www.springframework.org/tags"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" /> 
+    
+    <spring:message var="resetTxt" code="transfer.pane.reset" text="?Reset?"/>
+    <spring:message var="refreshTxt" code="transfer.pane.refresh" text="?Refresh?"/>
+    
+    <spring:message var="initializingTxt" code="transfer.pane.initializing" text="?Initializing?"/>
+    
+    <h1>
+        <spring:message code="transfer.title" text="?Data Transfer?"/>
+    </h1>
+    <div id="applet-container"><!-- fix --></div>
+    <p>
+        <spring:message code="transfer.description" text="?Description?" htmlEscape="false"/>    
+    </p>
+	<div id="transfer-wizard">
+    
+    
+    <div id="from-pane" class="transfer-pane tree-pane">
+        <div class="transfer-pane-header">            
+            <h3 class="transfer-pane-title"><spring:message code="transfer.pane.from.title" text="?From?"/></h3>
+            <label for="from-select" id="accessibility" >Source</label>
+            <select id="from-select" class="transfer-select"><jsp:text> </jsp:text></select>    
+        </div>
+        <div class="transfer-pane-header">        
+            <span id="from-info" class="transfer-pane-info">
+                <jsp:text> </jsp:text>
+            </span>
+            <span id="from-toolbar" class="transfer-toolbar">
+                <a id="from-pane-refresh" class="transfer-pane-refresh" title="${refreshTxt}" href="" onclick="return false;">
+                <jsp:text> </jsp:text>
+                </a>                           
+            </span>
+        </div>        
+        <div id="from-canvas" class="transfer-canvas">
+            <c:out value="${initializingTxt }"/>
+        </div>
+    </div>
+    <div id="transfer-button-pane">
+        <spring:message var="buttonTxt" code="transfer.button.transfer" text="?Transfer?"/>
+        <input id="transfer-button" type="button" title="${buttonTxt }" value="${buttonTxt}"/>
+    </div>
+    
+    <div id="to-pane" class="transfer-pane tree-pane">
+        <div class="transfer-pane-header">
+            <h3 class="transfer-pane-title"><spring:message code="transfer.pane.to.title" text="?To?"/></h3>
+            <label for="to-select" id="accessibility" >Destination</label>
+            <select id="to-select" class="transfer-select"><jsp:text> </jsp:text></select>            
+        </div>
+        <div class="transfer-pane-header">
+            <span id="to-info" class="transfer-pane-info">
+                <jsp:text> </jsp:text>
+            </span>
+            <span id="to-toolbar" class="transfer-toolbar">
+                <a id="to-pane-refresh" class="transfer-pane-refresh" title="${refreshTxt}" href="" onclick="return false;">
+                <jsp:text> </jsp:text>
+                </a>
+            </span>
+        </div>
+        <div id="to-canvas" class="transfer-canvas">
+            <c:out value="${initializingTxt }"/>
+        </div>
+    </div>
+    <div id="status-pane" class="transfer-pane">
+        <h3 class="transfer-pane-title"><spring:message code="transfer.pane.status.title" text="?Status?"/></h3>
+        <div id="status-canvas" class="transfer-canvas">
+            <p><spring:message code="transfer.pane.status.none" text="?No Transfer?"/></p>
+        </div>
+    </div>
+    
+    <c:url var="connectUrl" value="/filetree/connect"/>
+    <c:url var="listFromUrl" value="/filetree/listDownload"/>
+    <c:url var="listToUrl" value="/filetree/listUpload"/>
+    <c:url var="appletUrl" value="/resources/applets/dms-applet.jar"/>
+    <c:set var="req" value="${pageContext.request}" />
+    
+    <c:url var="connectRstudioUrl" value="/rstudiotree/connect"/>
+    <c:url var="listRstudioUrl" value="/rstudiotree/list"/>
+    
+    
+    <c:url var="urlCreateJob" value="/transferJob/copyJob"/>
+    <c:url var="urlCancelJob" value="/transferJob/jobCancel"/>
+    <c:url var="urlStatusJob" value="/jobs/jobStatus"/>
+    
+</div>
+    <script type="text/javascript">    
+    
+    var isAgriculture = "${isAgriculture}"; 
+    var hasRStudioAccount = ${hasRStudioAccount};
+    
+    Sydma.transfer.LocalPane.registerPaneType();
+    Sydma.transfer.ServerPane.registerPaneType();
+    if (isAgriculture == "true")
+    {
+        Sydma.transfer.RStudioPane.registerPaneType(hasRStudioAccount);
+
+        var rstudioOpt =
+        {
+          	"connectUrl" : "${connectRstudioUrl}",
+      	    "listUrl" : "${listRstudioUrl}"
+        };
+        
+        Sydma.transfer.RStudioPane.setUrls(rstudioOpt);
+
+    }
+    
+    var serverOpt =
+    {
+      	"connectUrl" : "${connectUrl}",
+      	"listFromUrl" : "${listFromUrl}",
+  	    "listToUrl" : "${listToUrl}"
+    };
+    
+    Sydma.transfer.ServerPane.setUrls(serverOpt);
+    
+    var tunnelUrl = document.URL.replace('transfer/transferwizard','tunnel/app');
+
+    var localOpt =
+    {
+      	"appletUrl" : "${appletUrl}",
+        "tunnelUrl" : tunnelUrl
+    };
+    
+    Sydma.transfer.LocalPane.setUrls(localOpt);
+    
+    var urlOpt =  
+    {
+        "urlCreateJob" : "${urlCreateJob}",
+        "urlCancelJob" : "${urlCancelJob}",
+        "urlStatusJob" : "${urlStatusJob}"
+    };
+    
+    Sydma.transfer.TransferAction.setUrls(urlOpt);
+    
+    var opt =
+    {
+        "fromSelector" : "#from-canvas",        
+        "toSelector" : "#to-canvas",
+        "fromToolbarSelector" : "#from-toolbar",
+        "toToolbarSelector" : "#to-toolbar",
+        "fromSelectSelector" : "#from-select",
+        "toSelectSelector" : "#to-select",
+        "fromInfoSelector" : "#from-info",
+        "toInfoSelector" : "#to-info",
+        "transferButtonSelector" : "#transfer-button",
+        "transferOpt" : 
+        {
+            "canvasSelector" : "#status-canvas"
+        }
+       
+    };
+    Sydma.transfer.TransferWizard.init(opt);
+    </script>
+</div>    

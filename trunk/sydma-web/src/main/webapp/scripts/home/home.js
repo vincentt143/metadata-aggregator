@@ -11,6 +11,9 @@ Sydma.home = {};
 (function()
 {
 
+    var debug = Sydma.getDebug("home");
+    var info = Sydma.getInfo("home");
+    
     var linkId = 0;
     
 
@@ -35,7 +38,7 @@ Sydma.home = {};
 
         var urlCreator = function(id)
         {
-            Sydma.log("ParamUrlCreator::adding param " + key + "=" + id);
+            debug("ParamUrlCreator::adding param " + key + "=" + id);
             var paramData = {};
             
             paramData[key] = id;
@@ -65,7 +68,7 @@ Sydma.home = {};
     
 
     var onLoadParams = jQuery.deparam.fragment();
-    Sydma.log("onLoadParams", onLoadParams);
+    debug("onLoadParams", onLoadParams);
     
     /*
      * contentData sourceSelect sideBar getChildUrl linkTemplates childControl
@@ -144,7 +147,7 @@ Sydma.home = {};
                 getContentsFor(currentSelectedParent, populateOnLoad);
                 
                 var selected = $sourceSelect.find(":selected");
-                Sydma.log("DEBUG::SelectControl::actionComplete, triggering select again", selected);
+                debug("SelectControl::actionComplete, triggering select again", selected);
                 selected.click();
                 
             };
@@ -213,8 +216,8 @@ Sydma.home = {};
 
             var current = contentMap[sourceId];
             var permissions = current.permissionMap;
-            Sydma.log("DEBUG::Adding links to sidebar with permissions", permissions);
-            Sydma.log("DEBUG::Link Templates", linkTemplates);
+            //debug("Adding links to sidebar with permissions", permissions);
+
 
             var linksToAdd = [];
             for ( var linkKey in linkTemplates)
@@ -256,7 +259,7 @@ Sydma.home = {};
             var selected = $sourceSelect.find(":selected");
             if (selected.length == 0)
             {
-                Sydma.log("DEBUG::Nothing selected");
+                debug("entrySelect::Nothing selected");
                 return;
             }
             var sourceId = selected.val();
@@ -290,7 +293,7 @@ Sydma.home = {};
     		}
         	
         	
-            Sydma.log("DEBUG::Getting child with url " + url);
+            debug("Getting child with url " + url);
             jQuery.ajax(
             {
                 "url" : url,
@@ -316,10 +319,9 @@ Sydma.home = {};
 
         var errorJson = function(error)
         {
-            Sydma.log("Error::",error);
-            alert("Error in Json Response, please refresh the page");
-            //TODO:
-            //window.location.reload();
+            info("Error::",error);
+            // Error in Json Response. Refresh the page to take user to log in screen
+            window.location.reload();
         };
         
         var insertEntries = function(data, toSelect)
@@ -348,7 +350,7 @@ Sydma.home = {};
 
         var receiveNewEntries = function(data)
         {
-            Sydma.log("DEBUG::SelectControl[" + opt.sourceSelect + "]::Received new entries ", data);
+            debug("SelectControl[" + opt.sourceSelect + "]::Received new entries ", data);
             
             insertEntries(data);
             
@@ -364,7 +366,7 @@ Sydma.home = {};
         {
         	var state = {};
         	state[paramVar] = id;
-        	Sydma.log("DEBUG::PushState", state); 
+        	debug("PushState", state); 
         	jQuery.bbq.pushState(state);
         };
         
@@ -385,7 +387,7 @@ Sydma.home = {};
         
         if (selectedParentOnLoad != null && selectedParentOnLoad != "")
     	{
-        	Sydma.log("SelectControl::" + opt.sourceSelect + "::onLoadHasParentSelected::" + selectedParentOnLoad);
+        	debug("SelectControl::" + opt.sourceSelect + "::onLoadHasParentSelected::" + selectedParentOnLoad);
         	getContentsFor(selectedParentOnLoad, populateOnLoad);        	
     	}
         else
@@ -441,25 +443,19 @@ Sydma.home = {};
 
     Sydma.home.publishDatasetCheck = function(linkTemplate, datasetData)
     {
-        Sydma.log("DEBUG::Check need for Publish Dataset link ", datasetData);
+        //debug("Check need for Publish Dataset link ", datasetData);
         return datasetData.showAdvertiseLink;
     };
 
     Sydma.home.rejectAdvertisingDatasetCheck = function(linkTemplate, datasetData)
     {
-        Sydma.log("DEBUG::Check need for Advertise Dataset link ", datasetData);
+        //debug("Check need for Advertise Dataset link ", datasetData);
         return datasetData.showRejectAdvertisingLink;
     };
     
-//    Sydma.home.unadvertisingDatasetCheck = function(linkTemplate, datasetData)
-//    {
-//        Sydma.log("DEBUG::Check need for Publish Dataset link ", datasetData);
-//        return datasetData.showUnadvertiseLink;
-//    };	
-    
     Sydma.home.notPhysicalCheck = function(linkTemplate, datasetData)
     {
-        Sydma.log("DEBUG::Check isPhysical ", datasetData);
+        //debug("Check isPhysical ", datasetData);
         return !datasetData.physicalCollection;
     };
     

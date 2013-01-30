@@ -26,7 +26,6 @@
  */
 package au.org.intersect.sydma.webapp.domain;
 
-import javax.persistence.CascadeType;
 import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -46,20 +45,20 @@ import org.springframework.roo.addon.tostring.RooToString;
  * @version $Rev: 29 $
  */
 @RooJavaBean
-@RooToString
+@RooToString(excludeFields = {"user"})
 @RooEntity(persistenceUnit = "sydmaPU", finders = {"findPermissionEntrysByPathEqualsAndUser",
-        "findPermissionEntrysByPathLikeAndUser", "findPermissionEntrysByUser", 
-        "findPermissionEntrysByPathLike"})
+        "findPermissionEntrysByPathLikeAndUser", "findPermissionEntrysByUser", "findPermissionEntrysByPathLike",
+        "findPermissionEntrysByPathEquals"})
 // TODO CHECKSTYLE-OFF: MagicNumber
 // TODO CHECKSTYLE-OFF: ParameterAssignmentCheck
+// TODO CHECKSTYLE-OFF: MultipleStringLiteralsCheck
 public class PermissionEntry
 {
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @NotNull
     private User user;
 
-    @Size(max = 1000)
+    @Size(max = 20000)
     @NotNull
     @NotEmpty(message = "Location is a required field")
     private String path;
@@ -83,6 +82,66 @@ public class PermissionEntry
         TypedQuery<PermissionEntry> q = em.createQuery(
                 "SELECT o FROM PermissionEntry AS o WHERE LOWER(o.path) LIKE LOWER(:path)", PermissionEntry.class);
         q.setParameter("path", path);
+        return q;
+    }
+
+    public static TypedQuery<PermissionEntry> findChildPathForUser(String path, User user)
+    {
+        if (path == null || path.length() == 0)
+        {
+            throw new IllegalArgumentException("The path argument is required");
+        }
+        path = path.replace('*', '%');
+
+        if (path.charAt(path.length() - 1) != '%')
+        {
+            path = path + "_%";
+        }
+        EntityManager em = PermissionEntry.entityManager();
+        TypedQuery<PermissionEntry> q = em.createQuery(
+                "SELECT o FROM PermissionEntry AS o WHERE LOWER(o.path) LIKE LOWER(:path) AND o.user = :user",
+                PermissionEntry.class);
+        q.setParameter("path", path);
+        q.setParameter("user", user);
+        return q;
+    }
+
+    public static TypedQuery<PermissionEntry> findChildPath(String path)
+    {
+        if (path == null || path.length() == 0)
+        {
+            throw new IllegalArgumentException("The path argument is required");
+        }
+        path = path.replace('*', '%');
+
+        if (path.charAt(path.length() - 1) != '%')
+        {
+            path = path + "_%";
+        }
+        EntityManager em = PermissionEntry.entityManager();
+        TypedQuery<PermissionEntry> q = em.createQuery(
+                "SELECT o FROM PermissionEntry AS o WHERE LOWER(o.path) LIKE LOWER(:path)", PermissionEntry.class);
+        q.setParameter("path", path);
+        return q;
+    }
+
+    public static TypedQuery<PermissionEntry> findParentPathForUser(String path, User user)
+    {
+        if (path == null || path.length() == 0)
+        {
+            throw new IllegalArgumentException("The path argument is required");
+        }
+        path = path.replace('*', '%');
+
+        if (path.charAt(path.length() - 1) != '%')
+        {
+            path = path.substring(0, path.length() - 2) + "%";
+        }
+        EntityManager em = PermissionEntry.entityManager();
+        TypedQuery<PermissionEntry> q = em.createQuery("SELECT o FROM PermissionEntry AS o "
+                + "WHERE LOWER(:path) LIKE CONCAT(LOWER(o.path), '_%') AND o.user = :user", PermissionEntry.class);
+        q.setParameter("path", path);
+        q.setParameter("user", user);
         return q;
     }
 }

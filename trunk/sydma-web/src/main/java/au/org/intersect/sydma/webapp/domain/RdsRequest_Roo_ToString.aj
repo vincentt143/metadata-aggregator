@@ -16,9 +16,12 @@ privileged aspect RdsRequest_Roo_ToString {
         sb.append("Name: ").append(getName()).append(", ");
         sb.append("PrincipalInvestigator: ").append(getPrincipalInvestigator()).append(", ");
         sb.append("RequestStatus: ").append(getRequestStatus()).append(", ");
+        sb.append("Requester: ").append(getRequester()).append(", ");
+        sb.append("ResearchGroup: ").append(getResearchGroup()).append(", ");
         sb.append("SubjectCode: ").append(getSubjectCode()).append(", ");
         sb.append("SubjectCode2: ").append(getSubjectCode2()).append(", ");
         sb.append("SubjectCode3: ").append(getSubjectCode3()).append(", ");
+        sb.append("TimeAndDateOfRequest: ").append(getTimeAndDateOfRequest()).append(", ");
         sb.append("Version: ").append(getVersion());
         return sb.toString();
     }

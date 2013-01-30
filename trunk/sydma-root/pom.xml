@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<artifactId>sydma</artifactId>
+		<groupId>au.org.intersect.sydma</groupId>
+		<version>0.10</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>au.org.intersect.sydma</groupId>
+	<artifactId>sydma-root</artifactId>
+	<packaging>war</packaging>
+	<version>0.10</version>
+	<name>sydma-root</name>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<topLevelDir>${project.parent.basedir}</topLevelDir>
+
+		<!-- default environment -->
+		<env>dev</env>
+		<context.path>sydma-web</context.path>
+
+	</properties>
+	<!-- profiles -->
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<context.path>sydma-web</context.path>
+			</properties>
+		</profile>
+		<profile>
+			<id>int</id>
+			<properties>
+				<context.path>sydma-web</context.path>
+			</properties>
+		</profile>
+		<profile>
+			<id>cucumber-dc2f</id>
+			<properties>
+				<context.path>sydma-web</context.path>
+			</properties>
+		</profile>
+		<profile>
+			<id>cucumber-dc2d</id>
+			<properties>
+				<context.path>sydae-web</context.path>
+			</properties>
+		</profile>
+		<profile>
+			<id>dc2f</id>
+			<properties>
+				<context.path>sydma-web</context.path>
+			</properties>
+		</profile>
+		<profile>
+			<id>dc2d</id>
+			<properties>
+				<context.path>sydae-web</context.path>
+			</properties>
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.2</version>
+                                <configuration>
+                                         <warName>ROOT</warName>
+                                         <webResources>
+                                           <resource>
+                                             <directory>src/main/index</directory>
+                                             <filtering>true</filtering>
+                                           </resource>
+                                         </webResources>
+                                </configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+                                        <overwrite>true</overwrite>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <h1>
+        <spring:message code="dbinstance.edit.title" text="?Edit Instance?" arguments="${dataset.name}" />
+    </h1>
+
+    <p class="required-warning">
+        <spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false" />
+    </p>
+    <c:url var="formAction" value="/dbinstance/edit" />
+    <form:form class="formbuilder" modelAttribute="datasetDB" method="post" action="${formAction }" autocomplete="off">
+
+        <input type="hidden" name="datasetId" value="${dataset.id }"/>
+        <fieldset>
+            <legend>
+                <spring:message code="dbinstance.edit.legend" text="?Edit Instance?" />
+            </legend>
+
+            <ol>             
+                <li>
+                    <util:fieldview code="dbinstance.dbName" value="${datasetDB.dbName}" id="dbName_value"/>                    
+                    <form:hidden path="dbName" />
+                </li>
+                <menu:form-text-area path="description" code="dbinstance.description" required="true" characters="1000"/>                
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input class="clear-button button" type="submit" name="_submit" value="Cancel"/> 
+            <input class="submit-button button" type="submit" name="_submit" value="Save"/>
+        </div>
+    </form:form>
+    
+</div>

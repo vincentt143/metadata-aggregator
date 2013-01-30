@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <h1>
+        <spring:message code="dbinstance.reverse.title" text="?Edit Instance?" arguments="${dataset.name}" />
+    </h1>
+    
+    <p class="required-warning">
+        <spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false" />
+    </p>
+    
+    <c:url var="formAction" value="/dbinstance/reverse" />
+    <form:form class="formbuilder" modelAttribute="schema" method="post" action="${formAction }" autocomplete="off">
+
+        <input type="hidden" name="datasetId" value="${dataset.id }"/>
+        <fieldset>
+            <legend>
+                <spring:message code="dbinstance.reverse.legend" text="?Reverse Instance?" />
+            </legend>
+
+            <ol>             
+                <h3><spring:message code="dbinstance.reverse.sql.header" text="?SQL COMMANDS?" /></h3>
+                <br/>
+                <div style="height : 250px; overflow:auto" id="reversedDll">${reversedSql}</div>
+                <br />
+                <menu:form-entry path="name" code="schema.name" required="true" characters="100"/>
+                <input type="hidden" name="filename" value="empty"/>
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input class="clear-button button" type="submit" name="_submit" value="Cancel"/> 
+            <input class="submit-button button" type="submit" name="_submit" value="Reverse"/>
+        </div>
+    </form:form>
+
+</div>

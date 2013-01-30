@@ -34,6 +34,12 @@
 	<put-attribute name="unlightboxable" value="/WEB-INF/layouts/insertBody.jspx" cascade="true"/>  		  	  	
   </definition>
   
+  <definition name="browse" extends="base">
+	<put-attribute name="content" value="/WEB-INF/layouts/contentForBrowse.jspx"/>
+	<put-attribute name="lightboxable" value="/WEB-INF/layouts/blank.jspx" cascade="true"/>
+	<put-attribute name="unlightboxable" value="/WEB-INF/layouts/insertBody.jspx" cascade="true"/>  		  	  	
+  </definition>
+  
   <definition name="contentLightboxable" extends="base">
   	<put-attribute name="lightboxable" value="/WEB-INF/layouts/insertBody.jspx" cascade="true"/>
 	<put-attribute name="unlightboxable" value="/WEB-INF/layouts/blank.jspx" cascade="true"/>  		  

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+    xmlns:publication="urn:jsptagdir:/WEB-INF/tags/publication"
+    xmlns:display="urn:jsptld:http://displaytag.sf.net"
+	xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" version="2.0" class="sydma_content">
+
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<spring:message code="label_researchdataset_new" htmlEscape="false"
+		var="title" text="?Research Dataset New?" />
+	<spring:message code="application_name" htmlEscape="false"
+		var="app_name" />
+	<h1>
+		<spring:message code="researchDataset.view.title" text="?researchDataset.view.title?" htmlEscape="false" />
+	</h1>
+
+	<form:form class="formbuilder" modelAttribute="researchDataset" autocomplete="off">
+		<fieldset id="dataset-tab">
+            <legend>
+                <spring:message code="researchDataset.view.legend" text="?researchDataset.view.legend?" htmlEscape="false" />
+            </legend>
+            <ul class="tabs">
+                <li><a href="#dataset-tab-basic"><spring:message code="researchDataset.tab.basic" text="?Basic?"/></a></li>
+                <li><a href="#dataset-tab-publication"><spring:message code="researchDataset.tab.publication" text="?Publication?"/></a></li>
+				<li><a href="#dataset-tab-keywords"><spring:message code="vocabulary.keyword.tab" text="?vocabulary.keyword.tab?"/></a></li>
+            </ul>
+            
+			<ol id="dataset-tab-basic">
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.name" text="?name?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:out value="${researchDataset.name }" escapeXml="true"/>
+	                </span>
+                </li>
+                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.field.of.research.code" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchDataset.subjectCode}">
+	                        <c:out value="${researchDataset.subjectCode.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
+                </li>
+                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchDataset.subjectCode2}">
+	                        <c:out value="${researchDataset.subjectCode2.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
+                </li>
+                
+               	<li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.field.of.research.code.optional" text="?research code?"/>:
+	                </span>
+	                <span class="field_value">
+	                    <c:if test="${not empty researchDataset.subjectCode3}">
+	                        <c:out value="${researchDataset.subjectCode3.displayName }" escapeXml="true"/>
+	                    </c:if>
+	                </span>
+                </li>
+                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.date.from" text="?date from?"/>:
+	                </span>
+	                <span class="field_value">
+						<fmt:formatDate value="${dateFrom }" pattern="dd-MM-yyyy"/>
+	                </span>
+                </li>
+                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.date.to" text="?date from?"/>:
+	                </span>
+	                <span class="field_value">
+		            	<fmt:formatDate value="${dateTo}" pattern="dd-MM-yyyy"/>
+	                </span>
+                </li>
+                                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.physicalLocation" text="?location?"/>:
+	                </span>
+	                <span class="field_value">
+		                <c:if test="${not empty researchDataset.physicalLocation}">
+		                	<c:out value="${researchDataset.physicalLocation.label}" escapeXml="true"/>
+		                </c:if>
+	                </span>
+                </li>
+                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.additionalLocationInformation" text="?location?"/>:
+	                </span>
+	                <span class="field_value">
+	                	<c:out value="${researchDataset.additionalLocationInformation}" escapeXml="true"/>
+	                </span>
+                </li>
+                
+                <li>
+	                <span class="field_label">
+	                	<spring:message code="researchDataset.description" text="?description?"/>:
+	                </span>
+	                <span class="field_value">
+	                	<c:out value="${researchDataset.description }" escapeXml="true"/>
+	                </span>
+                </li>
+            </ol>
+           	<ol id="dataset-tab-publication">
+            	<li id="publication_section">
+					<publication:view modelAttribute="researchDataset"/>
+				</li> 
+			</ol>
+			<ol id="dataset-tab-keywords">
+				<display:table uid="word" name="${researchDataset.keywords}" defaultsort="1" 
+					pagesize="25" requestURI="/researchdataset/view/${researchDataset.id}">
+					<display:column title="Keywords" property="keyword" />
+		
+					<display:setProperty name="basic.empty.showtable" value="true" />
+					<display:setProperty name="paging.banner.group_size" value="25" />
+					<display:setProperty name="paging.banner.onepage" value=" " />
+					<display:setProperty name="paging.banner.placement" value="bottom" />
+				</display:table>
+            </ol>  
+        </fieldset>
+	</form:form>
+	<script type="text/javascript">
+    jQuery(document).ready(function()
+    {
+        jQuery("#dataset-tab").tabs();
+    });
+    </script>
+</div>

@@ -3,17 +3,18 @@
 
 package au.org.intersect.sydma.webapp.domain;
 
-import au.org.intersect.sydma.webapp.domain.User;
+import au.org.intersect.sydma.webapp.domain.DBAccess;
+import au.org.intersect.sydma.webapp.domain.ResearchDatasetDB;
 import java.lang.String;
 
 privileged aspect DBUser_Roo_JavaBean {
     
-    public User DBUser.getUser() {
-        return this.user;
+    public ResearchDatasetDB DBUser.getDatabaseInstance() {
+        return this.databaseInstance;
     }
     
-    public void DBUser.setUser(User user) {
-        this.user = user;
+    public void DBUser.setDatabaseInstance(ResearchDatasetDB databaseInstance) {
+        this.databaseInstance = databaseInstance;
     }
     
     public String DBUser.getDbUsername() {
@@ -30,6 +31,14 @@ privileged aspect DBUser_Roo_JavaBean {
     
     public void DBUser.setDbPassword(String dbPassword) {
         this.dbPassword = dbPassword;
+    }
+    
+    public DBAccess DBUser.getAccessLevel() {
+        return this.accessLevel;
+    }
+    
+    public void DBUser.setAccessLevel(DBAccess accessLevel) {
+        this.accessLevel = accessLevel;
     }
     
 }

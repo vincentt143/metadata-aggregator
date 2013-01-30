@@ -34,7 +34,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,16 +42,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import au.org.intersect.sydma.webapp.domain.Role;
 import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.domain.UserType;
-import au.org.intersect.sydma.webapp.service.ExternalUserService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
 import au.org.intersect.sydma.webapp.util.UrlHelper;
 import au.org.intersect.sydma.webapp.wasm.WASMAuth;
@@ -66,23 +61,15 @@ import au.org.intersect.sydma.webapp.wasm.WASMService;
 @Controller
 public class LoginController
 {
-    private static final String USER_MODEL = "user";
-
-    private static final String CHANGE_PASSWORD_PAGE = "changepassword";
-
-    private static final String REDIRECT_TO_LOGIN = "redirect:/login";
+    private static final String REDIRECT_TO_ROOT = "redirect:/";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
     private static final String BREADCRUMBS = "breadcrumbs";
 
     private static List<Breadcrumb> breadcrumbs = new ArrayList<Breadcrumb>();
-    private static List<Breadcrumb> breadcrumbsForChangePassword = new ArrayList<Breadcrumb>();
-    private static List<Breadcrumb> breadcrumbsForForgotPassword = new ArrayList<Breadcrumb>();
     private static List<Breadcrumb> breadcrumbsForLogin = new ArrayList<Breadcrumb>();
     private static List<Breadcrumb> breadcrumbsForTermsAndConditions = new ArrayList<Breadcrumb>();
-
-    private static Breadcrumb login = new Breadcrumb("Log in", "/login");
 
     @Autowired
     private WASMService wasmService;
@@ -102,35 +89,31 @@ public class LoginController
     static
     {
         breadcrumbs.add(Breadcrumb.getHome());
-        breadcrumbs.add(new Breadcrumb("Log in"));
+        breadcrumbs.add(new Breadcrumb("sections.login.title"));
 
         breadcrumbsForLogin.add(Breadcrumb.getHome());
-        breadcrumbsForLogin.add(login);
-
-        breadcrumbsForChangePassword.add(Breadcrumb.getHome());
-        breadcrumbsForChangePassword.add(new Breadcrumb("Change Password", "/changepassword"));
-
-        breadcrumbsForForgotPassword.add(Breadcrumb.getHome());
-        breadcrumbsForForgotPassword.add(new Breadcrumb("Forgot Password", "/forgotpassword"));
+        breadcrumbsForLogin.add(new Breadcrumb("sections.external.user"));
 
         breadcrumbsForTermsAndConditions.add(Breadcrumb.getHome());
-        breadcrumbsForTermsAndConditions.add(new Breadcrumb("Terms and Conditions", "/termsAndConditions"));
+        breadcrumbsForTermsAndConditions.add(new Breadcrumb("sections.login.terms.title", "/termsAndConditions"));
     }
 
-    @Autowired
-    private ExternalUserService externalUserService;
+    private String wasmUrlString(boolean toLogin, String destUrl)
+    {
+        String what = toLogin ? "login.cgi" : "logout.cgi";
+        String wasm = wasmProtocol + "://" + wasmUrl + "/" + what + "?";
+        if (toLogin) 
+        {
+            wasm = wasm + "appID=" + appId + "&appRealm=" + appRealm + "&";
+        }
+        wasm = wasm + (toLogin ? "destUrl=" : "destURL=") + destUrl;
+        return wasm;
+    }
 
     @RequestMapping("/signin/**")
     public String index(ModelMap modelMap, HttpServletRequest request)
     {
-
-        StringBuffer url = new StringBuffer("");
-        String wasm = wasmProtocol + "://" + wasmUrl + "/login.cgi?appID=" + appId;
-        String realm = "&appRealm=" + appRealm;
-        String local = "&destURL=" + UrlHelper.getCurrentBaseUrl(request);
-        url.append(wasm + realm + local);
-
-        modelMap.addAttribute("wasmUrl", url);
+        modelMap.addAttribute("wasmUrl", wasmUrlString(true, UrlHelper.getCurrentBaseUrl(request)));
         modelMap.addAttribute(Breadcrumb.BREADCRUMBS, breadcrumbs);
         return "login/index";
     }
@@ -146,7 +129,7 @@ public class LoginController
             response.addCookie(new Cookie(wasmService.getSKeyCookieName(), sKey));
         }
 
-        return "redirect:/";
+        return REDIRECT_TO_ROOT;
     }
 
     @RequestMapping(value = "/")
@@ -159,21 +142,17 @@ public class LoginController
 
         User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
 
+        if (user == null)
+        {
+            return "redirect:/signin/index";
+        }
+
         if (!user.hasAcceptedTermsAndConditions())
         {
             return "redirect:/termsAndConditions";
         }
 
-        if (user.getUserType() == UserType.INTERNAL && !user.isActive())
-        {
-            return "redirect:/changepassword";
-        }
-
-        Role researcherRole = Role.findRolesByNameEquals(Role.RoleNames.ROLE_RESEARCHER.toString()).getSingleResult();
-        Role supportRole = Role.findRolesByNameEquals(Role.RoleNames.ROLE_ICT_SUPPORT.toString()).getSingleResult();
-        boolean canViewHome = user.getRoles().contains(researcherRole) || user.getRoles().contains(supportRole);
-
-        return canViewHome ? "redirect:/home/index" : "redirect:/admin/index";
+        return "redirect:/home/index";
     }
 
     @RequestMapping(value = "/login")
@@ -182,64 +161,13 @@ public class LoginController
         model.addAttribute(BREADCRUMBS, breadcrumbsForLogin);
     }
 
-    @RequestMapping(value = "/changepassword", method = RequestMethod.GET)
-    public void getPasswordScreen(Model model, Principal principal)
+    @RequestMapping(value = "/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response)
     {
-        User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
-        model.addAttribute(BREADCRUMBS, breadcrumbsForChangePassword);
-        model.addAttribute(USER_MODEL, user);
-    }
-
-    @RequestMapping(value = "/changepassword", method = RequestMethod.PUT)
-    public String changePassword(@RequestParam(value = "passwordCheck") String password, @Valid User user,
-            BindingResult result, Model model, Principal principal)
-    {
-        User existingUser = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
-
-        if (existingUser.isActive())
-        {
-            passwordExpire(result, password);
-            model.addAttribute(BREADCRUMBS, breadcrumbsForChangePassword);
-            return CHANGE_PASSWORD_PAGE;
-        }
-        if (!user.getPassword().equals(password))
-        {
-            passwordError(result, password);
-        }
-
-        if (result.hasFieldErrors())
-        {
-            model.addAttribute(BREADCRUMBS, breadcrumbsForChangePassword);
-            model.addAttribute(USER_MODEL, user);
-            return CHANGE_PASSWORD_PAGE;
-        }
-        existingUser.activateUser(password);
-        return REDIRECT_TO_LOGIN;
-    }
-
-    @RequestMapping(value = "/forgotpassword", method = RequestMethod.GET)
-    public void getForgotPasswordPage(User user, Model model)
-    {
-        model.addAttribute(USER_MODEL, user);
-        model.addAttribute(BREADCRUMBS, breadcrumbsForForgotPassword);
-    }
-
-    @RequestMapping(value = "/sendpassword", method = RequestMethod.POST)
-    public String sendPassword(@RequestParam(value = "email") String email, @Valid User user, BindingResult result,
-            Model model, HttpServletRequest request)
-    {
-        if (!externalUserService.checkIfEmailExists(email))
-        {
-            emailError(result, email);
-            model.addAttribute(BREADCRUMBS, breadcrumbsForForgotPassword);
-            model.addAttribute(USER_MODEL, user);
-            return "forgotpassword";
-        }
-
-        User existingUser = User.findUsersByEmailEqualsAndUserType(email, UserType.INTERNAL).getSingleResult();
-        externalUserService.resetExternalUser(existingUser, UrlHelper.getCurrentBaseUrl(request));
-
-        return REDIRECT_TO_LOGIN;
+        request.getSession().invalidate();
+        Cookie cookie = new Cookie(wasmService.getSKeyCookieName(), "");
+        response.addCookie(cookie);
+        return "redirect:" + wasmUrlString(false,"http://www.sydney.edu.au/");
     }
 
     @RequestMapping(value = "/termsAndConditions", method = RequestMethod.GET)
@@ -264,7 +192,7 @@ public class LoginController
                 session.invalidate();
             }
         }
-        return "redirect:/";
+        return REDIRECT_TO_ROOT;
     }
 
     @RequestMapping(value = "/rejectTerms")
@@ -278,32 +206,4 @@ public class LoginController
         model.addAttribute("reject", true);
         return "redirect:/signin/index";
     }
-
-    private void emailError(BindingResult result, String email)
-    {
-        String[] nameErrorCode = {""};
-        String[] nameErrorArg = {""};
-        FieldError nameError = new FieldError(USER_MODEL, "email", email, true, nameErrorCode, nameErrorArg,
-                "This email is not registered in the system");
-        result.addError(nameError);
-    }
-
-    private void passwordError(BindingResult result, String password)
-    {
-        String[] nameErrorCode = {""};
-        String[] nameErrorArg = {""};
-        FieldError nameError = new FieldError(USER_MODEL, "password", password, true, nameErrorCode, nameErrorArg,
-                "Password did not match, please check that your typing is correct");
-        result.addError(nameError);
-    }
-
-    private void passwordExpire(BindingResult result, String password)
-    {
-        String[] nameErrorCode = {""};
-        String[] nameErrorArg = {""};
-        FieldError nameError = new FieldError(USER_MODEL, "password", password, true, nameErrorCode, nameErrorArg,
-                "The one time password has expired.");
-        result.addError(nameError);
-    }
-
 }

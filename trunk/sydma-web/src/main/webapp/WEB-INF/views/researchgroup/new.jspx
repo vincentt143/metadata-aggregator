@@ -38,7 +38,7 @@
 				</span>
 				<menu:form-entry characters="100" path="subjectCode2" code="researchGroup.field.of.research.code" required="false" cssClass="subject_code_auto"/>
 				<menu:form-entry characters="100" path="subjectCode3" code="researchGroup.field.of.research.code" required="false" cssClass="subject_code_auto"/>
-				<menu:form-entry characters="20" path="principalInvestigator" code="researchGroup.principal.investigator" required="true"/>
+				<menu:form-entry characters="20" path="principalInvestigator" code="researchGroup.principal.investigator" required="true" cssClass="principal_investigator_auto"/>
 				<menu:form-entry characters="20" path="dataManagementContact" code="researchGroup.data.management.contact" required="false"/>
 				<menu:form-entry characters="400" path="url" code="researchGroup.URL" required="false" />
 				<span>Please include the protocol of the URL (for example: http:// or https://)</span>
@@ -51,12 +51,16 @@
 		</div>
 	</form:form>
     <c:url var="subjectCodeUrl" value="/subjectcode/search"/>
+    <c:url var="principalInvestigatorUrl" value="/usermanagement/searchUnikey" />
     <script type="text/javascript">
     
     jQuery(document).ready(function()
     {
         var subjectCodeUrl = "${subjectCodeUrl}";
+        var principalInvestigatorUrl = "${principalInvestigatorUrl}";
+        
         Sydma.autocomplete(".subject_code_auto", subjectCodeUrl);
+    	Sydma.autocompleteUser(".principal_investigator_auto", principalInvestigatorUrl);
     });
     
     </script>

@@ -29,6 +29,8 @@ package au.org.intersect.sydma.webapp.permission.path;
 import org.apache.commons.lang.StringUtils;
 
 import au.org.intersect.sydma.webapp.domain.ResearchDataset;
+import au.org.intersect.sydma.webapp.domain.ResearchGroup;
+import au.org.intersect.sydma.webapp.domain.ResearchProject;
 
 /**
  * Path to a file in a dataset
@@ -113,6 +115,16 @@ public class FilePath extends AbstractPath
     public boolean isFilePath()
     {
         return true;
+    }
+
+    @Override
+    public String getDisplayName()
+    {
+        ResearchGroup group = ResearchGroup.findResearchGroup(groupId);
+        ResearchProject project = ResearchProject.findResearchProject(projectId);
+        ResearchDataset dataset = ResearchDataset.findResearchDataset(datasetId);
+        return Path.SEPARATOR + group.getName() + Path.SEPARATOR + project.getName() + Path.SEPARATOR
+                + dataset.getName() + filePath;
     }
 
 }

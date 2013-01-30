@@ -5,6 +5,7 @@ package au.org.intersect.sydma.webapp.domain;
 
 import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 import java.lang.Boolean;
+import java.lang.Long;
 import java.lang.String;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -16,6 +17,22 @@ privileged aspect ResearchGroup_Roo_Finder {
         EntityManager em = ResearchGroup.entityManager();
         TypedQuery<ResearchGroup> q = em.createQuery("SELECT o FROM ResearchGroup AS o WHERE o.directoryPath = :directoryPath", ResearchGroup.class);
         q.setParameter("directoryPath", directoryPath);
+        return q;
+    }
+    
+    public static TypedQuery<ResearchGroup> ResearchGroup.findResearchGroupsByIdEquals(Long id) {
+        if (id == null) throw new IllegalArgumentException("The id argument is required");
+        EntityManager em = ResearchGroup.entityManager();
+        TypedQuery<ResearchGroup> q = em.createQuery("SELECT o FROM ResearchGroup AS o WHERE o.id = :id", ResearchGroup.class);
+        q.setParameter("id", id);
+        return q;
+    }
+    
+    public static TypedQuery<ResearchGroup> ResearchGroup.findResearchGroupsByIsPhysical(Boolean isPhysical) {
+        if (isPhysical == null) throw new IllegalArgumentException("The isPhysical argument is required");
+        EntityManager em = ResearchGroup.entityManager();
+        TypedQuery<ResearchGroup> q = em.createQuery("SELECT o FROM ResearchGroup AS o WHERE o.isPhysical = :isPhysical", ResearchGroup.class);
+        q.setParameter("isPhysical", isPhysical);
         return q;
     }
     

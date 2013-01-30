@@ -4,13 +4,18 @@
 package au.org.intersect.sydma.webapp.domain;
 
 import au.org.intersect.sydma.webapp.domain.Building;
+import au.org.intersect.sydma.webapp.domain.DBBackup;
 import au.org.intersect.sydma.webapp.domain.PublicAccessRight;
+import au.org.intersect.sydma.webapp.domain.Publication;
 import au.org.intersect.sydma.webapp.domain.PubliciseStatus;
 import au.org.intersect.sydma.webapp.domain.ResearchDatasetDB;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 import au.org.intersect.sydma.webapp.domain.ResearchSubjectCode;
+import au.org.intersect.sydma.webapp.domain.Vocabulary;
 import java.lang.Boolean;
 import java.lang.String;
+import java.util.List;
+import org.joda.time.DateTime;
 
 privileged aspect ResearchDataset_Roo_JavaBean {
     
@@ -44,6 +49,14 @@ privileged aspect ResearchDataset_Roo_JavaBean {
     
     public void ResearchDataset.setSubjectCode3(ResearchSubjectCode subjectCode3) {
         this.subjectCode3 = subjectCode3;
+    }
+    
+    public List<Publication> ResearchDataset.getPublications() {
+        return this.publications;
+    }
+    
+    public void ResearchDataset.setPublications(List<Publication> publications) {
+        this.publications = publications;
     }
     
     public String ResearchDataset.getDescription() {
@@ -90,6 +103,14 @@ privileged aspect ResearchDataset_Roo_JavaBean {
         this.physicalLocation = physicalLocation;
     }
     
+    public List<DBBackup> ResearchDataset.getDbBackups() {
+        return this.dbBackups;
+    }
+    
+    public void ResearchDataset.setDbBackups(List<DBBackup> dbBackups) {
+        this.dbBackups = dbBackups;
+    }
+    
     public ResearchDatasetDB ResearchDataset.getDatabaseInstance() {
         return this.databaseInstance;
     }
@@ -104,6 +125,30 @@ privileged aspect ResearchDataset_Roo_JavaBean {
     
     public void ResearchDataset.setAdditionalLocationInformation(String additionalLocationInformation) {
         this.additionalLocationInformation = additionalLocationInformation;
+    }
+    
+    public DateTime ResearchDataset.getDateFrom() {
+        return this.dateFrom;
+    }
+    
+    public void ResearchDataset.setDateFrom(DateTime dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+    
+    public DateTime ResearchDataset.getDateTo() {
+        return this.dateTo;
+    }
+    
+    public void ResearchDataset.setDateTo(DateTime dateTo) {
+        this.dateTo = dateTo;
+    }
+    
+    public List<Vocabulary> ResearchDataset.getKeywords() {
+        return this.keywords;
+    }
+    
+    public void ResearchDataset.setKeywords(List<Vocabulary> keywords) {
+        this.keywords = keywords;
     }
     
 }

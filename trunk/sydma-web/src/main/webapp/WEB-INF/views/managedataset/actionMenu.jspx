@@ -13,5 +13,32 @@
                 </dt>               
             </dl>
         </div>
+        
+        <div id="fileInfoMenu" class="column_right sidebar">
+            <dl class="feature">
+                <dt>
+                    <spring:message code="manageDataset.fileInfoMenu" text="?FileInfo?" />
+                </dt>               
+                <dd>
+                    <dl>
+                        <dt id="annotation-header">
+                            <spring:message code="manageDataset.fileInfoMenu.annotation" text="?Annotation?"/>                            
+                        </dt>
+                        <dd id="annotation-content">
+                        </dd>
+                        <dt id="modificationDate-header">
+                            <spring:message code="manageDataset.fileInfoMenu.modifiedDate" text="?modifiedDate?"/>                            
+                        </dt>
+                        <dd id="modificationDate-content">
+                        </dd>
+                        <dt id="size-header">
+                            <spring:message code="manageDataset.fileInfoMenu.size" text="?size?"/>                            
+                        </dt>
+                        <dd id="size-content">
+                        </dd>
+                    </dl>                    
+                </dd>
+            </dl>
+        </div>
 </div>
 

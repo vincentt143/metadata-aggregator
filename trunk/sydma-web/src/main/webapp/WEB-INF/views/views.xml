@@ -17,19 +17,15 @@
 	<definition extends="contentLightboxable" name="accessDenied">
 		<put-attribute name="body" value="/WEB-INF/views/accessDenied.jspx" cascade="true"/>
 	</definition>
-	
+
     <definition extends="contentLightboxable" name="uncaughtException">
         <put-attribute name="body" value="/WEB-INF/views/uncaughtException.jspx" cascade="true"/>
     </definition>
-    
-	<definition extends="contentLightboxable" name="forgotpassword">
-		<put-attribute name="body" value="/WEB-INF/views/forgotPassword.jspx" cascade="true"/>
+	
+	<definition extends="contentLightboxable" name="solrServerException">
+		<put-attribute name="body" value="/WEB-INF/views/solrServerException.jspx" cascade="true"/>
 	</definition>
 
-	<definition extends="contentLightboxable" name="changepassword">
-		<put-attribute name="body" value="/WEB-INF/views/changePassword.jspx" cascade="true"/>
-	</definition>
-	
 	<definition extends="contentLightboxable" name="termsAndConditions">
 		<put-attribute name="body" value="/WEB-INF/views/termsAndConditions.jspx" cascade="true"/>
 	</definition>

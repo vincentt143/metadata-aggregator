@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="contentLightboxable" name="publication/add">
+        <put-attribute name="body" value="/WEB-INF/views/publication/publication.jspx" cascade="true"/>
+        <put-attribute name="publishMode" value="add" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="publication/edit">
+        <put-attribute name="body" value="/WEB-INF/views/publication/publication.jspx" cascade="true"/>
+        <put-attribute name="publishMode" value="edit" cascade="true"/>
+    </definition>
+    <definition extends="contentLightboxable" name="publication/tableEntry">
+        <put-attribute name="body" value="/WEB-INF/views/publication/tableEntry.jspx" cascade="true"/>
+    </definition>
+</tiles-definitions>

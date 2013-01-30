@@ -1,8 +1,10 @@
-<div id="masthead">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div
+    xmlns:spring="http://www.springframework.org/tags" 
+    id="masthead">
 	<a href="#content" class="skip-nav">Skip to main content</a>
 	<h1>
 		<a id="logo" href="http://sydney.edu.au/">The University of Sydney</a>
-		<span id="separator">-</span> <span id="tag-line">My Research
-			Data Manager</span>
+		<span id="separator">-</span> <span id="tag-line"><spring:theme code="application.title"/></span>
 	</h1>
 </div>

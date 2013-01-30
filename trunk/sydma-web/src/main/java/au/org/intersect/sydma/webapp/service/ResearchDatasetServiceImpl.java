@@ -38,6 +38,7 @@ import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.domain.ResearchProject;
 import au.org.intersect.sydma.webapp.exception.NoneUniqueNameException;
 import au.org.intersect.sydma.webapp.util.RifCsWriter;
+import au.org.intersect.sydma.webapp.util.TokenInputHelper;
 
 /**
  * 
@@ -54,8 +55,11 @@ public class ResearchDatasetServiceImpl implements ResearchDatasetService
     @Autowired
     private RifCsWriter rifCsWriter;
 
+    @Autowired
+    private TokenInputHelper tokenInputHelper;
+
     @Override
-    public ResearchDataset createDataset(Long projectId, ResearchDataset researchDataset)
+    public ResearchDataset createDataset(Long projectId, ResearchDataset researchDataset, String keywords)
         throws NoneUniqueNameException
     {
         ResearchProject researchProject = ResearchProject.findResearchProject(projectId);
@@ -69,30 +73,29 @@ public class ResearchDatasetServiceImpl implements ResearchDatasetService
         if (ResearchDataset.isDuplicate(null, researchDataset.getName(), researchProject))
         {
             throw new NoneUniqueNameException("Dataset name [" + datasetName + "] is not unique");
-        }        
-        
+        }
+
         Boolean isPhysical = researchProject.getResearchGroup().getIsPhysical();
-        
-        researchDataset.setIsPhysical(isPhysical);        
+
+        researchDataset.setIsPhysical(isPhysical);
 
         researchProject.associateWithResearchDataset(researchDataset);
         researchDataset.setPubliciseStatus(PubliciseStatus.NOT_ADVERTISED);
+        tokenInputHelper.setKeywordsForDataset(keywords, researchDataset);
         researchDataset.persist();
-        
         if (BooleanUtils.isNotTrue(isPhysical))
         {
             if (!fileAccessService.prepareDatasetFileSpace(researchDataset))
             {
                 // TODO: Decide what to do to recover
-            }            
+            }
         }
-
+        ResearchDataset.indexResearchDataset(researchDataset);
         return researchDataset;
-
     }
 
     @Override
-    public ResearchDataset editDataset(ResearchDataset researchDataset) throws NoneUniqueNameException
+    public ResearchDataset editDataset(ResearchDataset researchDataset, String keywords) throws NoneUniqueNameException
     {
         ResearchDataset persistedDataset = ResearchDataset.findResearchDataset(researchDataset.getId());
         ResearchProject project = persistedDataset.getResearchProject();
@@ -106,9 +109,10 @@ public class ResearchDatasetServiceImpl implements ResearchDatasetService
         {
             throw new NoneUniqueNameException("Dataset name [" + datasetName + "] is not unique");
         }
-
+        tokenInputHelper.setKeywordsForDataset(keywords, researchDataset);
         researchDataset.merge();
         researchDataset.updateRifCsIfNeeded(rifCsWriter);
+        ResearchDataset.indexResearchDataset(researchDataset);
         return researchDataset;
     }
 }

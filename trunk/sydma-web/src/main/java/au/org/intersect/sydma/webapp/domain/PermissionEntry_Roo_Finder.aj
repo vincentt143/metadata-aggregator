@@ -11,6 +11,14 @@ import javax.persistence.TypedQuery;
 
 privileged aspect PermissionEntry_Roo_Finder {
     
+    public static TypedQuery<PermissionEntry> PermissionEntry.findPermissionEntrysByPathEquals(String path) {
+        if (path == null || path.length() == 0) throw new IllegalArgumentException("The path argument is required");
+        EntityManager em = PermissionEntry.entityManager();
+        TypedQuery<PermissionEntry> q = em.createQuery("SELECT o FROM PermissionEntry AS o WHERE o.path = :path", PermissionEntry.class);
+        q.setParameter("path", path);
+        return q;
+    }
+    
     public static TypedQuery<PermissionEntry> PermissionEntry.findPermissionEntrysByPathEqualsAndUser(String path, User user) {
         if (path == null || path.length() == 0) throw new IllegalArgumentException("The path argument is required");
         if (user == null) throw new IllegalArgumentException("The user argument is required");

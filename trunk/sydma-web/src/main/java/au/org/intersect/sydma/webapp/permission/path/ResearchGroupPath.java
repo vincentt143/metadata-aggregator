@@ -72,4 +72,11 @@ class ResearchGroupPath extends AbstractPath
         return true;
     }
 
+    @Override
+    public String getDisplayName()
+    {
+        ResearchGroup group = ResearchGroup.findResearchGroup(groupId);
+        return Path.SEPARATOR + group.getName() + Path.SEPARATOR;
+    }
+
 }

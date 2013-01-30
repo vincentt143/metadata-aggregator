@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <h1>
+    	<spring:message code="dbinstance.confirm.database.restore.title" text="?dbinstance.confirm.database.restore.title?"/>
+    </h1>
+    
+	<p class="required-warning">
+        <spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false" />
+    </p>
+    <c:url var="formAction" value="/dbinstance/confirmRestore" />
+ 	
+ 	<form:form class="formbuilder" modelAttribute="researchDatasetDB" method="post" action="${formAction}" autocomplete="off" >
+        <input type="hidden" name="backupId" value="${backupId}" />
+        <form:hidden path="id" />
+        <fieldset>
+            <legend>
+                <spring:message code="dbinstance.restore.database.title" text="?dbinstance.restore.database.title?" />
+            </legend>	
+            <ol>
+            	<li>
+	            	<i class="icon icon-warn" />
+			    	<span>
+			    		<spring:message code="dbinstance.restore.database.message" text="?dbinstance.restore.database.message?"/>
+		    		</span>
+		    	</li>
+            	<menu:form-text-area characters="1000" code="dbinstance.restore.database.reason" path="state" required="true" />
+				<span>
+					<c:choose>
+						<c:when test="${checkedForBackup}">
+							<input type="checkbox" name="confirmBackup" checked="${checkedForBackup}" >
+								<spring:message code="dbinstance.backup.before.restore.title" text="?dbinstance.backup.before.restore.title?" />
+							</input>
+						</c:when>
+						<c:otherwise>
+							<label for="backup" id="accessibility" >Confirm Backup</label>
+							<input type="checkbox" id="backup" name="confirmBackup" >
+								<spring:message code="dbinstance.backup.before.restore.title" text="?dbinstance.backup.before.restore.title?" />
+							</input>	
+						</c:otherwise>
+					</c:choose>
+				</span>
+		    </ol>
+
+	    </fieldset>
+	    <div class="buttons">
+        	<input id="cancel_button" class="cancel-button button" type="submit" name="_submit" value="Cancel"/>
+        	<input id="backup_button" class="submit-button button" type="submit" name="_submit" value="Restore"/>  
+        </div>
+    </form:form>
+</div>   

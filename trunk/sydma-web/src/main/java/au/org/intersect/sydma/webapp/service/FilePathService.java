@@ -27,7 +27,6 @@
 
 package au.org.intersect.sydma.webapp.service;
 
-import au.org.intersect.sydma.webapp.domain.ResearchDataset;
 import au.org.intersect.sydma.webapp.dto.FilePathInfo;
 import au.org.intersect.sydma.webapp.permission.path.Path;
 
@@ -46,22 +45,20 @@ public interface FilePathService
     FilePathInfo parseVirtualPath(String path);
 
     /**
-     * Absolute path to the dataset
-     * uploadRoot/serverPath(usually upload)/groupDirectory/datasetId
+     * Convert a upload path of format /groupPath/datasetId/directory     
+     * to virtual path of format /groupId/projectId/datasetId/directory/
+     * in the absence of pre existing knowledge of the group or dataset
+     * to assist in conversion
+     * 
      */
-    String resolveDatasetAbsolutePath(ResearchDataset dataset);
-
-    /**
-     * Absolute path to the dataset
-     * uploadRoot/serverPath(usually upload)/groupDirectory
-     */
-    String resolveGroupAbsolutePath(String groupDirectoryPath);
-
+    String relativeToVirtualPath(String uploadPath);
+    
     /**
      * Convert a upload path of format /groupPath/datasetId/directory     
-     * to virtual path of format /groupId/projectId/datasetId/directory
-     * The FilePathInfo is used to get the group, project and dataset id. 
-     * The directory in FilePathInfo is not used as it is
+     * to virtual path of format /groupId/projectId/datasetId/directory/ <br/>
+     * 
+     * The FilePath is used to get the group, project and dataset id. <br/>
+     * The directory in FilePath is not used as it is
      * presumed to be a part of uploadPath
      */
     String relativeToVirtualPath(Path filePath, String uploadPath);
@@ -72,13 +69,26 @@ public interface FilePathService
      * It expects the groupId and datasetId in pathInfo to be not null and valid,
      * If directory is not null in pathInfo it will add it as part of the relative path
      */
-    String resolveRelativePath(Path pathInfo);
+    String resolveToRelativePath(Path pathInfo);
 
+    /**
+     * returns a virtual path of /groupId/
+     */
     String createVirtualPath(Long groupId);
 
+    /**
+     * returns a virtual path of /groupId/projectId/
+     */
     String createVirtualPath(Long groupId, Long projectId);
     
+    /**
+     * returns a virtual path of /groupId/projectId/datasetId/
+     */
     String createVirtualPath(Long groupId, Long projectId, Long datasetId);
     
-    String resolveVirtualPath(Long groupId, Long projectId, Long datasetId, String directory);
+    /**
+     * returns a virtual path of /groupId/projectId/datasetId/directory/
+     */
+    String createVirtualPath(Long groupId, Long projectId, Long datasetId, String directory);
+
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form"
+    xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0" class="sydma_content">
+
+    <jsp:directive.page contentType="text/html;charset=UTF-8" />
+    <jsp:output omit-xml-declaration="yes" />
+    <h1>
+        <spring:message code="dbinstance.create.title" text="?Create Instance?" arguments="${dataset.name}" htmlEscape="true"/>
+    </h1>
+
+    <p class="required-warning">
+        <spring:message code="form.mandatory.fields" text="?form.mandatory.fields?" htmlEscape="false" />
+    </p>
+    <c:url var="formAction" value="/dbinstance/create" />
+    <form:form class="formbuilder" modelAttribute="dbInstanceDto" method="post" action="${formAction }" autocomplete="off">
+
+        <form:hidden path="datasetId"/>
+        <fieldset>
+            <legend>
+                <spring:message code="dbinstance.create.legend" text="?Schema?" />
+            </legend>
+
+            <ol>             
+                <menu:form-select path="dbSchema" code="dbinstance.schema.name" required="true" items="${schemas}" label="name" value="name" includeBlank="true"/>
+                <menu:form-text-area path="description" code="dbinstance.description" required="true" characters="1000"/>                
+            </ol>
+        </fieldset>
+        <div class="buttons">
+            <input class="clear-button button" type="submit" name="_submit" value="Cancel"/> 
+            <input class="submit-button button" type="submit" name="_submit" value="Create"/>
+        </div>
+    </form:form>
+    
+</div>

@@ -53,6 +53,8 @@ import au.org.intersect.sydma.webapp.domain.User;
 import au.org.intersect.sydma.webapp.permission.PermissionDto;
 import au.org.intersect.sydma.webapp.permission.dataset.DatasetPermissionQuery;
 import au.org.intersect.sydma.webapp.permission.group.GroupPermissionQuery;
+import au.org.intersect.sydma.webapp.permission.path.Path;
+import au.org.intersect.sydma.webapp.permission.path.PathBuilder;
 import au.org.intersect.sydma.webapp.permission.project.ProjectPermissionQuery;
 import au.org.intersect.sydma.webapp.service.PermissionService;
 import au.org.intersect.sydma.webapp.util.Breadcrumb;
@@ -74,7 +76,7 @@ public class HomeController
 
     static
     {
-        breadcrumbs.add(new Breadcrumb("My Research Data Manager"));
+        breadcrumbs.add(new Breadcrumb("application.title"));
     }
 
     @RequestMapping
@@ -120,7 +122,8 @@ public class HomeController
         List<ActionLinks> rpLinkList = new ArrayList<ActionLinks>();
         User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
         
-        ProjectPermissionQuery permissionQuery = permissionService.getViewProjectPermissions(user, researchGroup);
+        Path researchGroupPath = PathBuilder.groupPath(researchGroup);
+        ProjectPermissionQuery permissionQuery = permissionService.getViewProjectPermissions(user, researchGroupPath);
         
         for (ResearchProject project : ResearchProject.findProjectWithPermission(permissionQuery))
         {
@@ -148,7 +151,8 @@ public class HomeController
         List<ActionLinks> rdLinkList = new ArrayList<HomeController.ActionLinks>();
         User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
 
-        DatasetPermissionQuery permissionQuery = permissionService.getViewDatasetPermissions(user, researchProject);
+        Path projectPath = PathBuilder.projectPath(researchProject);
+        DatasetPermissionQuery permissionQuery = permissionService.getViewDatasetPermissions(user, projectPath);
         for (ResearchDataset dataset : ResearchDataset.findDatasetsWithPermission(permissionQuery))
         {
             boolean showAdvertiseLink = dataset.canBeAdvertisedBy(user);

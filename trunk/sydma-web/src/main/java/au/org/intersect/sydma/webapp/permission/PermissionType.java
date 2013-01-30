@@ -26,6 +26,8 @@
  */
 package au.org.intersect.sydma.webapp.permission;
 
+import au.org.intersect.sydma.webapp.domain.AccessLevel;
+
 /**
  * Enumeration of the different permission actions
  *
@@ -33,23 +35,61 @@ package au.org.intersect.sydma.webapp.permission;
  */
 public enum PermissionType
 {
-    EDIT_GROUP ("editGroup"), 
-    CREATE_PROJECT ("createProject"), 
-    ASSIGN_PERMISSION("assignGroupPermissions"),
-    VIEW_PERMISSION("viewGroupPermissions"),
-    EDIT_PROJECT("editProject"),
-    CREATE_DATASET("createDataset"),
-    EDIT_DATASET("editDataset"),
-    PUBLISH_DATASET("publishDataset"),
-    REJECT_ADVERTISING_DATASET("rejectAdvertisingDataset"),
-    CREATE_DATABASE_INSTANCE("createSchema"),
-    VIEW_DATABASE_INSTANCE("viewSchema");
+    VIEW_GROUP("viewGroup", PermissionAppliedType.GROUP, AccessLevel.VIEWING_ACCESS),
+    EDIT_GROUP("editGroup", PermissionAppliedType.GROUP, AccessLevel.EDITING_ACCESS),
+    CREATE_PROJECT("createProject", PermissionAppliedType.GROUP, AccessLevel.FULL_ACCESS),
+    ASSIGN_PERMISSION("assignGroupPermissions", PermissionAppliedType.GROUP, AccessLevel.EDITING_ACCESS),
+    ASSIGN_PROJECT_PERMISSION("assignProjectPermissions", PermissionAppliedType.PROJECT, AccessLevel.EDITING_ACCESS),
+    ASSIGN_DATASET_PERMISSION("assignDatasetPermissions", PermissionAppliedType.DATASET, AccessLevel.EDITING_ACCESS),
+    ASSIGN_DIRECTORY_PERMISSION("assignDirectoryPermissions", PermissionAppliedType.DIRECTORY,
+            AccessLevel.EDITING_ACCESS),
+    VIEW_PERMISSION("viewGroupPermissions", PermissionAppliedType.GROUP_AFFECTED, AccessLevel.EDITING_ACCESS),
+    DELETE_PERMISSION("deletePermission", PermissionAppliedType.GROUP_AFFECTED, AccessLevel.FULL_ACCESS),
+    ACTIVITY_LOG("permissionActivityLog", PermissionAppliedType.GROUP_AFFECTED, AccessLevel.EDITING_ACCESS),
+    VIEW_PROJECT("viewProject", PermissionAppliedType.PROJECT, AccessLevel.VIEWING_ACCESS),
+    EDIT_PROJECT("editProject", PermissionAppliedType.PROJECT, AccessLevel.EDITING_ACCESS),
+    CREATE_DATASET("createDataset", PermissionAppliedType.PROJECT, AccessLevel.FULL_ACCESS),
+    EDIT_DATASET("editDataset", PermissionAppliedType.DATASET, AccessLevel.EDITING_ACCESS),
+    VIEW_DATASET("viewDataset", PermissionAppliedType.DATASET, AccessLevel.VIEWING_ACCESS),
+    PUBLISH_DATASET("publishDataset", PermissionAppliedType.DATASET, AccessLevel.FULL_ACCESS),
+    REJECT_ADVERTISING_DATASET("rejectAdvertisingDataset", PermissionAppliedType.DATASET, AccessLevel.FULL_ACCESS),
+    //db instance related
+    CREATE_DATABASE_INSTANCE("createSchema", PermissionAppliedType.DATASET, AccessLevel.FULL_ACCESS),
+    VIEW_DATABASE_INSTANCE("viewSchema", PermissionAppliedType.DATASET, AccessLevel.VIEWING_ACCESS),
+    EDIT_DATABASE_INSTANCE("editSchema", PermissionAppliedType.DATASET, AccessLevel.EDITING_ACCESS),
+    DELETE_DATABASE_INSTANCE("deleteSchema", PermissionAppliedType.DATASET, AccessLevel.FULL_ACCESS),
+    CREATE_DATABASE_SQL("createDatabaseSql", PermissionAppliedType.DATASET, AccessLevel.FULL_ACCESS),
+    EDIT_DATABASE_SQL("editDatabaseSql", PermissionAppliedType.DATASET, AccessLevel.EDITING_ACCESS),
+    CHANGE_DATABASE_PASSWORD("changeDatabasePassword", PermissionAppliedType.DATASET, AccessLevel.FULL_ACCESS),
+    VIEW_DATABASE_SQL("viewDatabaseSql", PermissionAppliedType.DATASET, AccessLevel.VIEWING_ACCESS),
+    BACKUP_DATABASE_INSTANCE("manageDatabase", PermissionAppliedType.DATASET, AccessLevel.EDITING_ACCESS),
+    REVERSE_DATABASE_SCHEMA("reverseSchema", PermissionAppliedType.DATASET, AccessLevel.FULL_ACCESS),
+    //file management related
+    UPLOAD("upload", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS),
+    DOWNLOAD("download", PermissionAppliedType.DIRECTORY, AccessLevel.VIEWING_ACCESS),
+    CREATE_DIRECTORY("createDirectory", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS),
+    MOVE_DIRECTORY_FILE("moveDirectoryFile", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS),
+    DELETE_DIRECTORY("deleteDirectory", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS),
+    VIEW_DIRECTORY("viewDirectory", PermissionAppliedType.DIRECTORY, AccessLevel.VIEWING_ACCESS),
+    DELETE_FILE("deleteFile", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS),
+    //annotation related
+    CREATE_ANNOTATION("createAnnotation", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS), 
+    EDIT_ANNOTATION("editAnnotation", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS),
+    DELETE_ANNOTATION("deleteAnnotation", PermissionAppliedType.DIRECTORY, AccessLevel.EDITING_ACCESS),
+    //vocabulary and keyword related
+    MANAGE_VOCABULARY("manageVocabulary", PermissionAppliedType.GROUP, AccessLevel.FULL_ACCESS);
     
     private String permissionTypeName;
     
-    PermissionType(String permissionTypeName)
+    private PermissionAppliedType appliedType;
+
+    private AccessLevel requiredLevel;
+    
+    PermissionType(String permissionTypeName, PermissionAppliedType appliedType, AccessLevel requiredLevel)
     {
         this.permissionTypeName = permissionTypeName;
+        this.appliedType = appliedType;
+        this.requiredLevel = requiredLevel;
     }
     
     public String getPermissionTypeName()
@@ -57,4 +97,13 @@ public enum PermissionType
         return permissionTypeName;
     }
 
+    public PermissionAppliedType getAppliedType()
+    {
+        return appliedType;
+    }
+
+    public AccessLevel getRequiredLevel()
+    {
+        return requiredLevel;
+    }
 }

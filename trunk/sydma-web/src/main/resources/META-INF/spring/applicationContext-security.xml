@@ -11,22 +11,28 @@
 	<http auto-config="true" use-expressions="true">
 		<form-login login-processing-url="/resources/j_spring_security_check" login-page="/signin/index" authentication-failure-url="/login?login_error=t" default-target-url="/" always-use-default-target="true" />
 		<logout logout-url="/resources/j_spring_security_logout" />
-
-		<intercept-url pattern="/changepassword/**" access="hasRole('ROLE_RESEARCHER')" />
-		<intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/home/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/upload/**" access="hasRole('ROLE_RESEARCHER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/transfer/**" access="hasRole('ROLE_RESEARCHER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/download/**" access="hasRole('ROLE_RESEARCHER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/researchgroup/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/researchproject/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/researchdataset/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/phycol/**" access="hasRole('ROLE_RESEARCH_DATA_MANAGER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/managedataset/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
-		<intercept-url pattern="/rds/**" access="hasRole('ROLE_RESEARCHER') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		
+		<intercept-url pattern="/rstudio/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/rstudiotree/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/admin/**" access="hasAnyRole('ROLE_ADMINISTRATOR','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<!-- Every role can access the home page -->
+		<intercept-url pattern="/home/**" access="hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/subjectcode/**" access="hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/upload/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/transfer/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/download/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/researchgroup/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ADMINISTRATOR','ROLE_RESEARCH_DATA_MANAGER', 'ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/researchproject/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ADMINISTRATOR','ROLE_RESEARCH_DATA_MANAGER', 'ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/researchdataset/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ADMINISTRATOR','ROLE_RESEARCH_DATA_MANAGER', 'ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/phycol/**" access="hasAnyRole('ROLE_RESEARCH_DATA_MANAGER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/managedataset/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/search/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/rds/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
+		<intercept-url pattern="/usermanagement/assignroles/**" access="hasRole('ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
 		<intercept-url pattern="/usermanagement/**" access="hasAnyRole('ROLE_ADMINISTRATOR', 'ROLE_RESEARCHER','ROLE_ICT_SUPPORT') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
 		<intercept-url pattern="/permission/**" access="hasAnyRole('ROLE_RESEARCHER','ROLE_ICT_SUPPORT','ROLE_ADMINISTRATOR') and hasRole('ACCEPTED_TC') and hasRole('ACTIVE')" />
 		<intercept-url pattern="/resources/**" access="permitAll" />
+		<intercept-url pattern="/tunnel/**" access="permitAll" />
 		<intercept-url pattern="/**" access="permitAll" />
 
 		<custom-filter position="PRE_AUTH_FILTER" ref="preAuthenticatedProcessingFilter" />

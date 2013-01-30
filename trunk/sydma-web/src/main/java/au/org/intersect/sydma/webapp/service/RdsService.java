@@ -27,6 +27,7 @@
 package au.org.intersect.sydma.webapp.service;
 
 import au.org.intersect.sydma.webapp.domain.RdsRequest;
+import au.org.intersect.sydma.webapp.domain.ResearchGroup;
 
 /**
  * 
@@ -37,10 +38,10 @@ public interface RdsService
 {
     /**
      * Marks the RDS request as 'approved' and creates its corresponding research group
-     * @param directoryPath 
+     * @param researchGroup 
      * @param rdsRequest
      */
-    public void approveRdsRequest(String directoryPath, RdsRequest rdsRequest);
+    void approveRdsRequest(ResearchGroup researchGroup, RdsRequest rdsRequest);
 
     /**
      * Marks the RDS request as 'rejected'
@@ -53,5 +54,6 @@ public interface RdsService
      * @param rdsRequest
      */
     public void createRdsRequest(RdsRequest rdsRequest);
+
 
 }

@@ -27,41 +27,119 @@
 
 package au.org.intersect.sydma.webapp.domain;
 
-import javax.persistence.OneToOne;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
 
+import au.org.intersect.sydma.webapp.exception.ResearchDatasetDBSqlException;
+
 /**
  * Entity storing a user's access information to dataset databases
- *
+ * 
  * @version $Rev: 29 $
  */
 @RooJavaBean
 @RooToString
-@RooEntity(persistenceUnit = "sydmaPU")
+@RooEntity(persistenceUnit = "sydmaPU", finders = {"findDBUsersByDatabaseInstanceAndAccessLevel"})
 public class DBUser
 {
-    @OneToOne
+    private static final Logger LOG = LoggerFactory.getLogger(DBUser.class);
+
     @NotNull
-    private User user;
-    
+    @ManyToOne
+    private ResearchDatasetDB databaseInstance;
+
     @NotNull
+    @Column(unique = true)
     private String dbUsername;
-    
+
     @NotNull
     private String dbPassword;
-    
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private DBAccess accessLevel;
+
     protected DBUser()
     {
-        
+
+    }
+
+    public DBUser(String dbPassword, DBAccess accessLevel, ResearchDatasetDB databaseInstance)
+    {
+        this.dbPassword = dbPassword;
+        this.databaseInstance = databaseInstance;
+        this.accessLevel = accessLevel;
+        this.dbUsername = generateDBUsername(databaseInstance.getResearchDataset(), accessLevel);
+    }
+
+    private String generateDBUsername(ResearchDataset researchDataset, DBAccess accessLevel)
+    {
+        return "sydma_user_" + researchDataset.getId() + accessLevel.getDbSuffix();
     }
     
-    public DBUser(String dbUsername, String dbPassword)
+    public void changeUserDBPassword(Connection connection, String password)
     {
-        this.dbUsername = dbUsername;
-        this.dbPassword = dbPassword;
+        String query = "update user set password=PASSWORD('" + password + "') where User='" + this.dbUsername + "';";
+        String useDatabase = "use mysql;";
+        String flushPrivileges = "flush privileges;";
+        try
+        {
+            Statement st = null;
+            st = connection.createStatement();
+            
+            st.execute(useDatabase);
+            st.execute(query);
+            st.execute(flushPrivileges);
+        }
+        catch (SQLException sqle)
+        {
+            throw new ResearchDatasetDBSqlException("Failed to change DB password", sqle);
+        }
+    }
+
+    public void createAndGrantUser(Connection connection)
+    {
+        String sql = "GRANT " + accessLevel.getSqlGrants() + " ON " + databaseInstance.getDbName()
+                + ".* TO ?@'%' IDENTIFIED BY ?";
+        try
+        {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, dbUsername);
+            statement.setString(2, dbPassword);
+            statement.execute();
+        }
+        catch (SQLException e)
+        {
+            throw new ResearchDatasetDBSqlException("Failed to create and grant user", e);
+        }
+    }
+
+    public void dropUser(Connection connection)
+    {
+        String sql = "DROP USER " + dbUsername;
+        try
+        {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(sql);
+        }
+        catch (SQLException e)
+        {
+            LOG.error("Failed to drop db user", e);
+            throw new ResearchDatasetDBSqlException("Failed to drop db user with name:" + dbUsername, e);
+        }
     }
 }

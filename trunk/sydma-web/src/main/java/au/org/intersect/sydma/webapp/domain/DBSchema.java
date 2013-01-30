@@ -29,9 +29,11 @@ package au.org.intersect.sydma.webapp.domain;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.apache.commons.io.FileUtils;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -39,6 +41,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
+
+import au.org.intersect.sydma.webapp.validator.FileName;
 
 /**
  * Entity representing a db schema
@@ -53,13 +57,17 @@ public class DBSchema
     @Id
     @NotNull
     @NotEmpty
+    @FileName
+    // TODO CHECKSTYLE-OFF: MagicNumber
+    @Size(max = 100)
     private String name;
+    // TODO CHECKSTYLE-ON: MagicNumber
 
     @NotEmpty
     @NotNull
     private String filename;
 
-    @Value("#{dbSchemaProperties['sydma.schema.directory']}")
+    @Value("#{dbInstanceProperties['sydma.dbinstance.schema.directory']}")
     private transient String schemaDirectoryPath;
 
     protected DBSchema()
@@ -80,5 +88,11 @@ public class DBSchema
         String schemaSql = FileUtils.readFileToString(schemaFile);
 
         return schemaSql;
+    }
+    
+    public void createNewSchemaFile(List<String> dll) throws IOException
+    {
+        File schemaFile = new File(schemaDirectoryPath + filename);
+        FileUtils.writeLines(schemaFile, dll);
     }
 }

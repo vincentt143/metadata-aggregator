@@ -8,13 +8,19 @@
     </definition>
     <definition extends="withSidebar" name="admin/rds/listUnapproved">
         <put-attribute name="body" value="/WEB-INF/views/admin/rds/list.jspx" cascade="true"/>
-        <put-attribute name="listType" value="admin.rds.list.unapproved" cascade="true"/>
+        <put-attribute name="listType" value="sections.admin.list.unapproved" cascade="true"/>
         <put-attribute name="activeTab" value="admin.tab" cascade="true"/>
         <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx" cascade="true"/>
     </definition>
     <definition extends="withSidebar" name="admin/rds/listApproved">
         <put-attribute name="body" value="/WEB-INF/views/admin/rds/list.jspx" cascade="true"/>
-        <put-attribute name="listType" value="admin.rds.list.approved" cascade="true"/>
+        <put-attribute name="listType" value="sections.admin.list.approved" cascade="true"/>
+        <put-attribute name="activeTab" value="admin.tab" cascade="true"/>
+        <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx" cascade="true"/>
+    </definition>
+    <definition extends="withSidebar" name="admin/changePrincipalInvestigator">
+        <put-attribute name="body" value="/WEB-INF/views/admin/changePrincipalInvestigator.jspx" cascade="true"/>
+        <put-attribute name="listType" value="sections.admin.list.approved" cascade="true"/>
         <put-attribute name="activeTab" value="admin.tab" cascade="true"/>
         <put-attribute name="leftMenu" value="/WEB-INF/views/admin/leftMenu.jspx" cascade="true"/>
     </definition>
