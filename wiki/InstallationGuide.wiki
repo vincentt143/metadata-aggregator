@@ -24,7 +24,7 @@ $ yum install openssh-clients
 
 In a seperate bash tab, locally run:
 {{{
-$ scp [download location]/jdk-6u[version]-linux-x64-rpm.bin devel@[server name you are deploying to]:~
+$ scp [download location]/jdk-6u[version]-linux-x64-rpm.bin [username]@[server name you are deploying to]:~
 }}}
 
 Close the local tab and back in the ssh session run:
