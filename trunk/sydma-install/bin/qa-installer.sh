@@ -35,7 +35,7 @@ done
 
 
 ENV_FILE="../../${INSTALLER_DIR}/config/${REMOTE_CONFIG}/env.sh"
-if [ -e $ENV_FILE ]; then
+if [ -x $ENV_FILE ]; then
   . $ENV_FILE
 else
   echo "Please define a env.sh file for remote host in $ENV_FILE"
@@ -121,8 +121,12 @@ cp `ls $BUILD_DIR/${WAR_FILE_LOCAL}` ${TMP_STAGING_DIR}/${WAR_FILE_REMOTE}
 
 echo "\nPreparing solr configuration files to remote server"
 mkdir -p ${TMP_STAGING_DIR}/solr_conf
-cp ${INSTALLER_DIR}/resource/solr_conf/*.xml ${TMP_STAGING_DIR}/solr_conf
+cp ${INSTALLER_DIR}/resource/solr_conf/* ${TMP_STAGING_DIR}/solr_conf
 
+
+echo "\nPreparing tomcat6 configuration files to remote server"
+mkdir -p ${TMP_STAGING_DIR}/tomcat6-conf
+cp ${INSTALLER_DIR}/resource/tomcat6-conf/* ${TMP_STAGING_DIR}/tomcat6-conf
 
 echo "\nPreparing script file to remote server"
 cp ${INSTALLER_DIR}/bin/qa-installer-remote.sh ${TMP_STAGING_DIR}/qa-installer-remote.sh
@@ -131,17 +135,17 @@ chmod u+x ${TMP_STAGING_DIR}/qa-installer-remote.sh
 
 echo "\nPreparing dms.home to remote server"
 mkdir ${TMP_STAGING_DIR}/dms.home
-cp -rp ${INSTALLER_DIR}/config/${REMOTE_CONFIG}/  ${TMP_STAGING_DIR}/dms.home
+cp -rp ${INSTALLER_DIR}/resource/dms.home/*  ${TMP_STAGING_DIR}/dms.home
 
 echo "\nPreparing sql files to remote server"
-for sql_file in create_users.sql create_access_rights.sql create_buildings.sql create_research_subject_code.sql create_dataset_schema.sql create_vocabulary.sql; do
-  sed "s/SQL_D/$SQL_D/g
-s/SQL_F/$SQL_F/g" ${INSTALLER_DIR}/sql/${sql_file} > /tmp/temp.sql
-  cp /tmp/temp.sql ${TMP_STAGING_DIR}/${sql_file}
-done
+mkdir ${TMP_STAGING_DIR}/sql
+cp ${INSTALLER_DIR}/sql/* ${TMP_STAGING_DIR}/sql
 
 echo "\nPreparing sql schemas to remote server"
 cp -r ${INSTALLER_DIR}/resource/schemas ${TMP_STAGING_DIR}/dms.home/
+
+echo "Clean up before zipping"
+find ${TMP_STAGING_DIR}/ -name .svn -type d -exec rm -rf {} \;
 
 # Zip and Copy all
 cd /tmp && zip -r staging staging && cd -
@@ -156,12 +160,19 @@ fi
 #
 # Run remote script
 #
-echo "\nRunning installer (PENDING: JUST PRINTING COMMAND)"
-echo ssh ${REMOTE_USER}@${REMOTE_HOST} "unzip staging.zip && staging/qa-installer-remote.sh '$WAR_FILE_REMOTE' '$WEBAPP_DIR' "
-## if [ $? -ne 0 ]
-## then
-  ## echo "\nThere were errors running the installer."
-  ## exit 1
-## fi
+echo "\nRunning installer in remote machine"
+ssh -t ${REMOTE_USER}@${REMOTE_HOST} "unzip staging.zip && \
+     sudo ./staging/qa-installer-remote.sh -h '$HOME' \
+                                      -w '$WAR_FILE_REMOTE' \
+                                      -a '$WEBAPP_DIR' \
+                                      -j '$JAVA_HOME' \
+                                      -t '$TOMCAT6_HOME' \
+                                      -u '$DB_ROOT_USER' \
+                                      -p '$DB_ROOT_PASSWORD'"
+if [ $? -ne 0 ]
+then
+  echo "\nThere were errors running the installer."
+  exit 1
+fi
 
 exit 0

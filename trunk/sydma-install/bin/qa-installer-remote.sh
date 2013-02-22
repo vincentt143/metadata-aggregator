@@ -1,17 +1,21 @@
 #!/bin/sh
 set +x
 
-WAR_FILE=$1
-WEBAPP_DIR=$2
-DB_KEEP=$3
-if [ -n "$4" ]; then
-  JAVA_HOME=$4
-fi
-if [ -n "$5" ]; then
-  CATALINA_HOME=$5
-fi
-
-
+USAGE="qa-installer-remote.sh -h home -w war -a appname -k -j java_home -t tomcat_dir -u db_root_user -p db_root_password"
+while getopts "h:w:a:kj:t:u:p:" options; do
+  case $options in
+    h) HOME_DIR=$OPTARG;;
+    w) WAR_FILE=$OPTARG;;
+    a) WEBAPP_DIR=$OPTARG;;
+    k) DB_KEEP=keep;;
+    j) JAVA_HOME=$OPTARG;;
+    t) TOMCAT6_HOME=$OPTARG;;
+    u) DB_ROOT_USER=$OPTARG;;
+    p) DB_ROOT_PASSWORD=$OPTARG;;
+    *) echo $USAGE
+       exit 1;;
+  esac
+done
 
 
 #
@@ -87,20 +91,6 @@ function databaseCleanup {
         exit 1
     fi
     
-    OUT=`/usr/bin/mysql -u $DB_ROOT_USER -p$DB_ROOT_PASSWORD -e "$USER_DB_INSTANCE_PRIVS_SQL1"`
-    if [ -n "$OUT" ]
-    then
-        /bin/echo "Problem setting user dbinstance privileges:\n$OUT"
-        exit 1
-    fi
-    
-    OUT=`/usr/bin/mysql -u $DB_ROOT_USER -p$DB_ROOT_PASSWORD -e "$USER_DB_INSTANCE_PRIVS_SQL2"`
-    if [ -n "$OUT" ]
-    then
-        /bin/echo "Problem setting user dbinstance privileges:\n$OUT"
-        exit 1
-    fi
-
     CLEANUP_FOUND=$(
         /usr/bin/mysql -u $DB_ROOT_USER -p$DB_ROOT_PASSWORD --raw -B -e "select distinct User from mysql.user" | while read dbuser; do
             dropUserIfOurs $dbuser
@@ -132,16 +122,26 @@ function databasePopulate {
 	# Run SQL script to create users & roles
 	#
 
-	/bin/echo "Creating users and roles..."
-	cd ${HOME}/staging
-	sleep 30
-	OUT=`/usr/bin/mysql ${DB_NAME} -u $DB_USER -p$DB_PASSWORD <create_users.sql`
+	cd ${HOME_DIR}/staging/sql
+
+        echo "Creating database tables"
+	OUT=`/usr/bin/mysql ${DB_NAME} -u $DB_USER -p$DB_PASSWORD <create.sql`
+	if [ -n "$OUT" ]
+	then
+	    /bin/echo "Problem creating tables :\n$OUT"
+	    exit 1
+	fi
+
+
+	/bin/echo "Creating users and roles for DC2F..."
+	OUT=`/usr/bin/mysql ${DB_NAME} -u $DB_USER -p$DB_PASSWORD <create_roles_f.sql`
 	if [ -n "$OUT" ]
 	then
 	    /bin/echo "Problem creating users and roles :\n$OUT"
 	    /bin/echo "Try running the script manually when Tomcat has fully started!"
 	    exit 1
 	fi
+
 	OUT=`/usr/bin/mysql ${DB_NAME} -u $DB_USER -p$DB_PASSWORD <create_access_rights.sql`
 	if [ -n "$OUT" ]
 	then
@@ -183,22 +183,24 @@ function databasePopulate {
 }
 
 function workerCleanup {
-  # something
-  workerPath=`cat ${HOME}/staging/dms.home/worker.properties | grep 'dms.wn.localRootPath' | awk -F '=' '{print $2}'`
-  filePath=`unzip -c ${HOME}/staging/${WAR_FILE} WEB-INF/classes/META-INF/spring/fileServer.properties | grep 'sydma.localFileServer' | awk -F '=' '{print $2}'`
-  if [ -n "${workerPath}" -a -n "${filePath}" ]; then
-    echo "REMOVING FILES/FOLDERS FROM ${workerPath}/${filePath}"
-    rm -rf ${workerPath}/${filePath}/*
+  if [ -f "${TOMCAT6_HOME}/dms.home/worker.properties" ]; then
+      workerPath=`cat ${TOMCAT6_HOME}/dms.home/worker.properties | grep 'dms.wn.localRootPath' | awk -F '=' '{print $2}'`
+      filePath=`unzip -c ${HOME_DIR}/staging/${WAR_FILE} WEB-INF/classes/META-INF/spring/fileServer.properties | grep 'sydma.localFileServer' | awk -F '=' '{print $2}'`
+      if [ -n "${workerPath}" -a -n "${filePath}" ]; then
+        echo "REMOVING FILES/FOLDERS FROM ${workerPath}/${filePath}"
+        rm -rf ${workerPath}/${filePath}/*
+      fi
   fi
 }
 
+#
+# -- main --
+#
 
 #
 # Config stuff
 #
 
-DB_ROOT_USER="root"
-DB_ROOT_PASSWORD="root"
 
 DB_NAME="sydma"
 DB_USER="sydma"
@@ -208,16 +210,10 @@ CREATE_DB_SQL="CREATE DATABASE $DB_NAME CHARACTER SET UTF8;"
 CREATE_USER_SQL="CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';"
 # Access to all database so user can also create and grant on created databases
 USER_PRIVS_SQL="GRANT all privileges on ${DB_NAME}.* to '$DB_USER'@'localhost' with grant option;" 
-USER_DB_INSTANCE_PRIVS_SQL1="GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, 
-RELOAD, SHOW DATABASES, GRANT OPTION, CREATE USER, REFERENCES, ALTER, CREATE TEMPORARY TABLES, EXECUTE
-ON *.* TO '$DB_USER'@'localhost' with grant option;"
-USER_DB_INSTANCE_PRIVS_SQL2="GRANT CREATE ROUTINE, ALTER ROUTINE, TRIGGER, INDEX, CREATE VIEW, SHOW VIEW, EVENT, LOCK TABLES 
-ON *.* TO '$DB_USER'@'localhost' with grant option;"
-
 DROP_DB_SQL="DROP DATABASE IF EXISTS $DB_NAME;"
 DROP_USER_SQL="DROP USER '$DB_USER'@'localhost';"
 
-cd ${HOME}/staging
+cd ${HOME_DIR}/staging
 
 #
 # Check for dependencies
@@ -229,9 +225,9 @@ then
     exit 1
 fi
 
-if [ -z "$CATALINA_HOME" ]
+if [ -z "$TOMCAT6_HOME" ]
 then
-    /bin/echo "CATALINA_HOME is not set."
+    /bin/echo "TOMCAT6_HOME is not set."
     exit 1
 fi
 
@@ -245,96 +241,63 @@ fi
 # Stop tomcat
 #
 
-TOMCAT_PS=`/bin/ps -eo pid,args | grep $CATALINA_HOME | grep java`
-
-if  [ -n "$TOMCAT_PS" ]
-then
-    /bin/echo "Stopping Tomcat..."
-    cd ${CATALINA_HOME}/bin
-    OUT=`./shutdown.sh`
- 
-    /bin/sleep 5s
-    TOMCAT_PS=`/bin/ps -eo pid,args | grep $CATALINA_HOME | grep java`
-
-    if [ -n "$TOMCAT_PS" ]
-    then
-        /bin/echo "Killing Tomcat..."
-        PID=`echo $TOMCAT_PS | /usr/bin/cut -f1 -d" "`
-        /usr/bin/kill -9 $PID
-        /bin/sleep 5s
-    fi
-
-    TOMCAT_PS=`/bin/ps -eo pid,args | grep $CATALINA_HOME | grep java`
-
-    if [ -n "$TOMCAT_PS" ]
-    then
-        /bin/echo "Couldn't stop Tomcat, continuing anyway..."
-    fi
-else
-    /bin/echo "Tomcat is not running..."
-fi
+service tomcat6 stop
 
 #
 # Create database
 #
 
-MYSQL_PS=`/bin/ps -eo pid,args | grep [m]ysqld`
-if [ -z "$MYSQL_PS" ]
+service mysqld start
+
+if [ -z "$DB_KEEP" ];
 then
-    /bin/echo "mysql server is not running, ignoring database setup..."
+    /bin/echo "WIPING OUR CURRENT DATA..."
+    databaseCleanup
+    workerCleanup
+    /bin/echo "POPULATING STANDARD DATA..."
+    databasePopulate
 else
-    if [ -z "$DB_KEEP" ];
-    then
-        /bin/echo "WIPING OUR CURRENT DATA..."
-        databaseCleanup
-        workerCleanup
-    else
-        /bin/echo "KEEPING CURRENT DATA ..."
-    fi    
-fi
+    /bin/echo "KEEPING CURRENT DATA ..."
+fi    
 
 #
 # Install new war file
 #
 
-if [ -d ${CATALINA_HOME}/webapps ]
+if [ -d ${TOMCAT6_HOME}/webapps ]
 then
     /bin/echo "Deploying war file..."
-    /bin/cp -p ${HOME}/staging/${WAR_FILE} ${CATALINA_HOME}/webapps/
+    /bin/cp -p ${HOME_DIR}/staging/${WAR_FILE} ${TOMCAT6_HOME}/webapps/
+    chown tomcat ${TOMCAT6_HOME}/webapps/${WAR_FILE}
 
-    cd ${CATALINA_HOME}/webapps
+    cd ${TOMCAT6_HOME}/webapps
     if [ -d ${WEBAPP_DIR} ]
     then
         /bin/rm -rf ${WEBAPP_DIR}
-    fi
-    if [ -d ${TUNNEL_WEBAPP_DIR} ]
-    then
-        /bin/rm -rf ${TUNNEL_WEBAPP_DIR}
     fi
 else
     /bin/echo "No tomcat webapps folder..."
 fi
 
 #
+# copy tomcat6 configuration
+#
+echo "Copying new tomcat6 configuration"
+cp ${HOME_DIR}/staging/tomcat6-conf/* ${TOMCAT6_HOME}/conf
+chown -R tomcat ${TOMCAT6_HOME}/conf
+
+echo "Copying system configuration"
+mkdir -p ${TOMCAT6_HOME}/mda-data/dms.home
+mkdir -p ${TOMCAT6_HOME}/mda-data/solr/conf
+mkdir -p ${TOMCAT6_HOME}/mda-data/rifcs
+cp -r ${HOME_DIR}/staging/dms.home/* ${TOMCAT6_HOME}/mda-data/dms.home
+cp -r ${HOME_DIR}/staging/solr_conf/* ${TOMCAT6_HOME}/mda-data/solr/conf
+chown -R tomcat ${TOMCAT6_HOME}/mda-data
+
+#
 # Start Tomcat
 #
 
-TOMCAT_PS=`/bin/ps -eo pid,args | grep $CATALINA_HOME | grep java`
-
-if  [ -n "$TOMCAT_PS" ]
-then
-    /bin/echo "Tomcat already running..."
-else
-    /bin/echo "Starting Tomcat..."
-    cd ${CATALINA_HOME}/bin
-    export CATALINA_OPTS="-Ddms.config.home=/home/devel/staging/dms.home -Ddms.worker.profile=worker-external.xml -Xmx1024m -XX:MaxPermSize=256m "
-    OUT=`./startup.sh`
-fi
-
-if [ -z "$DB_KEEP" ];
-then
-    /bin/echo "POPULATING STANDARD DATA..."
-    databasePopulate
-fi    
+service tomcat6 start
 
 exit 0
