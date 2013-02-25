@@ -27,29 +27,29 @@ In a seperate bash tab, locally run:
 $ scp [download location]/jdk-6u[version]-linux-x64-rpm.bin [username]@[server name you are deploying to]:~
 }}}
 
-Close the local tab and back in the ssh session run:
+Close the local tab. Then back in the ssh session run:
 {{{
 $ chmod a+x jdk-6u[version]-linux-x64-rpm.bin
 $ ./jdk-6u[version]-linux-x64-rpm.bin
 }}}
 
 {{{
-$ alternatives --install /usr/bin/java java /usr/java/jdk1.6.0_39/jre/bin/java 20000
-$ alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.6.0_39/jre/bin/javaws 20000
-$ alternatives --install /usr/bin/javac javac /usr/java/jdk1.6.0_39/bin/javac 20000
-$ alternatives --install /usr/bin/jarsigner jarsigner /usr/java/jdk1.6.0_39/bin/jarsigner 20000
-$ alternatives --install /usr/bin/jar jar /usr/java/jdk1.6.0_39/bin/jar 20000 
+$ alternatives --install /usr/bin/java java /usr/java/jdk1.6.0_[version]/jre/bin/java 20000
+$ alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.6.0_[version]/jre/bin/javaws 20000
+$ alternatives --install /usr/bin/javac javac /usr/java/jdk1.6.0_[version]/bin/javac 20000
+$ alternatives --install /usr/bin/jarsigner jarsigner /usr/java/jdk1.6.0_[version]/bin/jarsigner 20000
+$ alternatives --install /usr/bin/jar jar /usr/java/jdk1.6.0_[version]/bin/jar 20000 
 }}}
 
 
 Now that Java is installed next we will setup MySQL
 {{{
-$ yum install mysql-server mysql
+$ yum install mysql mysql-server
 }}}
 
 Set the MySQL service to start on boot
 {{{
-$ chkconfig --levels 235 mysqld on
+$ chkconfig --level 2345 mysqld on; service mysqld start
 }}}
 
 Start the MySQL service
@@ -62,20 +62,69 @@ Log into MySQL
 mysql -u root
 }}}
 
-Create sydma db
-{{{
-create database sydma character set utf8;
-CREATE USER 'sydma'@'localhost' IDENTIFIED BY 'sydma';
-GRANT all privileges on sydma.* to 'sydma'@'localhost' with grant option; 
-}}}
-////////// devel populate db sh?
-
 Install Apache Tomcat 6
 {{{
 $ yum -y install tomcat6 tomcat6-webapps tomcat6-admin-webapps
 }}}
 
-#some port forwarding here
+You need to config Tomcat. These instructions assume that Tomcat installed in the default location of /usr/share/tomcat6
+
+{{{
+$ vi /etc/tomcat6/tomcat6.conf
+}}}
+
+Add the following lines to the config file below the existing JAVA_OPTS.
+
+{{{
+JAVA_OPTS="${JAVA_OPTS} -Ddms.config.home=/usr/share/tomcat6/mda-data/dms.home"
+JAVA_OPTS="${JAVA_OPTS} -Dsolr.solr.home=/usr/share/tomcat6/mda-data/solr"
+JAVA_OPTS="${JAVA_OPTS} -XX:MaxPermSize=256m -XX:+CMSClassUnloadingEnabled -Xmx1024m -Xms512m"
+}}}
+
+Now we are ready to download the source code for this application
+{{{
+$ exit
+$ cd ~
+$ mkdir code
+$ cd code
+$ yum install svn
+$ svn checkout http://metadata-aggregator.googlecode.com/svn/trunk/ metadata-aggregator-read-only
+$ svn checkout http://ammrf-dms.googlecode.com/svn/trunk/sdms sdms-read-only
+}}}
+
+Now install Apache Solr:
+{{{
+$ cd ~
+$ wget http://archive.apache.org/dist/lucene/solr/1.4.1/apache-solr-1.4.1.tgz
+$ tar xfz apache-solr-1.4.1.tgz
+
+$ mkdir /usr/share/tomcat6/webapps/solr
+$ cd /usr/share/tomcat6/webapps/solr
+$ unzip ~/apache-solr-1.4.1/dist/apache-solr-1.4.1.war
+
+$ mkdir /usr/share/tomcat6/mda-data/solr
+$ cd /usr/share/tomcat6/mda-data/solr
+$ mkdir conf
+$ mkdir data
+$ cp /home/devel/code/metadata-aggregator-read-only/sydma-install/resource/solr_conf/* conf
+$ chown -R tomcat /usr/share/tomcat6/mda-data/solr
+$ chown -R tomcat /usr/share/tomcat6/webapps/solr
+}}}
+
+
+Now install JOAI:
+{{{
+$ cd ~
+$ wget --no-check-certificate https://sourceforge.net/projects/dlsciences/files/jOAI%20-%20OAI%20Provider_Harvester/v3.1.1.3/joai_v3.1.1.3.zip
+$ yum install unzip
+$ unzip joai_v3.1.1.3.zip
+$ cd /usr/share/tomcat6/webapps
+$ mkdir oai
+$ cd oai
+$ unzip ~/joai_v3.1.1.3/oai.war
+
+$ chkconfig tomcat6 on && service tomcat6 restart
+}}}
 
 Install Apache Maven version 2.2.1
 {{{
@@ -96,20 +145,11 @@ Exit the editor by entering :wq and then check that mvn is installed correctly b
 $ mvn -version
 }}}
 
-Now we are ready to download the source code for this application
-
+Configure the app for deployment
 {{{
-$ exit
-$ cd home/[user]
-$ mkdir staging
-$ cd staging
-$ yum install svn
-$ svn checkout http://metadata-aggregator.googlecode.com/svn/trunk/ metadata-aggregator-read-only
-$ svn checkout http://ammrf-dms.googlecode.com/svn/trunk/sdms sdms-read-only
-
 $ sudo su -
 
-$ cd sdms-read-only/lib
+$ cd /home/devel/code/sdms-read-only/lib
 $ ./install.sh
 $ cd ..
 $ mvn clean
@@ -117,77 +157,40 @@ $ mvn install
 
 $ cd ../metadata-aggregator-read-only/lib
 $ ./install.sh
-$ cd ..
-$ mvn clean
-$ mvn package
+$ cd ../sydma-install
 }}}
 
-You need to config Tomcat. These instructions assume you have installed Tomcat in the default location od /usr/share/tomcat6
-
+Open the environment script and ensure the paths in there match those of your system (i.e. JAVA_HOME)
 {{{
-$ vi /etc/tomcat6/tomcat6.conf
+$ vi config/local-dc2f/env.sh
 }}}
 
-Add the following lines to the config file below the existing JAVA_OPTS.
-
+Now run the installation script that will deploy the app
 {{{
-JAVA_OPTS="${JAVA_OPTS} -Ddms.config.home=/usr/share/tomcat6/mda-data/dms.home"
-JAVA_OPTS="${JAVA_OPTS} -Dsolr.solr.home=/usr/share/tomcat6/mda-data/solr"
-JAVA_OPTS="${JAVA_OPTS} -XX:MaxPermSize=256m -XX:+CMSClassUnloadingEnabled -Xmx1024m -Xms512m"
+$ cd bin
+$ ./qa-installer.sh -h local-dc2f -b
 }}}
 
-
-Now install Apache Solr:
+Switch off selinux
 {{{
-$ wget http://archive.apache.org/dist/lucene/solr/1.4.1/apache-solr-1.4.1.tgz
-$ tar xfz apache-solr-1.4.1.tgz
-$ mv apache-solr-1.4.1/example/solr /opt
-$ mv apache-solr-1.4.1/dist/apache-solr-1.4.1.war /opt/solr/solr.war
-$ chown tomcat:tomcat -R /opt/solr
-
-$ cat > /usr/share/tomcat6/conf/Catalina/localhost/solr.xml <<EOF
-
+$ sudo setenforce 0
 }}}
 
-Then copy and paste this into the terminal and press enter:
+And finally, configure the system's iptable to allow connections on port 8080
 {{{
-<?xml version="1.0" encoding="utf-8"?>
-<Context docBase="/opt/solr/solr.war" debug="0" crossContext="true">
-  <Environment name="solr/home" type="java.lang.String" value="/opt/solr/" override="true"/>
-</Context>
-EOF
+$ sudo vi /etc/sysconfig/iptables
 }}}
-
-Now install JOAI:
+Insert the following line
 {{{
-$ wget --no-check-certificate https://sourceforge.net/projects/dlsciences/files/jOAI%20-%20OAI%20Provider_Harvester/v3.1.1.3/joai_v3.1.1.3.zip
-$ yum install unzip
-$ unzip joai_v3.1.1.3.zip
-$ cp oai.war /var/lib/tomcat6/webapps/
-
-$ chkconfig tomcat6 on && service tomcat6 restart
+-A INPUT -m state -state NEW -m tcp -p tcp --dport 8080 -j ACCEPT
 }}}
 
-
-
-
-
-= Installation Profiles =
-
-The software contains an installation script that depends on installation profiles. For each server where the system is to be deployed, the following configuration files are needed:
-  # sydma-install/config configuration: where the dms, tunnel, and worker properties are customised, and where the system keys are in place. There are examples of some profiles in the source code, that can serve as a baseline.
-  # Filter configuration. System specific properties that need to be accessible at runtime are stored in sydma-web/src/main/filters. Each deployment environment should have a filter file, where the environment specific variables are defined.
-
-= Installation Script = 
-
-To install the software, go to sydma-install/bin, and run
+Then restart the iptables service
 {{{
-$ qa-installer.sh –h <environment>
+$ sudo service iptables restart
 }}}
-The {{{<environment>}}} parameter needs to match:
-  # A host name where it is possible to ssh/scp. We recommend setting your public key in the authorized_keys of the target environment, to avoid having to enter the password multiple times. 
-  # A directory under sydma-intall/config
-  # A filter called  {{{filter-<environment>.properties}}} under sydma-web/src/main/filters
+
+
   
   
   
