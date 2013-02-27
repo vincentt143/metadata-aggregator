@@ -145,6 +145,18 @@ $ source /etc/profile.d/maven.sh
 $ mvn -version
 }}}
 
+If you would like to run our mock wasm service to simulate the logging in process you need to do the following:
+{{{
+$ cd ~
+$ wget http://dist.groovy.codehaus.org/distributions/groovy-binary-2.1.1.zip
+$ unzip groovy-binary-2.1.1.zip
+$ export GROOVY_HOME="~/groovy-2.1.1/"
+$ export PATH=$PATH:$GROOVY_HOME/bin
+$ cd ~/code/metadata-aggregator-read-only/wasm-server/
+$ nohup groovy wasmserver.groovy &
+$ nohup groovy webserver.groovy &
+}}}
+
 Configure the app for deployment
 {{{
 $ cd /home/devel/code/sdms-read-only/lib
