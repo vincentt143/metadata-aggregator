@@ -1,4 +1,4 @@
-#summary Installation Guide
+#summary Installation Guide For DC2D.
 
 
 = Installing Application Requirements = 
@@ -139,15 +139,39 @@ export M2_HOME=/usr/local/maven
 export PATH=${M2_HOME}/bin:${PATH}
 }}}
 
-Exit the editor by entering :wq and then check that mvn is installed correctly by entering
+Then save the changes and exit the editor by typing
+{{{
+:wq
+}}}
+
+Then check that mvn is installed correctly by entering
 {{{
 $ source /etc/profile.d/maven.sh
 $ mvn -version
 }}}
 
+Change the ApplicationType.properties to Agriculture and Environment type and theme (AGR_ENV)
+{{{
+$ cd ~/sydma-install/resource/dms.home
+$ vi applicationType.properties
+}}}
+
+Replace the contents of the file with the following lines:
+{{{
+# use AGGREGATOR for DC2F or AGR_ENV for DC2D
+application.type=AGR_ENV
+application.base.theme=agr_env
+application.theme.cache.secs=0
+}}}
+
+Then save the changes and exit the editor by typing
+{{{
+:wq
+}}}
+
 Configure the app for deployment
 {{{
-$ cd /home/devel/code/sdms-read-only/lib
+$ cd ~/code/sdms-read-only/lib
 $ ./install.sh
 $ cd ..
 $ mvn clean
@@ -160,14 +184,18 @@ $ cd ../sydma-install
 
 Open the environment script and ensure the paths in there match those of your system (i.e. JAVA_HOME)
 {{{
-$ vi config/local-dc2f/env.sh
+$ vi config/local-dc2d/env.sh
 }}}
+
 
 Now run the installation script that will deploy the app
 {{{
 $ cd bin
-$ ./qa-installer.sh -h local-dc2f -b
+$ ./qa-installer.sh -h local-dc2d -b
 }}}
+
+
+INSTALLING R-STUDIO STUFF GOES HERE (see MDA Prod Deploy notes)
 
 Switch off selinux
 {{{
