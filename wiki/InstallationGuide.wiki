@@ -97,8 +97,8 @@ $ cd ~
 $ wget http://archive.apache.org/dist/lucene/solr/3.1.0/apache-solr-3.1.0.tgz
 $ tar xfz apache-solr-3.1.0.tgz
 
-$ mkdir /usr/share/tomcat6/webapps/solr
-$ cd /usr/share/tomcat6/webapps/solr
+$ mkdir /usr/share/tomcat6/webapps/apache-solr
+$ cd /usr/share/tomcat6/webapps/apache-solr
 $ unzip ~/apache-solr-3.1.0/dist/apache-solr-3.1.0.war
 
 $ mkdir /usr/share/tomcat6/mda-data/solr
@@ -107,7 +107,7 @@ $ mkdir conf
 $ mkdir data
 $ cp /home/devel/code/metadata-aggregator-read-only/sydma-install/resource/solr_conf/* conf
 $ chown -R tomcat /usr/share/tomcat6/mda-data/solr
-$ chown -R tomcat /usr/share/tomcat6/webapps/solr
+$ chown -R tomcat /usr/share/tomcat6/webapps/apache-solr
 }}}
 
 
