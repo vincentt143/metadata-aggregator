@@ -150,25 +150,6 @@ $ source /etc/profile.d/maven.sh
 $ mvn -version
 }}}
 
-Change the ApplicationType.properties to Agriculture and Environment type and theme (AGR_ENV)
-{{{
-$ cd ~/sydma-install/resource/dms.home
-$ vi applicationType.properties
-}}}
-
-Replace the contents of the file with the following lines:
-{{{
-# use AGGREGATOR for DC2F or AGR_ENV for DC2D
-application.type=AGR_ENV
-application.base.theme=agr_env
-application.theme.cache.secs=0
-}}}
-
-Then save the changes and exit the editor by typing
-{{{
-:wq
-}}}
-
 If you would like to run our mock wasm service to simulate the logging in process you need to do the following:
 {{{
 $ cd ~
