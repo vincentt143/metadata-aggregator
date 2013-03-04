@@ -46,12 +46,11 @@ public class UrlHelperTest
     public void testGetCurrentBaseUrl()
     {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getProtocol()).thenReturn("http/blah");
-        when(request.getServerName()).thenReturn("server");
-        when(request.getLocalPort()).thenReturn(80);
         when(request.getContextPath()).thenReturn("/context-path");
-        String baseUrl = UrlHelper.getCurrentBaseUrl(request);
-        assertEquals("http://server/context-path", baseUrl);
+        UrlHelperImpl helper = new UrlHelperImpl();
+        helper.setBaseUrl("http://server:80");
+        String baseUrl = helper.getCurrentBaseUrl(request);
+        assertEquals("http://server:80/context-path", baseUrl);
     }
 
 }

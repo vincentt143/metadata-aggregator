@@ -85,6 +85,8 @@ public class LoginController
 
     @Value("#{wasm[app_id]}")
     private String appId;
+    @Autowired
+	private UrlHelper urlHelper;
 
     static
     {
@@ -113,7 +115,7 @@ public class LoginController
     @RequestMapping("/signin/**")
     public String index(ModelMap modelMap, HttpServletRequest request)
     {
-        modelMap.addAttribute("wasmUrl", wasmUrlString(true, UrlHelper.getCurrentBaseUrl(request)));
+        modelMap.addAttribute("wasmUrl", wasmUrlString(true, urlHelper.getCurrentBaseUrl(request)));
         modelMap.addAttribute(Breadcrumb.BREADCRUMBS, breadcrumbs);
         return "login/index";
     }

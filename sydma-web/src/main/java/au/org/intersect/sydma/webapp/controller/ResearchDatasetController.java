@@ -72,6 +72,7 @@ import au.org.intersect.sydma.webapp.util.Breadcrumb;
 import au.org.intersect.sydma.webapp.util.RifCsWriter;
 import au.org.intersect.sydma.webapp.util.TokenInputHelper;
 import au.org.intersect.sydma.webapp.util.UrlHelper;
+import au.org.intersect.sydma.webapp.util.UrlHelperImpl;
 import au.org.intersect.sydma.webapp.validator.TemporalDataValidator;
 
 /**
@@ -133,6 +134,9 @@ public class ResearchDatasetController
 
     @Autowired
     private TokenInputHelper tokenInputHelper;
+    
+    @Autowired
+	private UrlHelper urlHelper;
 
     /**
      * For ResearchDataset we always initialize them with an empty ResearchProject first, workaround for the NotNull
@@ -353,7 +357,7 @@ public class ResearchDatasetController
 
             boolean advertiseOccurred = researchDataset.advertise(username,
                     incomingResearchDataset.getPublicAccessRight(), rifCsWriter, mailService,
-                    UrlHelper.getCurrentBaseUrl(request));
+                    urlHelper.getCurrentBaseUrl(request));
             if (advertiseOccurred)
             {
                 researchDataset.merge();
