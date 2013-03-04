@@ -129,20 +129,25 @@ mkdir -p ${TMP_STAGING_DIR}/tomcat6-conf
 cp ${INSTALLER_DIR}/resource/tomcat6-conf/* ${TMP_STAGING_DIR}/tomcat6-conf
 
 echo "\nPreparing script file to remote server"
-cp ${INSTALLER_DIR}/bin/qa-installer-remote.sh ${TMP_STAGING_DIR}/qa-installer-remote.sh
+cp ${INSTALLER_DIR}/bin/${REMOTE_SCRIPT_NAME}.sh ${TMP_STAGING_DIR}/qa-installer-remote.sh
 chmod u+x ${TMP_STAGING_DIR}/qa-installer-remote.sh
 
 
 echo "\nPreparing dms.home to remote server"
-mkdir ${TMP_STAGING_DIR}/dms.home
-cp -rp ${INSTALLER_DIR}/resource/dms.home/*  ${TMP_STAGING_DIR}/dms.home
+mkdir ${TMP_STAGING_DIR}/dms.home.2d
+mkdir ${TMP_STAGING_DIR}/dms.home.2f
+
+cp -rp ${INSTALLER_DIR}/resource/dms.home.2d/*  ${TMP_STAGING_DIR}/dms.home.2d
+cp -rp ${INSTALLER_DIR}/resource/dms.home.2f/*  ${TMP_STAGING_DIR}/dms.home.2f
+
 
 echo "\nPreparing sql files to remote server"
 mkdir ${TMP_STAGING_DIR}/sql
 cp ${INSTALLER_DIR}/sql/* ${TMP_STAGING_DIR}/sql
 
 echo "\nPreparing sql schemas to remote server"
-cp -r ${INSTALLER_DIR}/resource/schemas ${TMP_STAGING_DIR}/dms.home/
+cp -r ${INSTALLER_DIR}/resource/schemas ${TMP_STAGING_DIR}/dms.home.2d/
+cp -r ${INSTALLER_DIR}/resource/schemas ${TMP_STAGING_DIR}/dms.home.2f/
 
 echo "Clean up before zipping"
 find ${TMP_STAGING_DIR}/ -name .svn -type d -exec rm -rf {} \;

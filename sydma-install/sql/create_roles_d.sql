@@ -18,3 +18,12 @@ INSERT INTO roles(id,version,name,display_name) VALUES(5,1,'ROLE_RESEARCH_DATA_M
 INSERT INTO roles(id,version,name,display_name) VALUES(4,1,'NO_ROLE','-None-');
 INSERT INTO roles(id,version,name,display_name) VALUES(6,1,'ACCEPTED_TC','Accepted Terms & Conditions');
 INSERT INTO roles(id,version,name,display_name) VALUES(7,1,'ACTIVE','Active');
+
+INSERT INTO `users` (`id`, `email`, `enabled`, `givenname`, `has_rstudio_account`, `institution`, `password`, `surname`, `user_type`, `username`, `version`) VALUES (1,'admin@test.com','',NULL,NULL,NULL,'5f4dcc3b5aa765d61d8327deb882cf99',NULL,'INTERNAL','admin',NULL);
+
+INSERT INTO `users_roles` (`users`, `roles`) VALUES (1,1);
+INSERT INTO `users_roles` (`users`, `roles`) VALUES (1,2);
+INSERT INTO `users_roles` (`users`, `roles`) VALUES (1,3);
+INSERT INTO `users_roles` (`users`, `roles`) VALUES (1,5);
+INSERT INTO `users_roles` (`users`, `roles`) VALUES (1,6);
+INSERT INTO `users_roles` (`users`, `roles`) VALUES (1,7);
