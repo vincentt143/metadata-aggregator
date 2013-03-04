@@ -290,7 +290,7 @@ echo "Copying system configuration"
 mkdir -p ${TOMCAT6_HOME}/mda-data/dms.home
 mkdir -p ${TOMCAT6_HOME}/mda-data/solr/conf
 mkdir -p ${TOMCAT6_HOME}/mda-data/rifcs
-cp -r ${HOME_DIR}/staging/dms.home.2d/* ${TOMCAT6_HOME}/mda-data/dms.home
+cp -r ${HOME_DIR}/staging/dms.home.2f/* ${TOMCAT6_HOME}/mda-data/dms.home
 cp -r ${HOME_DIR}/staging/solr_conf/* ${TOMCAT6_HOME}/mda-data/solr/conf
 chown -R tomcat ${TOMCAT6_HOME}/mda-data
 
