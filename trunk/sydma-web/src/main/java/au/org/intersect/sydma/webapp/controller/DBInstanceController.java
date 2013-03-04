@@ -84,6 +84,7 @@ import au.org.intersect.sydma.webapp.util.DBBackupHelper;
 import au.org.intersect.sydma.webapp.util.DBPasswordHelper;
 import au.org.intersect.sydma.webapp.util.ModelAndViewRedirectHelper;
 import au.org.intersect.sydma.webapp.util.UrlHelper;
+import au.org.intersect.sydma.webapp.util.UrlHelperImpl;
 
 /**
  * Controller to handle dataset dbSchemas
@@ -160,6 +161,9 @@ public class DBInstanceController
     @Autowired
     private NewMailService mailService;
 
+    @Autowired
+	private UrlHelper urlHelper;
+    
     static
     {
         createBreadcrumbs.add(Breadcrumb.getHome());
@@ -892,7 +896,7 @@ public class DBInstanceController
                         
                         if (successfulChange)
                         {
-                            mailService.sendDatabasePasswordChangedEmail(dataset, UrlHelper.getCurrentBaseUrl(request));
+                            mailService.sendDatabasePasswordChangedEmail(dataset, urlHelper.getCurrentBaseUrl(request));
                         }
 
                         return "view";
