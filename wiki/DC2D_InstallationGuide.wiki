@@ -92,6 +92,34 @@ $ svn checkout http://metadata-aggregator.googlecode.com/svn/trunk/ metadata-agg
 $ svn checkout http://ammrf-dms.googlecode.com/svn/trunk/sdms sdms-read-only
 }}}
 
+
+Install Apache Maven version 2.2.1
+{{{
+$ cd /tmp/
+$ wget http://mirror.overthewire.com.au/pub/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
+$ tar xzf apache-maven-2.2.1-bin.tar.gz -C /usr/local
+$ cd /usr/local
+$ ln -s apache-maven-2.2.1 maven 
+$ vi /etc/profile.d/maven.sh
+}}}
+Write these lines into the vi input
+{{{
+export M2_HOME=/usr/local/maven
+export PATH=${M2_HOME}/bin:${PATH}
+}}}
+
+Then save the changes and exit the editor by typing
+{{{
+:wq
+}}}
+
+Then check that mvn is installed correctly by entering
+{{{
+$ source /etc/profile.d/maven.sh
+$ mvn -version
+}}}
+
+
 Now install Apache Solr:
 {{{
 $ sudo su -
@@ -102,7 +130,6 @@ $ tar xfz apache-solr-3.1.0.tgz
 $ mkdir /usr/share/tomcat6/webapps/apache-solr
 $ cd /usr/share/tomcat6/webapps/apache-solr
 $ unzip ~/apache-solr-3.1.0/dist/apache-solr-3.1.0.war
-
 
 $ mkdir -p /usr/share/tomcat6/mda-data/solr
 $ mkdir -p /usr/share/tomcat6/mda-data/mount-point
@@ -128,45 +155,25 @@ $ chown -R tomcat /usr/share/tomcat6/webapps/oai
 $ chkconfig tomcat6 on && service tomcat6 restart
 }}}
 
-Install Apache Maven version 2.2.1
-{{{
-$ wget http://mirror.overthewire.com.au/pub/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
-$ tar xzf apache-maven-2.2.1-bin.tar.gz -C /usr/local
-$ cd /usr/local
-$ ln -s apache-maven-2.2.1 maven 
-$ vi /etc/profile.d/maven.sh
-}}}
-Write these lines into the vi input
-{{{
-export M2_HOME=/usr/local/maven
-export PATH=${M2_HOME}/bin:${PATH}
-}}}
-
-Then save the changes and exit the editor by typing
-{{{
-:wq
-}}}
-
-Then check that mvn is installed correctly by entering
-{{{
-$ source /etc/profile.d/maven.sh
-$ mvn -version
-}}}
 
 If you would like to run our mock wasm service to simulate the logging in process you need to do the following:
 {{{
-$ cd ~
+$ cd /tmp/
 $ wget http://dist.groovy.codehaus.org/distributions/groovy-binary-2.1.1.zip
 $ unzip groovy-binary-2.1.1.zip
-$ export GROOVY_HOME="~/groovy-2.1.1/"
+$ export GROOVY_HOME=/tmp/groovy-2.1.1/
 $ export PATH=$PATH:$GROOVY_HOME/bin
-$ cd ~/code/metadata-aggregator-read-only/wasm-server/
+$ cd /home/[username]/code/metadata-aggregator-read-only/wasm-server/
+}}}
+Now execute the the scripts to start the mock wasm server (Note: when you execute these commands no output will be displayed on the screen, so as soon as you see the line "nohup: ignoring input and appending output to `nohup.out'" you can press ctrl-c and continue).
+{{{
 $ nohup groovy wasmserver.groovy &
 $ nohup groovy webserver.groovy &
 }}}
 
 Configure the app for deployment
 {{{
+$ exit
 $ cd ~/code/sdms-read-only/lib
 $ ./install.sh
 $ cd ..
@@ -192,10 +199,14 @@ $ cd bin
 $ ./qa-installer.sh -h local-dc2d -b
 }}}
 
-
-INSTALLING R-STUDIO STUFF GOES HERE (see MDA Prod Deploy notes)
-
+Once the deployment is complete you will need to change some variables in a few properties files to ensure to you can log in:
 {{{
+$ cd /usr/share/tomcat6/mda-data/dms.home/
+$ vi wasm.properties
+
+Now install R studio:
+{{{
+$ cd /tmp/
 $ wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 $ wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
 $ sudo rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
@@ -204,20 +215,21 @@ $ wget http://download2.rstudio.org/rstudio-server-0.97.318-x86_64.rpm
 $ sudo yum install --nogpgcheck rstudio-server-0.97.318-x86_64.rpm
 }}}
 
-At this point you should be able to see R-studio web page by going to http://localhost:8787  
+At this point you should be able to see the R studio web page by going to http://Your Server Name:8787  
 
 Switch off selinux
 {{{
 $ setenforce 0
 }}}
 
-And finally, configure the system's iptable to allow connections on port 8080
+And finally, configure the system's iptable to allow connections on port 8080 and 8888
 {{{
 $ vi /etc/sysconfig/iptables
 }}}
-Insert the following line
+Insert the following lines
 {{{
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 8888 -j ACCEPT
 }}}
 
 Then restart the iptables service
