@@ -24,16 +24,14 @@ $ yum install openssh-clients
 
 In a seperate bash tab, locally run:
 {{{
-$ scp [download location]/jdk-6u[version]-linux-x64-rpm.bin [username]@[server name you are deploying to]:~
+$ scp [download location]/jdk-6u[version]-linux-x64-rpm.bin [username]@[server name you are deploying to]:/tmp/
 }}}
 
-Close the local tab. Then back in the ssh session run:
+Close the local tab. Then back in the ssh session run (replacing [version] with the version number that you installed):
 {{{
 $ chmod a+x jdk-6u[version]-linux-x64-rpm.bin
 $ ./jdk-6u[version]-linux-x64-rpm.bin
-}}}
 
-{{{
 $ alternatives --install /usr/bin/java java /usr/java/jdk1.6.0_[version]/jre/bin/java 20000
 $ alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.6.0_[version]/jre/bin/javaws 20000
 $ alternatives --install /usr/bin/javac javac /usr/java/jdk1.6.0_[version]/bin/javac 20000
@@ -61,6 +59,7 @@ Log into MySQL
 {{{
 mysql -u root
 }}}
+Then press CTRL-C to exit the input.
 
 Install Apache Tomcat 6
 {{{
@@ -73,7 +72,7 @@ You need to config Tomcat. These instructions assume that Tomcat installed in th
 $ vi /etc/tomcat6/tomcat6.conf
 }}}
 
-Add the following lines to the config file below the existing JAVA_OPTS.
+Add the following lines to the config file below the existing JAVA_OPTS (Note: To insert text in a vi window you must enter insert mode by pressing the i key. Once you've finished inserting you must press the esc key and enter :wq followed by the enter key to save your changes and exit the vi).
 
 {{{
 JAVA_OPTS="${JAVA_OPTS} -Ddms.config.home=/usr/share/tomcat6/mda-data/dms.home"
@@ -83,17 +82,19 @@ JAVA_OPTS="${JAVA_OPTS} -XX:MaxPermSize=256m -XX:+CMSClassUnloadingEnabled -Xmx1
 
 Now we are ready to download the source code for this application
 {{{
+$ yum install svn unzip
+$ exit
 $ cd ~
 $ mkdir code
 $ cd code
-$ yum install svn unzip
 $ svn checkout http://metadata-aggregator.googlecode.com/svn/trunk/ metadata-aggregator-read-only
 $ svn checkout http://ammrf-dms.googlecode.com/svn/trunk/sdms sdms-read-only
 }}}
 
 Now install Apache Solr:
 {{{
-$ cd ~
+$ sudo su -
+$ cd /tmp/
 $ wget http://archive.apache.org/dist/lucene/solr/3.1.0/apache-solr-3.1.0.tgz
 $ tar xfz apache-solr-3.1.0.tgz
 
@@ -101,26 +102,27 @@ $ mkdir /usr/share/tomcat6/webapps/apache-solr
 $ cd /usr/share/tomcat6/webapps/apache-solr
 $ unzip ~/apache-solr-3.1.0/dist/apache-solr-3.1.0.war
 
-$ mkdir /usr/share/tomcat6/mda-data/solr
+
+$ mkdir -p /usr/share/tomcat6/mda-data/solr
+$ mkdir -p /usr/share/tomcat6/mda-data/mount-point
 $ cd /usr/share/tomcat6/mda-data/solr
 $ mkdir conf
 $ mkdir data
-$ cp /home/devel/code/metadata-aggregator-read-only/sydma-install/resource/solr_conf/* conf
-$ chown -R tomcat /usr/share/tomcat6/mda-data/solr
+$ cp /home/[username]/code/metadata-aggregator-read-only/sydma-install/resource/solr_conf/* conf
+$ chown -R tomcat /usr/share/tomcat6/mda-data/
 $ chown -R tomcat /usr/share/tomcat6/webapps/apache-solr
 }}}
 
 
 Now install JOAI:
 {{{
-$ cd ~
+$ cd /tmp/
 $ wget --no-check-certificate https://sourceforge.net/projects/dlsciences/files/jOAI%20-%20OAI%20Provider_Harvester/v3.1.1.3/joai_v3.1.1.3.zip
-$ yum install unzip
 $ unzip joai_v3.1.1.3.zip
 $ cd /usr/share/tomcat6/webapps
 $ mkdir oai
 $ cd oai
-$ unzip ~/joai_v3.1.1.3/oai.war
+$ unzip /tmp/joai_v3.1.1.3/oai.war
 $ chown -R tomcat /usr/share/tomcat6/webapps/oai
 $ chkconfig tomcat6 on && service tomcat6 restart
 }}}
