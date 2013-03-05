@@ -122,7 +122,7 @@ $ tar xfz apache-solr-3.1.0.tgz
 
 $ mkdir /usr/share/tomcat6/webapps/apache-solr
 $ cd /usr/share/tomcat6/webapps/apache-solr
-$ unzip ~/apache-solr-3.1.0/dist/apache-solr-3.1.0.war
+$ unzip /tmp/apache-solr-3.1.0/dist/apache-solr-3.1.0.war
 
 
 $ mkdir -p /usr/share/tomcat6/mda-data/solr
