@@ -92,6 +92,27 @@ $ svn checkout http://metadata-aggregator.googlecode.com/svn/trunk/ metadata-agg
 $ svn checkout http://ammrf-dms.googlecode.com/svn/trunk/sdms sdms-read-only
 }}}
 
+Install Apache Maven version 2.2.1
+{{{
+$ /tmp/
+$ wget http://mirror.overthewire.com.au/pub/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
+$ tar xzf apache-maven-2.2.1-bin.tar.gz -C /usr/local
+$ cd /usr/local
+$ ln -s apache-maven-2.2.1 maven 
+$ vi /etc/profile.d/maven.sh
+}}}
+Write these lines into the vi input
+{{{
+export M2_HOME=/usr/local/maven
+export PATH=${M2_HOME}/bin:${PATH}
+}}}
+
+Exit the editor by entering :wq and then check that mvn is installed correctly by entering
+{{{
+$ source /etc/profile.d/maven.sh
+$ mvn -version
+}}}
+
 Now install Apache Solr:
 {{{
 $ sudo su -
@@ -126,26 +147,6 @@ $ cd oai
 $ unzip /tmp/joai_v3.1.1.3/oai.war
 $ chown -R tomcat /usr/share/tomcat6/webapps/oai
 $ chkconfig tomcat6 on && service tomcat6 restart
-}}}
-
-Install Apache Maven version 2.2.1
-{{{
-$ wget http://mirror.overthewire.com.au/pub/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
-$ tar xzf apache-maven-2.2.1-bin.tar.gz -C /usr/local
-$ cd /usr/local
-$ ln -s apache-maven-2.2.1 maven 
-$ vi /etc/profile.d/maven.sh
-}}}
-Write these lines into the vi input
-{{{
-export M2_HOME=/usr/local/maven
-export PATH=${M2_HOME}/bin:${PATH}
-}}}
-
-Exit the editor by entering :wq and then check that mvn is installed correctly by entering
-{{{
-$ source /etc/profile.d/maven.sh
-$ mvn -version
 }}}
 
 If you would like to run our mock wasm service to simulate the logging in process you need to do the following:
