@@ -27,7 +27,7 @@ In a seperate bash tab, locally run:
 $ scp [download location]/jdk-6u[version]-linux-x64-rpm.bin [username]@[server name you are deploying to]:/tmp/
 }}}
 
-Close the local tab. Then back in the ssh session run (replacing [version] with the version number that you installed):
+Close the local tab. Then back in the ssh session run (replacing [[version]] with the version number that you installed):
 {{{
 $ cd /tmp/
 $ chmod a+x jdk-6u[version]-linux-x64-rpm.bin
