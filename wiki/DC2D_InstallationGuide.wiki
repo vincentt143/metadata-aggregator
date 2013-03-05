@@ -201,8 +201,15 @@ $ ./qa-installer.sh -h local-dc2d -b
 
 Once the deployment is complete you will need to change some variables in a few properties files to ensure to you can log in:
 {{{
+$ sudo su -
 $ cd /usr/share/tomcat6/mda-data/dms.home/
 $ vi wasm.properties
+}}}
+
+Then change the wasm_url from localhost:8080 to equal your server name with :8080 on the end. Also do the same for application.url in applicationType.properties: http://yourServerName:8080.
+{{{
+$ vi applicationType.properties
+}}}
 
 Now install R studio:
 {{{
