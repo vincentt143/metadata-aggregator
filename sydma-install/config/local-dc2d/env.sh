@@ -8,4 +8,5 @@ PROFILE=dc2d
 REMOTE_HOST=localhost
 REMOTE_USER=test
 DB_ROOT_USER=root
+DB_ROOT_PASSWORD=root
 
