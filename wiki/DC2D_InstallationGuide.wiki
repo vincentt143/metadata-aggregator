@@ -178,10 +178,12 @@ $ ./install.sh
 $ cd ../sydma-install
 }}}
 
-Open the environment script and ensure the paths in there match those of your system (i.e. JAVA_HOME)
+Open the environment script and ensure the paths in there match those of your system (i.e. JAVA_HOME) and change the REMOTE_USER to equal the username which you used to ssh into the server you are deploying to.
 {{{
 $ vi config/local-dc2d/env.sh
 }}}
+
+Insert changes by first pressing the i key, then esc when finished and save your changes and exit by entering :wq.
 
 
 Now run the installation script that will deploy the app
