@@ -209,6 +209,7 @@ $ vi wasm.properties
 Then change the wasm_url from localhost:8080 to equal your server name with :8080 on the end. Also do the same for application.url in applicationType.properties: http://yourServerName:8080.
 {{{
 $ vi applicationType.properties
+$ service tomcat6 restart
 }}}
 
 Now install R studio:
