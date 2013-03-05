@@ -94,7 +94,7 @@ $ svn checkout http://ammrf-dms.googlecode.com/svn/trunk/sdms sdms-read-only
 
 Install Apache Maven version 2.2.1
 {{{
-$ /tmp/
+$ cd /tmp/
 $ wget http://mirror.overthewire.com.au/pub/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
 $ tar xzf apache-maven-2.2.1-bin.tar.gz -C /usr/local
 $ cd /usr/local
