@@ -59,7 +59,7 @@ Log into MySQL
 {{{
 mysql -u root
 }}}
-Then type CTRL-C to exit the input.
+Then press CTRL-C to exit the input.
 
 Install Apache Tomcat 6
 {{{
@@ -116,14 +116,13 @@ $ chown -R tomcat /usr/share/tomcat6/webapps/apache-solr
 
 Now install JOAI:
 {{{
-$ cd ~
+$ cd /tmp/
 $ wget --no-check-certificate https://sourceforge.net/projects/dlsciences/files/jOAI%20-%20OAI%20Provider_Harvester/v3.1.1.3/joai_v3.1.1.3.zip
-$ yum install unzip
 $ unzip joai_v3.1.1.3.zip
 $ cd /usr/share/tomcat6/webapps
 $ mkdir oai
 $ cd oai
-$ unzip ~/joai_v3.1.1.3/oai.war
+$ unzip /tmp/joai_v3.1.1.3/oai.war
 $ chown -R tomcat /usr/share/tomcat6/webapps/oai
 $ chkconfig tomcat6 on && service tomcat6 restart
 }}}
