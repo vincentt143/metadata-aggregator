@@ -82,17 +82,19 @@ JAVA_OPTS="${JAVA_OPTS} -XX:MaxPermSize=256m -XX:+CMSClassUnloadingEnabled -Xmx1
 
 Now we are ready to download the source code for this application
 {{{
+$ yum install svn unzip
+$ exit
 $ cd ~
 $ mkdir code
 $ cd code
-$ yum install svn unzip
 $ svn checkout http://metadata-aggregator.googlecode.com/svn/trunk/ metadata-aggregator-read-only
 $ svn checkout http://ammrf-dms.googlecode.com/svn/trunk/sdms sdms-read-only
 }}}
 
 Now install Apache Solr:
 {{{
-$ cd ~
+$ sudo su -
+$ cd /tmp/
 $ wget http://archive.apache.org/dist/lucene/solr/3.1.0/apache-solr-3.1.0.tgz
 $ tar xfz apache-solr-3.1.0.tgz
 
@@ -106,7 +108,7 @@ $ mkdir -p /usr/share/tomcat6/mda-data/mount-point
 $ cd /usr/share/tomcat6/mda-data/solr
 $ mkdir conf
 $ mkdir data
-$ cp /home/devel/code/metadata-aggregator-read-only/sydma-install/resource/solr_conf/* conf
+$ cp /home/[username]/code/metadata-aggregator-read-only/sydma-install/resource/solr_conf/* conf
 $ chown -R tomcat /usr/share/tomcat6/mda-data/
 $ chown -R tomcat /usr/share/tomcat6/webapps/apache-solr
 }}}
