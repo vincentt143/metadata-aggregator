@@ -27,13 +27,11 @@ In a seperate bash tab, locally run:
 $ scp [download location]/jdk-6u[version]-linux-x64-rpm.bin [username]@[server name you are deploying to]:~
 }}}
 
-Close the local tab. Then back in the ssh session run:
+Close the local tab. Then back in the ssh session run (replacing [version] with the version number that you installed):
 {{{
 $ chmod a+x jdk-6u[version]-linux-x64-rpm.bin
 $ ./jdk-6u[version]-linux-x64-rpm.bin
-}}}
 
-{{{
 $ alternatives --install /usr/bin/java java /usr/java/jdk1.6.0_[version]/jre/bin/java 20000
 $ alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.6.0_[version]/jre/bin/javaws 20000
 $ alternatives --install /usr/bin/javac javac /usr/java/jdk1.6.0_[version]/bin/javac 20000
@@ -61,6 +59,7 @@ Log into MySQL
 {{{
 mysql -u root
 }}}
+Then type CTRL-C to exit the input.
 
 Install Apache Tomcat 6
 {{{
@@ -73,7 +72,7 @@ You need to config Tomcat. These instructions assume that Tomcat installed in th
 $ vi /etc/tomcat6/tomcat6.conf
 }}}
 
-Add the following lines to the config file below the existing JAVA_OPTS.
+Add the following lines to the config file below the existing JAVA_OPTS (Note: To insert text in a vi window you must enter insert mode by pressing the i key. Once you've finished inserting you must press the esc key and enter :wq followed by the enter key to save your changes and exit the vi).
 
 {{{
 JAVA_OPTS="${JAVA_OPTS} -Ddms.config.home=/usr/share/tomcat6/mda-data/dms.home"
