@@ -156,7 +156,7 @@ $ wget http://dist.groovy.codehaus.org/distributions/groovy-binary-2.1.1.zip
 $ unzip groovy-binary-2.1.1.zip
 $ export GROOVY_HOME="~/groovy-2.1.1/"
 $ export PATH=$PATH:$GROOVY_HOME/bin
-$ cd ~/code/metadata-aggregator-read-only/wasm-server/
+$ cd /home/[username]/code/metadata-aggregator-read-only/wasm-server/
 }}}
 Now execute the the scripts to start the mock wasm server (Note: when you execute these commands no output will be displayed on the screen, so as soon as you see the line "nohup: ignoring input and appending output to `nohup.out'" you can press ctrl-c and continue).
 {{{
@@ -185,7 +185,7 @@ $ vi config/local-dc2f/env.sh
 
 Insert changes by first pressing the i key, then esc when finished and save your changes and exit by entering :wq.
 
-Now run the installation script that will deploy the app
+Now run the installation script that will deploy the app. You will be prompted to create passwords for some mock users in the system, please remember what you enter at this point as they are the credentials you will enter later to access the application.
 {{{
 $ cd bin
 $ ./qa-installer.sh -h local-dc2f -b
@@ -193,15 +193,22 @@ $ ./qa-installer.sh -h local-dc2f -b
 
 Once the deployment is complete you will need to change some variables in a few properties files to ensure to you can log in:
 {{{
+$ sudo su -
 $ cd /usr/share/tomcat6/mda-data/dms.home/
 $ vi wasm.properties
+}}}
+Change the wasm_url from localhost:8080 to equal your server name with :8080 on the end. Also do the same for application.url in applicationType.properties: http://YourServerName:8080.
+{{{
+$ vi applicationType.properties
+$ service tomcat6 restart
+}}}
 
-Switch off selinux
+Switch off selinux (Note: this is temporary, if you server is switched off for any reason then you will need to re-run this command)
 {{{
 $ setenforce 0
 }}}
 
-And finally, configure the system's iptable to allow connections on port 8080
+And finally, configure the system's iptable to allow connections on port 8080 and 8888
 {{{
 $ vi /etc/sysconfig/iptables
 }}}
@@ -217,6 +224,20 @@ $ service iptables restart
 }}}
 
 
+You are now ready to use the system.
+
+The url for the application will be: http://YourServerName:8080/sydma-web
+
+If you did not set up the mock wasm server then you may log in using the external user log in link on the home page using the following username and password 
+
+u: admin p: password
+
+If you did set up the wasm server then you may log in with any of the following usernames and the passwords for these will be whatever the entered when prompted while running the installation script:
+
+ictintersect1
+ictintersect2
+ictintersect3
+ictintersect4
   
   
   
