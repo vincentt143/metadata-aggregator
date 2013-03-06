@@ -193,7 +193,7 @@ $ vi config/local-dc2d/env.sh
 Insert changes by first pressing the i key, then esc when finished and save your changes and exit by entering :wq.
 
 
-Now run the installation script that will deploy the app
+Now run the installation script that will deploy the app. You will be prompted to create passwords for some mock users in the system, please remember what you enter at this point as they are the credentials you will enter later to access the application.
 {{{
 $ cd bin
 $ ./qa-installer.sh -h local-dc2d -b
@@ -205,8 +205,7 @@ $ sudo su -
 $ cd /usr/share/tomcat6/mda-data/dms.home/
 $ vi wasm.properties
 }}}
-
-Then change the wasm_url from localhost:8080 to equal your server name with :8080 on the end. Also do the same for application.url in applicationType.properties: http://yourServerName:8080.
+Change the wasm_url from localhost:8080 to equal your server name with :8080 on the end. Also do the same for application.url in applicationType.properties: http://YourServerName:8080.
 {{{
 $ vi applicationType.properties
 $ service tomcat6 restart
@@ -217,20 +216,18 @@ Now install R studio:
 $ cd /tmp/
 $ wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 $ wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-$ sudo rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
-$ sudo yum install R
+$ rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
+$ yum install R
 $ wget http://download2.rstudio.org/rstudio-server-0.97.318-x86_64.rpm
-$ sudo yum install --nogpgcheck rstudio-server-0.97.318-x86_64.rpm
-}}}
+$ yum install --nogpgcheck rstudio-server-0.97.318-x86_64.rpm
+}}} 
 
-At this point you should be able to see the R studio web page by going to http://Your Server Name:8787  
-
-Switch off selinux
+Switch off selinux (Note: this is temporary, if you server is switched off for any reason then you will need to re-run this command)
 {{{
 $ setenforce 0
 }}}
 
-And finally, configure the system's iptable to allow connections on port 8080 and 8888
+And finally, configure the system's iptable to allow connections on port 8080, 8787 and 8888
 {{{
 $ vi /etc/sysconfig/iptables
 }}}
@@ -238,6 +235,7 @@ Insert the following lines
 {{{
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 8888 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 8787 -j ACCEPT
 }}}
 
 Then restart the iptables service
@@ -246,6 +244,17 @@ $ service iptables restart
 }}}
 
 
-  
-  
+You are now ready to use the system.
+
+The url for the application will be: http://YourServerName:8080/sydae-web
+To access R studio directly: http://YourServerName:8787
+
+If you did not set up the mock wasm server then you may log in using the external user log in link on the home page using the following username and password (Note: you will not have an R studio account in this case) u: admin p: password
+
+If you did set up the wasm server then you may log in with any of the following usernames and the passwords for these will be whatever the entered when prompted while running the installation script:
+
+ictintersect1
+ictintersect2
+ictintersect3
+ictintersect4
   
