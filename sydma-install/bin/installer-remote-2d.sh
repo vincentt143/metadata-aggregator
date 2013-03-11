@@ -313,10 +313,27 @@ echo "Creating ssh keys"
 echo "Please use password as a password in next 4 steps"
 mkdir ${HOME_DIR}/staging/_ssh
 ssh-keygen -t rsa -f ${HOME_DIR}/staging/_ssh/id_rsa
-ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect1@localhost "ls -al"
-ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect2@localhost "ls -al"
-ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect3@localhost "ls -al"
-ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect4@localhost "ls -al"
+mkdir /home/ictintersect1/.ssh/
+mkdir /home/ictintersect2/.ssh/
+mkdir /home/ictintersect3/.ssh/
+mkdir /home/ictintersect4/.ssh/
+sudo cp ${HOME_DIR}/staging/_ssh/id_rsa.pub /home/ictintersect1/.ssh/authorized_keys
+sudo cp ${HOME_DIR}/staging/_ssh/id_rsa.pub /home/ictintersect2/.ssh/authorized_keys
+sudo cp ${HOME_DIR}/staging/_ssh/id_rsa.pub /home/ictintersect3/.ssh/authorized_keys
+sudo cp ${HOME_DIR}/staging/_ssh/id_rsa.pub /home/ictintersect4/.ssh/authorized_keys
+sudo chown -R ictintersect1 /home/ictintersect1/.ssh/
+sudo chown -R ictintersect2 /home/ictintersect2/.ssh/
+sudo chown -R ictintersect3 /home/ictintersect3/.ssh/
+sudo chown -R ictintersect4 /home/ictintersect4/.ssh/
+sudo chmod 600 /home/ictintersect1/.ssh/authorized_keys
+sudo chmod 600 /home/ictintersect2/.ssh/authorized_keys
+sudo chmod 600 /home/ictintersect3/.ssh/authorized_keys
+sudo chmod 600 /home/ictintersect4/.ssh/authorized_keys
+
+#ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect1@localhost "ls -al"
+#ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect2@localhost "ls -al"
+#ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect3@localhost "ls -al"
+#ssh -t  -oIdentityFile=${HOME_DIR}/staging/_ssh/id_rsa -oUserKnownHostsFile=${HOME_DIR}/staging/_ssh/known_hosts ictintersect4@localhost "ls -al"
 
 
 mkdir -p ${TOMCAT6_HOME}/mda-data/_ssh
