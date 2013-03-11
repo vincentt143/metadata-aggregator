@@ -207,7 +207,6 @@ $ vi wasm.properties
 }}}
 Change the wasm_url from localhost:8080 to equal your server name with :8080 on the end. Also do the same for application.url in applicationType.properties: http://YourServerName:8080.
 {{{
-$ vi applicationType.properties
 $ service tomcat6 restart
 }}}
 
