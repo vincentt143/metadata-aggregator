@@ -18,7 +18,7 @@
 		<checkstyle_config_dir>${topLevelDir}/build-tools/src/main/resources/checkstyle</checkstyle_config_dir>
 		<topLevelDir>${basedir}</topLevelDir>
 
-		<dms.version>1.5.3</dms.version>
+		<dms.version>1.5.5</dms.version>
 		<roo.version>1.1.2.RELEASE</roo.version>
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<aspectj.version>1.6.11.M2</aspectj.version>
