@@ -56,9 +56,6 @@ public class RstudioTreeController
     @Autowired
     private DmsService dmsService;
 
-    @Value("#{rstudio[rstudio_home]}")
-    private String rstudioHome;
-
     @Value("#{rstudio[rstudio_server]}")
     private String rstudioServer;
 
@@ -79,16 +76,14 @@ public class RstudioTreeController
         User user = User.findUsersByUsernameEquals(principal.getName()).getSingleResult();
         String username = user.getRstudioUsername();
 
-        String userPath = rstudioHome + username;
-        String dmsTotalPath = userPath + dmsPath;
+        String dmsTotalPath = dmsPath;
 
         List<FileInfo> fileInfoList = filteredList(dmsService.getList(connectionId, dmsTotalPath), dmsPath);
         List<JsonFileInfo> jsonFileInfoList = new ArrayList<JsonFileInfo>();
         for (FileInfo fileInfo : fileInfoList)
         {
             String childAbsolutePath = fileInfo.getAbsolutePath();
-            String childVirtualPath = childAbsolutePath.substring(userPath.length());
-            JsonFileInfo jsonFileInfo = new JsonFileInfo(fileInfo.getName(), childVirtualPath, fileInfo.getFileType()
+            JsonFileInfo jsonFileInfo = new JsonFileInfo(fileInfo.getName(), childAbsolutePath, fileInfo.getFileType()
                     .toString(), fileInfo.getModificationDate(), fileInfo.getSize(), null, true);
             jsonFileInfoList.add(jsonFileInfo);
         }

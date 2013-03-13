@@ -34,10 +34,16 @@ public class ApplicationTypeServiceImpl implements ApplicationTypeService
 {
 
     private ApplicationType theType;
+    private boolean allowExternal;
 
     public void setApplicationType(String name)
     {
         theType = ApplicationType.valueOf(name.toUpperCase());
+    }
+
+    public void setAllowExternal(String value)
+    {
+        allowExternal = Boolean.valueOf(value);
     }
 
     /*
@@ -57,6 +63,12 @@ public class ApplicationTypeServiceImpl implements ApplicationTypeService
     public String getThemeName()
     {
         return theType.name().toLowerCase();
+    }
+
+    @Override
+    public boolean getAllowExternal()
+    {
+        return allowExternal;
     }
 
 }

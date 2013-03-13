@@ -36,13 +36,6 @@ import au.org.intersect.sydma.webapp.domain.User;
  */
 public class SftpProtocolPath implements ProtocolPath
 {
-    @Value("#{rstudio[rstudio_home]}")
-    private String rstudioHome;
-
-    public void setRstudioHome(String rstudioHome)
-    {
-        this.rstudioHome = rstudioHome;
-    }
 
     @Override
     public String getDisplayPath(String path, User user)
@@ -53,7 +46,7 @@ public class SftpProtocolPath implements ProtocolPath
     @Override
     public String getTransportPath(String path, User user)
     {
-        return rstudioHome + user.getRstudioUsername() + path;
+        return path;
     }
 
 }

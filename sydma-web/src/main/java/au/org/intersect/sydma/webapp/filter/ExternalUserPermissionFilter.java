@@ -116,6 +116,7 @@ public class ExternalUserPermissionFilter extends HandlerInterceptorAdapter
             boolean permission = permissionService.canCreateExternalUser(user);
             modelAndView.getModel().put("canCreateExternalUser", permission);
             modelAndView.getModel().put("isAgrEnv", applicationTypeService.applicationIs(ApplicationType.AGR_ENV));
+            modelAndView.getModel().put("allowExternal", applicationTypeService.getAllowExternal());
             modelAndView.getModel().put("logoutUrl", appUrl + "/logout");
         }
     }

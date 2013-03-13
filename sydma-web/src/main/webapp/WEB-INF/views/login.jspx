@@ -21,6 +21,8 @@
 		<p>
 			<spring:message code="security_login_message" />
 		</p>
+
+                <c:if test="${allowExternal}">
 		
 		<spring:url value="/resources/j_spring_security_check" var="form_url" />
 		<form name="f" action="${fn:escapeXml(form_url)}" method="POST">
@@ -70,6 +72,15 @@
 				</tr>
 			</table>
 		</form>
+
+                </c:if>
+                <c:else>
+
+		<p>
+                        <spring:theme code="links.external.user.faq" text="theme/links.external.user.faq" htmlEscape="false"/>
+		</p>
+
+                </c:else>
 	</util:panel>
 </div>
 
