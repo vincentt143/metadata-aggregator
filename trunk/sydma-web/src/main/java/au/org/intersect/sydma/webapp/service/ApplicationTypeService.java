@@ -38,4 +38,6 @@ public interface ApplicationTypeService
 
     String getThemeName();
 
+    boolean getAllowExternal();
+
 }
