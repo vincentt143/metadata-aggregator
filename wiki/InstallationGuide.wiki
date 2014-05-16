@@ -154,7 +154,7 @@ If you would like to run our mock wasm service to simulate the logging in proces
 $ cd /tmp/
 $ wget http://dist.groovy.codehaus.org/distributions/groovy-binary-2.1.1.zip
 $ unzip groovy-binary-2.1.1.zip
-$ export GROOVY_HOME="~/groovy-2.1.1/"
+$ export GROOVY_HOME="/tmp/groovy-2.1.1/"
 $ export PATH=$PATH:$GROOVY_HOME/bin
 $ cd /home/[username]/code/metadata-aggregator-read-only/wasm-server/
 }}}
