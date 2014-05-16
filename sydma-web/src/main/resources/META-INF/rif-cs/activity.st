@@ -2,7 +2,7 @@
 <registryObjects xmlns="http://ands.org.au/standards/rif-cs/registryObjects"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/documentation/rifcs/1.3/schema/registryObjects.xsd">
-<registryObject group="$researchProject.researchGroup.name$">
+<registryObject group="The University of Sydney">
     <key>$researchProject.keyForRifCs$</key>
     <originatingSource>$researchProject.originatingSource$</originatingSource>
     <activity type="project">
@@ -25,12 +25,6 @@
         <!-- Sydney Uni -->
         <relatedObject>
             <key>$sydneyUniKey$</key>
-            <relation type="isPartOf"/>
-        </relatedObject>
-
-        <!-- Research Group -->
-        <relatedObject>
-            <key>$researchProject.researchGroup.keyForRifCs$</key>
             <relation type="isManagedBy"/>
         </relatedObject>
 

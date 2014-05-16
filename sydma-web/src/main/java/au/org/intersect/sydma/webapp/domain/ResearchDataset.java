@@ -193,7 +193,7 @@ public class ResearchDataset
         ResearchProject project = this.researchProject;
         ResearchGroup group = project.getResearchGroup();
         User principalInvestigator = group.getPrincipalInvestigator();
-        rifCsWriter.writeGroupRifCs(group);
+        //rifCsWriter.writeGroupRifCs(group);
         rifCsWriter.writePrincipalInvestigatorRifCs(principalInvestigator, group);
         rifCsWriter.writeProjectRifCs(project);
         rifCsWriter.writeDatasetRifCs(this);

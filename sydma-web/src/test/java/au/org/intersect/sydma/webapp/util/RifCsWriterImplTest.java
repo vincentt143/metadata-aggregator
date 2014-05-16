@@ -146,6 +146,7 @@ public class RifCsWriterImplTest
         building.setPostCode("my postcode");
         building.setStateName("my state");
     }
+/*    NOTE::: the writing of group ('party') records has been removed as of 15/05/14 as requested by Usyd and agreed upon by ANDS.
 
     @Test
     public void testWritePartyRecord() throws IOException
@@ -180,7 +181,7 @@ public class RifCsWriterImplTest
         String expected = readFileFromClasspath("research-group-no-desc.xml");
         parseAndAssertEquals(actual, expected);
     }
-
+*/
     @Test
     public void testWritePrincipalInvestigatorRecord() throws IOException
     {
@@ -248,6 +249,7 @@ public class RifCsWriterImplTest
         parseAndAssertEquals(actual, expected);
     }
 
+/*NOTE::: the writing of group ('party') records has been removed as of 15/05/14 as requested by Usyd and agreed upon by ANDS.
     @Test
     public void testTemplateEscapesXmlSpecialCharacters() throws IOException
     {
@@ -257,7 +259,7 @@ public class RifCsWriterImplTest
         String actual = readFromTempFolder(group.getKeyForRifCs() + ".xml");
         String expected = readFileFromClasspath("research-group-special-chars.xml");
         parseAndAssertEquals(actual, expected);
-    }
+    }*/
 
     @Test
     public void testEraseDatasetRecord()
@@ -296,7 +298,7 @@ public class RifCsWriterImplTest
         writer.eraseProjectRifCs(project1);
         assertTrue(projectFile.exists());
     }
-
+/*NOTE::: the writing of group ('party') records has been removed as of 15/05/14 as requested by Usyd and agreed upon by ANDS.
     @Test
     public void testEraseGroupRecord()
     {
@@ -347,7 +349,7 @@ public class RifCsWriterImplTest
 
         writer.eraseGroupRifCs(group);
         assertTrue(groupFile.exists());
-    }
+    }*/
 
     @Test
     public void testErasePrincipalInvestigatorRecord()

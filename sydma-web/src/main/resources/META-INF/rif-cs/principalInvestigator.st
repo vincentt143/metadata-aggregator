@@ -17,16 +17,11 @@
         <!-- Sydney Uni -->
         <relatedObject>
             <key>$sydneyUniKey$</key>
-            <relation type="isPartOf"/>
+            <relation type="isManagedBy"/>
         </relatedObject>
 
-        <!-- Research Group -->
         $user.researchGroups:{ group |      
         $if(group.hasAdvertisedProjects)$ 
-	        <relatedObject>
-	            <key>$group.keyForRifCs$</key>
-	            <relation type="isManagerOf"/>
-	        </relatedObject>
         
 	        <!-- Advertised Projects -->
 	        $group.advertisedResearchProjects:{ project | 

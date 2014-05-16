@@ -25,7 +25,7 @@
         <!-- Sydney Uni -->
         <relatedObject>
             <key>$sydneyUniKey$</key>
-            <relation type="isPartOf"/>
+            <relation type="isManagedBy"/>
         </relatedObject>
 
         <!-- PI -->

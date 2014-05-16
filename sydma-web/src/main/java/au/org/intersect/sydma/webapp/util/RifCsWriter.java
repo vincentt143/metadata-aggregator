@@ -43,7 +43,7 @@ public interface RifCsWriter
     
     public void writeProjectRifCs(ResearchProject project);
     
-    public void writeGroupRifCs(ResearchGroup group);
+    //public void writeGroupRifCs(ResearchGroup group);
     
     public void writePrincipalInvestigatorRifCs(User principalInvestigator, ResearchGroup group);
     

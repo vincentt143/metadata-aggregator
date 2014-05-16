@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registryObjects xmlns="http://ands.org.au/standards/rif-cs/registryObjects"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/home/orca/schemata/registryObjects.xsd">
-<registryObject group="My group name">
+                 xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/documentation/rifcs/1.3/schema/registryObjects.xsd">
+<registryObject group="The University of Sydney">
     <key>www.sydney.edu.au-metadata-aggregator-research-dataset-201</key>
     <originatingSource>www.sydney.edu.au</originatingSource>
     <collection type="dataset">
@@ -29,16 +29,10 @@
 
         <!-- Sydney Uni -->
         <relatedObject>
-            <key>sydney.edu.au/stc/PTY/0006</key>
-            <relation type="isPartOf"/>
-        </relatedObject>
-
-        <!-- Research Group -->
-        <relatedObject>
-            <key>www.sydney.edu.au-metadata-aggregator-research-group-5</key>
+            <key>http://nla.gov.au/nla.party-593941</key>
             <relation type="isManagedBy"/>
         </relatedObject>
-        
+
         <!-- PI -->
         <relatedObject>
             <key>me@sydney.edu.au</key>
@@ -48,13 +42,13 @@
         <!-- Research Project -->
         <relatedObject>
             <key>www.sydney.edu.au-metadata-aggregator-research-project-101</key>
-            <relation type="isOwnedBy"/>
+            <relation type="isOutputOf"/>
         </relatedObject>
         
         <subject type="anzsrc-for">888</subject>
 		<subject type="anzsrc-for">111</subject>
         <description type="brief">This is my dataset description.</description>
-        <description type="rights">These are my rights.</description>
+        <description type="accessRights">These are my rights.</description>
     </collection>
 </registryObject>
 </registryObjects>

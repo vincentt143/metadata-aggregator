@@ -245,7 +245,7 @@ public class ResearchGroup
     {
         if (hasAdvertisedProjects())
         {
-            rifCsWriter.writeGroupRifCs(this);
+            //rifCsWriter.writeGroupRifCs(this);
             if (getPrincipalInvestigator().getId() != previousPI.getId())
             {
                 rifCsWriter.deletePrincipalInvestigatorRifCs(previousPI);
