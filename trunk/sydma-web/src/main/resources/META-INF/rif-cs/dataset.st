@@ -2,7 +2,7 @@
 <registryObjects xmlns="http://ands.org.au/standards/rif-cs/registryObjects"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/documentation/rifcs/1.3/schema/registryObjects.xsd">
-<registryObject group="$researchDataset.researchProject.researchGroup.name$">
+<registryObject group="The University of Sydney">
     <key>$researchDataset.keyForRifCs$</key>
     <originatingSource>www.sydney.edu.au</originatingSource>
     <collection type="dataset">
@@ -46,15 +46,9 @@
         <!-- Sydney Uni -->
         <relatedObject>
             <key>$sydneyUniKey$</key>
-            <relation type="isPartOf"/>
-        </relatedObject>
-
-        <!-- Research Group -->
-        <relatedObject>
-            <key>$researchDataset.researchProject.researchGroup.keyForRifCs$</key>
             <relation type="isManagedBy"/>
         </relatedObject>
-        
+       
         <!-- PI -->
         <relatedObject>
             <key>$researchDataset.researchProject.researchGroup.principalInvestigator.keyForRifCs$</key>
@@ -64,7 +58,7 @@
         <!-- Research Project -->
         <relatedObject>
             <key>$researchDataset.researchProject.keyForRifCs$</key>
-            <relation type="isOwnedBy"/>
+            <relation type="isOutputOf"/>
         </relatedObject>
         
         <subject type="anzsrc-for">$researchDataset.subjectCode.subjectCode$</subject>
@@ -76,7 +70,7 @@
 		$endif$
 
         <description type="brief">$researchDataset.description$</description>
-        <description type="rights">$researchDataset.publicAccessRight.description$</description>
+        <description type="accessRights">$researchDataset.publicAccessRight.description$</description>
     </collection>
 </registryObject>
 </registryObjects>

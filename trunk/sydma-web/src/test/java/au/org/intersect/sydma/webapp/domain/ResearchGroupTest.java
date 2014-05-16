@@ -90,7 +90,7 @@ public class ResearchGroupTest
         assertEquals(1, groupWithOne.getAdvertisedResearchProjects().size());
         assertEquals(projectWithOne, groupWithOne.getAdvertisedResearchProjects().get(0));
     }
-
+/* NOTE::: the writing of group ('party') records has been removed as of 15/05/14 as requested by Usyd and agreed upon by ANDS.
     @Test
     public void updateRifCsOnlyUpdatesIfGroupHasAdvertisedProjects()
     {
@@ -102,7 +102,7 @@ public class ResearchGroupTest
         verify(rifCsWriter).writePrincipalInvestigatorRifCs(group.getPrincipalInvestigator(), group);
         verifyNoMoreInteractions(rifCsWriter);
     }
-
+*/
     @Test
     public void updateRifCsDoesNothingIfGroupHasNoAdvertisedProjects()
     {
@@ -121,7 +121,8 @@ public class ResearchGroupTest
         oldPi.setId(2L);
 
         group.updateRifCsIfNeeded(rifCsWriter, oldPi);
-        verify(rifCsWriter).writeGroupRifCs(group);
+	//NOTE::: the writing of group ('party') records has been removed as of 15/05/14 as requested by Usyd and agreed 	 //upon by ANDS.        
+	//verify(rifCsWriter).writeGroupRifCs(group);
         verify(rifCsWriter).writePrincipalInvestigatorRifCs(newPi, group);
         verify(rifCsWriter).deletePrincipalInvestigatorRifCs(oldPi);
         verify(rifCsWriter).deletePrincipalInvestigatorRifCs(oldPi);
@@ -150,7 +151,8 @@ public class ResearchGroupTest
         group.setPrincipalInvestigator(newPi);
 
         group.updateRifCsIfNeeded(rifCsWriter, oldPi);
-        verify(rifCsWriter).writeGroupRifCs(group);
+	//NOTE::: the writing of group ('party') records has been removed as of 15/05/14 as requested by Usyd and agreed 	 //upon by ANDS.        
+	//verify(rifCsWriter).writeGroupRifCs(group);
         verify(rifCsWriter).writePrincipalInvestigatorRifCs(newPi, group);
         verify(rifCsWriter).deletePrincipalInvestigatorRifCs(oldPi);
         verify(rifCsWriter).writeProjectRifCs(project1);
