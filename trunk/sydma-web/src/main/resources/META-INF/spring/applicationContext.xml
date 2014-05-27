@@ -137,7 +137,9 @@
     <bean class="au.org.intersect.sydma.webapp.security.SecurityContextFacadeImpl" id="securityContextFacade"/>
     <bean class="au.org.intersect.sydma.webapp.service.ApplicationTypeServiceImpl" id="applicationType">
         <property name="applicationType" value="${application.type}"/>
-        <property name="allowExternal" value="${application.external}"/>
+	<property name="allowExternal">
+		<value type="java.lang.Boolean">${application.external}</value>
+	</property>
     </bean>
 
     <!-- ${filter.context.start}
